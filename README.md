@@ -2,7 +2,7 @@
 
 install your own opensuse server.   I use leap version:   https://software.opensuse.org/422/en
 
-    You can get by with a text only install,  but you can do the whole gui thing if you want.  After you install,  copy and the attached   install_gwhelpdesk.sh  script.   This will install a few needed rpm's , python modules and get the download from git.
+You can get by with a text only install,  but you can do the whole gui thing if you want.  After you install,  copy and the attached   install_gwhelpdesk.sh  script.   This will install a few needed rpm's , python modules and get the download from git.
 
 After the script runs, cd to /var/gwhelpdesk and run:
 
