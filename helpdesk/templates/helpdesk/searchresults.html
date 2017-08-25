@@ -1,0 +1,106 @@
+{% extends 'helpdesk/base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+
+<div class="col-lg-12">
+    <div class="card">
+        <div class="header">
+            <h4>List of users matching on search string:<b> {{ searchstring }} </b></h4>
+             <h5>The list contains the first 10 matches.  Please refine the search string if the desired user is not listed.</h5>
+            <h5>The search will return matches on GroupWise Userid, First Name and Last Name.</h5>
+            <p><h5>The Change Password option is disabled if the user is associated to a directory and the post office is using LDAP authentication.</h5></p>
+
+            {% for message in messages %}
+                    {% if message.level == 30 %}
+                      <div class="col-lg-12">
+
+
+                            <div class="col-lg-8">
+                                <div class="alert alert-danger alert-dismissable">
+                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                    {{ message }}
+                                </div>
+                            </div>
+                      </div>
+                    {% endif %}
+
+                {% endfor %}
+            <br>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Userid</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Post Office</th>
+                            <th>Domain</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                             <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                         {% for user in users %}
+                        <form id="{{ user.name }}" method="POST" action="{% url 'userdata' %}" name="{{ user.id }}">
+                        {% csrf_token %}
+                            <input type="hidden" name="id" value="{{user.id}}"/>
+                            <input type="hidden" name="name" value="{{user.name}}"/>
+
+                            <tr>
+
+                                <td>
+                                    {% if user.ldapDn %}
+                                    <img src="{% static 'img/associateduser.png' %}" style="float:left;width:15px;height:15px;"/>
+                                    {% elif user.externalRecord %}
+                                    <img src="{% static 'img/external.png' %}" style="float:left;width:15px;height:15px;"/>
+                                    {% else %}
+                                    <img src="{% static 'img/gwuser.png' %}" style="float:left;width:15px;height:15px;"/>
+                                    {% endif %}
+                                    &nbsp&nbsp&nbsp{{ user.name }}</td>
+                                <td>{{ user.givenName }}</td>
+                                <td>{{ user.surname }}</td>
+                                <td>{{ user.postOfficeName }}</td>
+                                <td>{{ user.domainName }}</td>
+                                {% if user.pendingOp == 'true' %}
+                                    <td colspan="3">There is a pending operation for {{ user.name }}</td>
+                                {% endif %}
+                                {% if request.session.role != "PW" and user.pendingOp == 'false' %}
+                                    <td>
+                                        <button class="btn btn-primary btn-fill btn-xs" type="submit" name="edit">Edit</button>
+                                    </td>
+                                     {% if request.session.role != "HL" %}
+                                        <td>
+                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="delete">Delete</button>
+                                         </td>
+                                    {% endif %}
+                                {% endif %}
+                                {% if user.pendingOp == 'true' %}
+                                <td></td>
+                                {% endif %}
+                                <td>
+                                    {% if user.pendingOp == 'true' %}
+                                    {% elif user.externalRecord %}
+                                       <font size="2">External User</font>
+                                    {% elif user.ldap == 'false'  %}
+                                        <button class="btn btn-primary btn-fill btn-xs" type="submit" name="changepwd">Change Pwd</button>
+                                    {% elif user.ldap == 'true' %}
+                                        <font size="2">Directory Associated User</font>
+                                     {% else %}
+                                        <font size="2">Pending</font>
+                                  {% endif %}
+                                </td>
+                            </tr>
+                        </form>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

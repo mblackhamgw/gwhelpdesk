@@ -1,0 +1,118 @@
+{% extends 'helpdesk/base.html' %}
+{% block content %}
+
+<div class="page-header">
+    <h1>GroupWise Admin Server Settings</h1>
+    </div><!-- /.page-header -->
+        <div class="col-xs-8 ">
+            <div class="widget-box widget-color-blue">
+                <div class="widget-header">
+                    <h5 class="widget-title bigger lighter">Settings for GroupWise Admin Service</h5>
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main">
+                     <div class="row">
+                        {% if gwconfig %}
+                            {% for message in messages %}
+                                {% if message.level == 40 %}
+                                    <div class="col-lg-8">
+                                        <div class="alert alert-danger alert-dismissable">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                            {{ message }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                             {% endfor %}
+
+                        {% else %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    {% if message.level == 40 %}
+                                        <div class="col-lg-8">
+                                             <div class="alert alert-danger alert-dismissable">
+                                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                                 {{ message }}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                       {% endif %}
+                     </div>
+                    <div class="row">
+                         <div class="col-lg-8">
+                           <form action="" method="post" role="form">
+                               {% csrf_token %}
+                                 <div class="form-group">
+                                       <label>GroupWise Admin Server IP/Hostname</label>
+                                       <input id="gwHost" name="gwHost" class="form-control"
+                                          {% if gwconfig.gwHost %}
+                                            value="{{ gwconfig.gwHost }}"
+                                          {% endif %}
+                                        />
+                               </div>
+                                <div class="form-group">
+                                    <label for="gwPort">GroupWise Admin Server Port</label>
+                                    <input id="gwPort" name="gwPort" value="9710" class="form-control border-input"
+                                      {% if gwconfig.gwPort %}
+                                        value="{{ gwconfig.gwPort }}"
+                                      {% endif %}
+                                   />
+                               </div>
+                                <div class="form-group">
+                                       <label for="gwAdmin">GroupWise Admininstrator</label>
+                                       <input id="gwAdmin" name="gwAdmin" class="form-control border-input"
+                                          {% if gwconfig.gwAdmin %}
+                                            value="{{ gwconfig.gwAdmin }}"
+                                          {% endif %}
+                                       />
+                                </div>
+                                <div class="form-group">
+                                       <label for="gwPass">GroupWise Admin Password</label>
+                                       <input id="gwPass" name="gwPass" type="password" class="form-control border-input"
+                                          {% if gwconfig.gwPass %}
+                                            value="{{ gwconfig.gwPass }}"
+                                          {% endif %}
+                                       />
+                               </div>
+                        </div>
+                        <input type="hidden" name="id" value="{{gwconfig.id}}">
+
+                        <div class="col-lg-5">
+                            <button class="btn btn-primary btn-fill btn-wd" type="submit" name="save">Save Config</button>
+                        </div>
+
+                    <div class="clearfix"></div>
+                </div>
+           </form>
+             </div><!-- end col-lg-5 -->
+             </div><!-- end row -->
+            </div> <!-- end panel-body -->
+            <div class="row">
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if message.level == 30 %}
+                            <div class="col-lg-8">
+                            <div class="alert alert-danger alert-dismissable">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                    {{ message }}
+                            </div>
+                        {% endif %}
+                        {% if message.level == 25 %}
+                            <div class="col-lg-8">
+                            <div class="alert alert-info alert-dismissable">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                    {{ message }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+
+
+       </div>
+     </div>
+
+{% endblock %}

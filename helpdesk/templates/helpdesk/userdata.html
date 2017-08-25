@@ -1,0 +1,563 @@
+{% extends 'helpdesk/base.html' %}
+{% block content %}
+<div class="page-header">
+    <h1>GroupWise User Settings for {{ request.session.name }}</h1>
+    <div class="collapse navbar-collapse">
+         <ul class="nav navbar-nav navbar-right">
+             <form method="post" action="{% url 'userdata' %}">
+            <li class="dropdown">
+                <a href="#notifications" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="ti-arrow-circle-down"></i>
+                    <span class="notification">More</span>
+                    <p class="hidden-md hidden-lg">
+                        Notifications
+                        <b class="caret"></b>
+                    </p>
+                </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="{% url 'changepassword' %}">Change Password</a>
+                        </li>
+                        {% if request.session.role == "AD" or request.session.role == "HD" %}
+                            <li>
+                                <a href="{% url 'deluser' %}">Delete User</a>
+                            </li>
+                        {% endif %}
+                        {% if request.session.role == "AD" %}
+                            {% if user.ldapDn %}
+                                <li>
+                                    <a href="{% url 'dissociate' %}">Dissociate</a>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+
+
+                        <li>
+                            <a href="{% url 'groups' %}">Group Membership</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'addtogroups' %}">Add to Groups</a>
+                        </li>
+
+                    </ul>
+            </li>
+        </ul>
+    </div>
+</div><!-- /.page-header -->
+
+<div class="widget-box widget-color-blue">
+    <div class="widget-header">
+        <h5 class="widget-title bigger lighter"></h5>
+        <h6> <b>{{ user.givenName }} {{ user.surname }}</b>&nbsp;&nbsp; (GroupWise UserID: <b>{{ user.name }}</b> &nbsp;&nbsp; FID: <b>{{ user.fileId }}</b> )
+
+               &nbsp;&nbsp; Domain:  <b>{{ user.domainName }}</b>  &nbsp;&nbsp; Post Office:  <b>{{ user.postOfficeName }}</b>
+
+                {% if user.ldapDn %}
+                <br>
+            LDAP DN:  <b>{{ user.ldapDn }}</b>
+
+            &nbsp;&nbsp;DirectoryId:  <b>{{ user.directoryId }}</b>
+                {% endif %}
+
+        </h6>
+    </div>
+
+</div>
+
+<div class="widget-body">
+    <div class="widget-main">
+        <div class="col-lg-12">
+            <p>Most attributes are read-only if the user is associated to a directory.</p>
+
+
+            <div class="row">
+                <div class="col-sm-10">
+                    <div class="tabbable ">
+                        <ul class="nav nav-tabs padding-12 tab-color-blue background-blue id="myTab">
+                            <li class="active">
+                                <a data-toggle="tab" href="#general">
+                                    General
+                                </a>
+                            </li>
+                            <li>
+                                <a data-toggle="tab" href="#contact">
+                                    Contact
+                                </a>
+                            </li>
+                            <li>
+                                <a data-toggle="tab" href="#account">
+                                    Account
+                                </a>
+                            </li>
+                            <li>
+                                <a data-toggle="tab" href="#inet">
+                                    Internet Addressing
+                                </a>
+                            </li>
+                        </ul>
+
+                         <form method="post" action="{% url 'userdata' %}">
+                             {% csrf_token %}
+
+
+                            <div class="tab-content">
+                                <div id="general" class="tab-pane in active">
+
+                                    <h4>General Settings</h4>
+                                        <input type="hidden" name="name" value="{{ user.name }}" />
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>First Name</label>
+                                                <input class="form-control" name="givenName" value="{{ user.givenName }}"
+                                                       {% if user.ldap == "true" %} disabled {% endif %} />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>Last Name</label>
+                                                <input class="form-control" name="surname" value="{{ user.surname }}"
+                                                    {% if user.ldap == "true" %} disabled {% endif %} />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>Middle</label>
+                                                <input class="form-control" name="middleInitial" value="{{ user.middleInitial }}"
+                                                    {% if user.ldap == "true" %} disabled {% endif %} />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>Suffix</label>
+                                                <input class="form-control" name="suffix" value="{{ user.suffix }}"
+                                                       {% if user.ldap == "true" %} disabled {% endif %} />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>Title</label>
+                                                <input class="form-control" name="title" value="{{ user.title }}"
+                                                       {% if user.ldap == "true" %} disabled {% endif %} />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>Company</label>
+                                                <input class="form-control" name="company" value="{{ user.company }}"
+                                                       {% if user.ldap == "true" %} disabled {% endif %} />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>Department</label>
+                                                <input class="form-control" name="department" value="{{ user.department }}"
+                                                    {% if user.ldap == "true" %} disabled {% endif %} />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label>Location</label>
+                                                <input class="form-control" name="location" value="{{ user.location }}"
+                                                    {% if user.ldap == "true" %} disabled {% endif %} />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Description</label>
+                                                <textarea class="form-control" rows="2" name="description"
+                                                          style="text-align:left; overflow:auto;"
+                                                          {% if user.ldap == "true" %} disabled {% endif %}>{{ user.description }}</textarea>
+                                            </div>
+                                        </div>
+                                </div><!-- end general tab pane -->
+
+                                <div id="contact" class="tab-pane">
+                                    <h4>Contact Settings</h4>
+                                    <div class="col-sm-3">
+                                       <div class="form-group">
+                                           <label>Phone</label>
+                                            <input class="form-control" name="telephoneNumber" value="{{ user.telephoneNumber }}"
+                                            {% if user.ldap == "true" %} disabled {% endif %} />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Mobile Phone</label>
+                                            <input class="form-control" name="mobilePhoneNumber" value="{{ user.mobilePhoneNumber }}"
+                                                {% if user.ldap == "true" %} disabled {% endif %} />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Home Phone</label>
+                                            <input class="form-control" name="homePhoneNumber" value="{{ user.homePhoneNumber }}"
+                                                {% if user.ldap == "true" %} disabled {% endif %} />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Other Phone</label>
+                                            <input class="form-control" name="otherPhoneNumber" value="{{ user.otherPhoneNumber }}"
+                                                   {% if user.ldap == "true" %} disabled {% endif %} />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Fax Number</label>
+                                            <input class="form-control" name="faxNumber" value="{{ user.faxNumber }}"
+                                                   {% if user.ldap == "true" %} disabled {% endif %} />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Pager Number</label>
+                                            <input class="form-control" name="pagerNumber" value="{{ user.pagerNumber }}"
+                                                   {% if user.ldap == "true" %} disabled {% endif %} />
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                        <h4>Postal Settings</h4>
+                                            <div class="col-sm-5">
+                                               <div class="form-group">
+                                                    <label>Street Address</label>
+                                                    <input class="form-control" name="streetAddress" value="{{ user.streetAddress}}"
+                                                       {% if user.ldap == "true" %} disabled {% endif %} />
+                                                </div>
+                                            </div>
+                                             <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label>Post Office Box</label>
+                                                    <input class="form-control" name="postOfficeBox" value="{{ user.postOfficeBox }}"
+                                                        {% if user.ldap == "true" %} disabled {% endif %} />
+                                                </div>
+                                             </div>
+                                        </div>
+                                        <div class="col-lg-12">
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label>City</label>
+                                                    <input class="form-control" name="city" value="{{ user.city }}"
+                                                        {% if user.ldap == "true" %} disabled {% endif %} />
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label>State</label>
+                                                    <input class="form-control" name="stateProvince" value="{{ user.stateProvince }}"
+                                                        {% if user.ldap == "true" %} disabled {% endif %} />
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label>Zip Code</label>
+                                                    <input class="form-control" name="postalZipCode" value="{{ user.postalZipCode }}"
+                                                        {% if user.ldap == "true" %} disabled {% endif %} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- end row -->
+
+                                </div><!-- end contact tab -->
+
+                                <div id="account" class="tab-pane">
+                                    <h4>Account Settings</h4>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Visibility</label>
+                                            <select  class="form-control" name="visibility">
+                                                {% for key, value in form.visibility.field.choices %}
+                                                    <option
+                                                        {% if key == user.visibility %}
+                                                            selected="selected"
+                                                        {% endif %}
+                                                        value="{{ key }}">{{ value }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label></label>
+                                                <label class="checkbox">
+                                                    <input type="checkbox" name="loginDisabled" data-toggle="checkbox"
+                                                           {% if user.loginDisabled == True %}
+                                                                checked
+                                                            {% endif %}
+                                                    >Disble Login</input>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label></label>
+                                                <label class="checkbox">
+                                                    <input type="checkbox" name="forceInactive" data-toggle="checkbox"
+                                                            {% if user.forceInactive == True %}
+                                                                checked
+                                                            {% endif %}
+                                                    ">Force Inactive</input>
+                                                </label>
+                                            </div>
+                                    </div>
+                                    </div>
+                                     <div class="row">
+
+                                     </div>
+
+
+
+
+                                </div><!-- end account tab -->
+
+                                <div id="inet" class="tab-pane">
+                                    <h4>Internet Addressing</h4>
+
+                                    <div class="col-lg-12">
+                                        <div class="col-lg-6">
+                                            <label>Allowed Addressing Formats</label>
+                                            <div class="form-group">
+                                                <div id="showAllowedOverride">
+                                                     <div class="checkbox">
+                                                        <label>
+                                                            <input type="checkbox", id="allowedOverride" name="allowedOverride" data-toggle="checkbox"
+                                                                {% if user.allowedAddressFormats.inherited == False %}
+                                                                    checked
+                                                                {% endif %}
+                                                            >
+                                                            Override
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                {% for format in addressFormats %}
+                                                    {% if format != "FULL" %}
+                                                        <div class="checkbox">
+                                                            <label>
+                                                            <input type="checkbox" data-toggle="checkbox"
+                                                                {% if format  in user.allowedAddressFormats.value %}
+                                                                        checked
+                                                                 {% endif %}
+                                                                   {% if user.allowedAddressFormats.inherited == False %}
+                                                                    readonly="readonly"
+                                                                {% endif %}
+
+                                                                   {% if format == "HOST" %}
+                                                                        name="HOST" id="{{format}}"
+                                                                    {% endif %}
+                                                                {% if format == "USER" %}
+                                                                        name="USER" id="{{format}}"
+                                                                    {% endif %}
+                                                                {% if format == "FIRST_LAST" %}
+                                                                        name="FIRST_LAST" id="{{format}}"
+                                                                    {% endif %}
+                                                                {% if format == "LAST_FIRST" %}
+                                                                        name="LAST_FIRST" id="{{format}}"
+                                                                    {% endif %}
+                                                                 {% if format == "FLAST" %}
+                                                                        name="FLAST" id="{{format}}"
+                                                                    {% endif %}
+                                                                 >
+
+                                                                {% if format == "HOST" %}
+                                                                   Username.PostOffice@InternetDomain
+                                                                {% endif %}
+                                                                {% if format == "USER" %}
+                                                                   Username@InternetDomain
+                                                                {% endif %}
+                                                                {% if format == "FIRST_LAST" %}
+                                                                    First.Last@InternetDomain
+                                                                {% endif %}
+                                                                {% if format == "LAST_FIRST" %}
+                                                                    Last_FIRST@InternetDomain
+                                                                {% endif %}
+                                                                {% if format == "FLAST" %}
+                                                                    FirstInitialLastName@InternetDomain
+                                                                {% endif %}
+                                                            </label>
+                                                        </div>
+                                                    {% endif %}
+                                               {% endfor %}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-5">
+                                            <label>Preferred Address Format</label>
+                                            <div class="form-group">
+                                                {{ user.preferredAddressFormat.value}}@Internet domain name
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox", id="preferredAddressFormatInherited" name="preferredAddressFormatInherited" data-toggle="checkbox"
+                                                            {% if user.preferredAddressFormat.inherited == False %}
+                                                                checked
+                                                            {% endif %}
+                                                        >
+                                                        Override
+                                                    </label>
+                                                </div>
+                                            </div>
+
+
+
+                                           <div id="showPref" {% if user.preferredAddressFormat.inherited == True %} style="display: none" {% endif %}>
+                                                <div class="form-group">
+                                                    <select {% if user.preferredAddressFormat.inherited == True %}  {% endif %}
+                                                        class="form-control" name="preferredAddressFormatValue" id="preferredAddressFormatValue">
+                                                        {% for x, y in form.preferredAddressFormatValue.field.choices %}
+                                                            <option
+                                                                {% if user.preferredAddressFormat.value == x %}
+                                                                    selected="selected"
+                                                                {% endif %}
+                                                                value="{{ x }}">{{ y }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label   >Preferred Email ID</label>
+                                                    <input class="form-control" name="preferredEmailId" id="preferredEmailId" value="{{ user.preferredEmailId }}"
+                                                    {% if user.preferredAddressFormat.inherited == True %}  {% endif %}
+                                                    >
+                                                </div>
+                                           </div>
+
+
+
+                                        <!-- end col 5 -->
+                                    </div><!-- end col 12 -->
+
+                                    <div class="row"></div>
+
+                                        <div class="col-lg-6">
+                                            <label>Internet Domain Name</label> - <b>{{ user.internetDomainName.value }}</b>
+                                        </div>
+                                        <div class="col-lg-12">
+                                         <div class="col-lg-2">
+                                            <div class="checkbox">
+                                                <input type="checkbox", id="internetDomainNameOverride" name="internetDomainNameOverride" data-toggle="checkbox"
+                                                    {% if user.internetDomainName.inherited == False %}
+                                                        checked
+                                                    {% endif %}
+                                                >
+                                                Override
+                                            </div>
+                                        </div>
+                                        <div id="showDomain" {% if user.internetDomainName.inherited == True %} style="display: none" {% endif %}>
+                                            <div class="col-lg-4">
+                                                <select  class="form-control" name="iDomainValue" id="internetDomainNameValue">
+                                                    {% for idom in idomains %}
+                                                        <option
+                                                            {% if idom.0 == user.internetDomainName.value %}
+                                                                selected="selected"
+                                                            {% endif %}
+                                                            value="{{ idom.0 }}">{{ idom.0}}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                             <div class="col-lg-5">
+                                                 <div id="showExclusive">
+                                                    <div class="checkbox">
+                                                        <input type="checkbox", id="iDomainExclusive" name="iDomainExclusive" data-toggle="checkbox"
+                                                        {% if user.internetDomainName.exclusive == True %}
+                                                            checked
+                                                        {% endif %}
+                                                               >
+
+
+                                                        Recipient is known exclusively by this Internet domain name
+                                                    </div>
+                                                 </div>
+                                            </div>
+                                        </div>
+
+                                            <div class="col-lg-8">
+                                <div class="panel-group" id="accordion">
+                                    <div class="panel-heading">
+                                        <button class="btn btn-fill btn-primary" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">View Email Addresses</button>
+                                    </div>
+                                    <div id="collapseOne" class="panel-collapse collapse">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Preferred Email Address</label>
+                                                {{ user.preferredEmailAddress }}
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <div class="form-group">
+                                            <label>Allowed Email Addresses</label>
+                                                <textarea disabled rows="4" cols="40">{{ emailAddrs }}</textarea>
+                                            </div>
+                                        </div>
+                                        <!-- add later maybe
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Nickname Email Addresses</label>
+                                                {{ user.preferredEmailAddress }}
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <div class="form-group">
+                                            <label>Gateway Alias Addresses</label>
+                                                <textarea disabled rows="4" cols="40">{{ emailAddrs }}</textarea>
+                                            </div>
+                                        </div>
+-->
+                                    </div>
+                                </div><!-- end accordian -->
+                            </div><!-- end col 8 -->
+
+                                </div><!-- end inet tab -->
+                            </div>
+
+                        </div><!-- end tab content -->
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="col-lg-3">
+                                <button class="btn btn-fill btn-primary" type="submit" name="update">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                 </form>
+                </div>
+
+                <div class="vspace-6-sm"></div>
+
+
+            </div><!-- /.row -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

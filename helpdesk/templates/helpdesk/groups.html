@@ -1,0 +1,94 @@
+{% extends 'helpdesk/base.html' %}
+{% block content %}
+<div class="page-header">
+    <h1>Group Membership for {{ request.session.name }}</h1>
+    </div><!-- /.page-header -->
+        <div class="col-xs-10 ">
+            <div class="widget-box widget-color-blue">
+                <div class="widget-header">
+                    <h5 class="widget-title bigger lighter">Modify Participation or Delete user from group</h5>
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main">
+
+                    <form method="POST" action="">
+                    {% csrf_token %}
+
+                     <div class="content table-responsive table-full-width">
+                        <table class="table">
+
+                        <thead>
+                        <th>Group</th>
+                        <th>Participation</th>
+                        <th></th>
+                        <th></th>
+                        </thead>
+                        <tbody>
+                        {% for group in groupList %}
+                        <form method="POST" action="">
+                            {% csrf_token %}
+                            <input type="hidden" name="id" value="{{ request.session.id }}">
+                            <input type="hidden" name="grpid" value="{{ group.2 }}">
+                            <input type="hidden" name="group" value="{{group.0}}"/></td>
+                            <tr>
+                                <td>
+                                    <b>{{ group.0 }}</b>
+
+                                <td>
+
+                                    <input type="radio" name="participation"  value="PRIMARY"
+                                        {% if group.1 == "PRIMARY" %}
+                                            checked
+                                        {% endif %}
+
+                                    >&nbsp Primary &nbsp&nbsp
+                                 </td>
+                                <td>
+
+                                    <input type="radio" name="participation"  value="CARBON_COPY"
+                                    {% if group.1 == "CARBON_COPY" %}
+                                            checked
+                                        {% endif %}
+                                    >&nbsp CC &nbsp&nbsp
+
+                              </td>
+                                <td>
+                                    <input type="radio" name="participation" value="BLIND_COPY"
+                                    {% if group.1 == "BLIND_COPY" %}
+                                            checked
+                                        {% endif %}
+                                    >&nbsp BC
+
+
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary btn-fill btn-md" type="submit" name="edit">Save</button>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary btn-fill btn-md" type="submit" name="remove">Remove</button>
+                                </td>
+                            </tr>
+
+                            </form>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                 </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="entry">
+                                <a href="{% url "addtogroups" %}" class="btn btn-primary btn-fill btn-wd">Add {{ request.session.name }} to Groups</a>
+                            </div>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

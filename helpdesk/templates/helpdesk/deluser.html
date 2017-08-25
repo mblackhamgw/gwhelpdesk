@@ -1,0 +1,55 @@
+{% extends 'helpdesk/base.html' %}
+{% block content %}
+<div class="page-header">
+    <h1>User Deleted</h1>
+</div><!-- /.page-header -->
+
+<div class="widget-box widget-color-blue">
+    <div class="widget-header">
+        <h5 class="widget-title bigger lighter">{{ request.session.id }} Deleted</h5>
+    </div>
+</div>
+
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="col-lg-8">
+
+                            <form  method="post" action="{% url 'searchresults' %}">
+                                {% csrf_token %}
+                                 <div class="col-md-6">
+                                     <label>Search for another User</label>
+                                    <div class="input-group custom-search-form">
+                                          <input type="text" class="form-control" placeholder="GroupWise Username..." name="userid">
+                                            <span class="input-group-btn">
+                                            <button class="btn btn-primary btn-sm " type="submit">
+                                                <i class="fa fa-search"></i>&nbsp &nbsp;Search
+                                            </button>
+                                        </span>
+                                    </div>
+                                 </div>
+                                <div class="clearfix"></div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                    <div class="col-md-12">
+                        {% for message in messages %}
+                            {% if message.level == 30 %}
+                                <div class="alert alert-danger alert-dismissable">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                            {{ message }}
+                                    </div>
+
+                            {% endif %}
+                        {% endfor %}
+
+
+                    </div>
+                </div>
+
+
+        </div>
+
+
+{% endblock %}

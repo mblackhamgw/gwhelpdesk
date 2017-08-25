@@ -1,0 +1,20 @@
+{% extends 'helpdesk/base.html' %}
+{% block content %}
+<div class="page-header">
+    <h1>GWHelpdesk Log</h1>
+</div><!-- /.page-header -->
+    <div class="col-xs-8 ">
+        <div class="widget-box widget-color-blue">
+            <div class="widget-header">
+                <h5 class="widget-title bigger lighter">Logfile</h5>
+            </div>
+
+            <div class="widget-body">
+                <div class="widget-main">
+                        <textarea class="form-control" rows="20" name="log" style="text-align:left; overflow:scroll;">{{log}}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

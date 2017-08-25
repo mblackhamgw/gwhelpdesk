@@ -1,0 +1,45 @@
+{% extends 'helpdesk/base.html' %}
+{% block content %}
+<div class="col-xs-8 ">
+
+     <div class="widget-box">
+            <div class="widget-header">
+
+                     <h4>Welcome to the GroupWise Helpdesk Application - {{ request.session.adminname}}</h4>
+
+            </div>
+
+            <div class="widget-body">
+                <div class="widget-main">
+                    <h5>
+                    <p>
+                   Use the left menus to search for GroupWise Users, or performing site administration functions.
+                    </p>
+                            <p>
+                                Edit the GroupWise Configuration settings to allow the application to  connect to your GroupWise Admin Service.
+                                The Administrator must be a GroupWise System Administrator.
+                            </p>
+                            <p>
+                                There are currently 4 administrator roles:
+                               <ul>
+                        <li><strong>Administrator</strong> -  This role allows all functions of the application and is also used to add other administrators.</li>
+                        <li><strong>Helpdesk</strong> - This role allows modification, adds, deletes and password change for all GroupWise user objects.</li>
+                        <li><strong>Helpdesk Lite</strong> - This role allows modification and password change, but not add or delete rights for all GroupWise user objects.</li>
+                        <li><strong>Password</strong> - This role is restriction to only GroupWise user password changes.</li>
+                                </ul>
+                            </p>
+                            <p>
+                                If a GroupWise user account is associated to a eDir or Active Directory account,  most of the details for that user will be read-only.
+                                If the associated user's Post Office is set for LDAP Authentication,  the change password option will be disabled.
+
+                            </p>
+                    </h5>
+
+
+                </div>
+            </div>
+
+
+</div>
+
+{% endblock %}

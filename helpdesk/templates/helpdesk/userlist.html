@@ -1,0 +1,162 @@
+{% extends 'helpdesk/base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+<div class="page-header">
+    <h1>GroupWise Users</h1>
+</div><!-- /.page-header -->
+
+<div class="widget-box widget-color-blue">
+    <div class="widget-header">
+        <h5 class="widget-title bigger lighter">GroupWise User List - Total User Count {{ usercount }} </h5>
+    </div>
+</div>
+
+<div class="widget-body">
+    <div class="widget-main">
+        <p>
+        <h5>You may edit First Name, Last Name or Role.  Admin ID is read-only as it is used for authentication.<br>
+        The Change Password option is disabled if the user is associated to a directory and the post office is using LDAP authentication.</h5>
+        </p>
+       <div class="col-xs-12 ">
+
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Userid</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Post Office</th>
+                            <th>Domain</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                    </tr>
+                </thead>
+                 <tbody>
+                    {% for user in users %}
+                        <form name="userform" id="userform" class="userform" method="post" action="{% url 'userdata' %}">
+                            <span>{% csrf_token %}</span>
+                            <input type="hidden" name="id" value="{{ user.id}}">
+                            <input type="hidden" name="name" value="{{ user.name}}">
+                            <tr>
+                                 <td>
+                                    {% if user.ldapDn %}
+                                        <img src="{% static 'img/associateduser.png' %}" style="float:left;width:15px;height:15px;"/>
+                                    {% elif user.externalRecord %}
+                                        <img src="{% static 'img/external.png' %}" style="float:left;width:15px;height:15px;"/>
+                                    {% else %}
+                                        <img src="{% static 'img/gwuser.png' %}" style="float:left;width:15px;height:15px;"/>
+                                    {% endif %}
+                                    &nbsp&nbsp&nbsp{{ user.name }}
+                                 </td>
+                                <td>{{ user.givenName }}</td>
+                                <td>{{ user.surname }}</td>
+                                <td>{{ user.postOfficeName }}</td>
+                                <td> {{ user.domainName }}</td>
+                                {% if user.pendingOp %}
+                                    <td colspan="3">There is a pending operation for {{ user.name }}</td>
+                                {% else%}
+                                    {% if request.session.role == "PW" %}
+                                         <td></td><td></td>
+                                         <td>
+                                             {% if user.externalRecord %}
+                                                <font size="2">External User</font>
+                                             {% else %}
+
+                                              <button class="btn btn-primary btn-fill btn-xs" type="submit" name="changepwd">Change Pwd</button>
+                                             {% endif %}
+                                         </td>
+                                     {% elif request.session.role == "HL" %}
+                                         <td>
+                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="edit">Edit</button>
+                                         </td>
+                                         <td>
+                                            {% if user.ldap == True and user.ldapDn %}
+                                                <font size="2">Directory Associated User</font>
+                                            {% elif user.externalRecord %}
+                                              <font size="2">External User</font>
+                                             {% else %}
+                                             <button class="btn btn-primary btn-fill btn-xs" type="submit" name="changepwd">Change Pwd</button>
+                                            {% endif %}
+                                        </td>
+                                    {% elif request.session.role != "HL" %}
+                                        <td>
+                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="edit">Edit</button>
+                                         </td>
+                                        <td>
+                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="delete">Delete</button>
+                                         </td>
+                                        <td>
+
+                                            {% if user.externalRecord %}
+                                                <font size="2">External User</font>
+                                            {% elif user.ldapDn %}
+                                                {% if user.ldap == True %}
+                                                    <font size="2">Directory Associated User</font>
+                                                    {% else %}
+                                                    <button class="btn btn-primary btn-fill btn-xs" type="submit" name="changepwd">Change Pwd</button>
+                                                {% endif %}
+
+                                            {% else %}
+                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="changepwd">Change Pwd</button>
+
+                                            {% endif %}
+                                        </td>
+                                        {% endif %}
+                                    {% endif %}
+                            </tr>
+                        </form>
+                    {% endfor %}
+                 </tbody>
+             </table>
+
+
+              <div class="col-lg=8">
+                   <div class="col-md-5">
+                      <form name="next" method="post" action="{% url 'userlist' %}">
+                        {% csrf_token %}
+                        <input name="nextid" type="hidden"
+                            {% if nextid != 1 or nextid != 0 %}
+                                value="{{nextid}}"
+                            {% else %}
+                               value="0"
+                            {% endif %}
+                        />
+                            {% if nextid != 1 or nextid != 0 %}
+                                {% if firstset == False %}
+                                    <a href="javascript:window.history.back();"  class="btn btn-primary btn-fill btn-sm" )">Back</a>
+                                    <button class="btn btn-primary btn-fill btn-sm " type="submit" name="next">Next</button>
+                                {% endif %}
+                                {% if firstset == True %}
+                                    <a href=""  class="btn btn-primary btn-fill btn-sm" )">Back</a>
+                                    <button class="btn btn-primary btn-fill btn-sm" type="submit" name="next">Next</button>
+                                {% endif %}
+                            {% endif %}
+                        </form>
+                   </div>
+
+                      <div class="col-md-5">
+                          <form  method="post" action="{% url 'searchresults' %}">
+                            {% csrf_token %}
+                            <div class="input-group custom-search-form">
+                                  <input type="text" class="form-control" placeholder="Search for GW User" name="userid">
+                                    <span class="input-group-btn">
+                                    <button class="btn btn-primary btn-sm" type="submit">
+                                        <i class="fa fa-search"></i>&nbsp;&nbsp;Search
+                                    </button>
+                                </span>
+                            </div>
+                          </form>
+                      </div>
+                </div>
+
+
+
+      </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
