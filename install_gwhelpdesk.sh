@@ -1,4 +1,5 @@
 #!/bin/bash
+
 echo "Installing some needed packages.."
 
 declare -a rpms=(python-pip nginx git)
