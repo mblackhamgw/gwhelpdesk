@@ -159,26 +159,6 @@ class gw:
 
         return gwusers
 
-    def getPic(self, url, user):
-        self.session.headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/octet-stream'
-        }
-        picname = '%s.jpg' % user
-        picpath = settings.BASE_DIR + '/helpdesk/static/photos/%s' % picname
-
-        picurl = '%s%s/picture' % (self.baseUrl, url)
-        response = self.session.get(picurl, stream=True)
-        with open(picpath,'wb') as f:
-            for chunk in response.iter_content(512):
-                f.write(chunk)
-            f.close()
-        self.session.headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-        return picname
-
     def getObject(self, id):
         url = '%s/gwadmin-service/object/%s' % (self.baseUrl, id)
         response = self.session.get(url, timeout=5)
