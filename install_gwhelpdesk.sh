@@ -22,4 +22,5 @@ yes | pip install django gunicorn requests django-baseurl django-ipware
 
 echo "Getting the gwhelpdesk app from git.."
 mkdir -p /var/gwhelpdesk
+
 GIT_SSL_NO_VERIFY=true git clone https://github.com/mblackhamgw/gwhelpdesk.git /var/gwhelpdesk
