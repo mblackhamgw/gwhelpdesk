@@ -1,5 +1,7 @@
 {% extends 'helpdesk/base.html' %}
+{% load staticfiles %}
 {% block content %}
+
 <div class="page-header">
     <h1>GroupWise User Settings for {{ request.session.name }}</h1>
     <div class="collapse navbar-collapse">
@@ -49,27 +51,19 @@
     <div class="widget-header">
         <h5 class="widget-title bigger lighter"></h5>
         <h6> <b>{{ user.givenName }} {{ user.surname }}</b>&nbsp;&nbsp; (GroupWise UserID: <b>{{ user.name }}</b> &nbsp;&nbsp; FID: <b>{{ user.fileId }}</b> )
-
                &nbsp;&nbsp; Domain:  <b>{{ user.domainName }}</b>  &nbsp;&nbsp; Post Office:  <b>{{ user.postOfficeName }}</b>
-
                 {% if user.ldapDn %}
                 <br>
             LDAP DN:  <b>{{ user.ldapDn }}</b>
-
             &nbsp;&nbsp;DirectoryId:  <b>{{ user.directoryId }}</b>
                 {% endif %}
-
         </h6>
     </div>
-
 </div>
-
 <div class="widget-body">
     <div class="widget-main">
         <div class="col-lg-12">
             <p>Most attributes are read-only if the user is associated to a directory.</p>
-
-
             <div class="row">
                 <div class="col-sm-10">
                     <div class="tabbable ">
@@ -98,8 +92,6 @@
 
                          <form method="post" action="{% url 'userdata' %}">
                              {% csrf_token %}
-
-
                             <div class="tab-content">
                                 <div id="general" class="tab-pane in active">
 
@@ -308,9 +300,6 @@
 
                                      </div>
 
-
-
-
                                 </div><!-- end account tab -->
 
                                 <div id="inet" class="tab-pane">
@@ -401,8 +390,6 @@
                                                 </div>
                                             </div>
 
-
-
                                            <div id="showPref" {% if user.preferredAddressFormat.inherited == True %} style="display: none" {% endif %}>
                                                 <div class="form-group">
                                                     <select {% if user.preferredAddressFormat.inherited == True %}  {% endif %}
@@ -424,9 +411,6 @@
                                                     >
                                                 </div>
                                            </div>
-
-
-
                                         <!-- end col 5 -->
                                     </div><!-- end col 12 -->
 
@@ -467,8 +451,6 @@
                                                             checked
                                                         {% endif %}
                                                                >
-
-
                                                         Recipient is known exclusively by this Internet domain name
                                                     </div>
                                                  </div>
@@ -511,8 +493,8 @@
                                 </div><!-- end accordian -->
                             </div><!-- end col 8 -->
 
-                                </div><!-- end inet tab -->
-                            </div>
+                        </div><!-- end inet tab -->
+                        </div>
 
                         </div><!-- end tab content -->
                     <div class="row">
@@ -526,36 +508,7 @@
                 </div>
 
                 <div class="vspace-6-sm"></div>
-
-
             </div><!-- /.row -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         </div>
     </div>
 </div>

@@ -1,57 +1,46 @@
-
 {% extends 'helpdesk/base.html' %}
 {% block content %}
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 <div class="page-header">
     <h1>Add {{ request.session.name }} to Groups</h1>
-    </div><!-- /.page-header -->
+</div><!-- /.page-header -->
 
-        <div class="col-xs-10 ">
-            <div class="widget-box widget-color-blue">
-                <div class="widget-header">
-                    <h5 class="widget-title bigger lighter">You can select multiple groups with Control-Click</h5>
-                </div>
+<div class="col-md-10 ">
+	<div class="widget-box widget-color-blue">
+		<div class="widget-header">
+			<h5 class="widget-title bigger lighter">You can select multiple groups with Control-Click</h5>
+		</div>
 
-                <div class="widget-body">
-                    <div class="widget-main">
-
-
-
-
-			<div class="col-md-5">
-				<div class="input-group custom-search-form">
-						  <input type="text" class="form-control" placeholder="Filter..." name="userid" id="textbox">
-							<span class="input-group-btn">
+		<div class="widget-body">
+			<div class="widget-main">
+				<div class="col-md-5">
+					<div class="input-group custom-search-form">
+					    <input type="text" class="form-control" placeholder="Filter..." name="userid" id="textbox">
+						<span class="input-group-btn">
 							<button class="btn btn-primary " type="submit">
 								<i class="fa fa-search"></i>
 							</button>
 						</span>
 					</div>
-			</div>
-						<div class="clearfix"></div>
+				</div>
+				<div class="clearfix"></div>
 
-
-
-<div class="col-md-5">
-	<form action="{% url 'groups' %}" method="post" role="form">
-                               {% csrf_token %}
-
-				<select id="select" class="form-control" name="groups" multiple="multiple" size="25" style="width: 250px; max-height: 475px; overflow:auto;">
-
-				{% for grp in groups %}
-				<option value="{{grp.1}}">{{grp.0}}</option>
-
-				{% endfor %}
-
-				</select>
-</div>
-			<div class="col-lg-5">
-                            <button class="btn btn-primary btn-fill btn-wd" type="submit" name="add">Save</button>
-                        </div>
-		</form>
-			<div class="clearfix"></div>
-
-		</div><!--  end dontent  -->
-	</div><!--  end card  -->
-</div> <!-- end col-md-12 -->
+				<div class="col-md-5">
+					<form action="{% url 'groups' %}" method="post" role="form">
+					   {% csrf_token %}
+						<select id="select" class="form-control" name="groups" multiple="multiple" size="20" style="width: 250px; max-height: 450px; overflow:auto;">
+							{% for grp in groups %}
+								<option value="{{grp.1}}">{{grp.0}}</option>
+							{% endfor %}
+						</select>
+						<br>
+						<div class="col-lg-5">
+							<button class="btn btn-primary btn-fill btn-wd" type="submit" name="add">Save</button>
+						</div>
+					</form>
+				</div>
+				<div class="clearfix"></div>
+		</div><!--  widget main  -->
+	</div><!--  widget body  -->
+</div> <!-- end col-md-10 -->
 {% endblock %}

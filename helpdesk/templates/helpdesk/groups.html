@@ -8,16 +8,12 @@
                 <div class="widget-header">
                     <h5 class="widget-title bigger lighter">Modify Participation or Delete user from group</h5>
                 </div>
-
                 <div class="widget-body">
                     <div class="widget-main">
-
                     <form method="POST" action="">
                     {% csrf_token %}
-
                      <div class="content table-responsive table-full-width">
                         <table class="table">
-
                         <thead>
                         <th>Group</th>
                         <th>Participation</th>
@@ -34,9 +30,8 @@
                             <tr>
                                 <td>
                                     <b>{{ group.0 }}</b>
-
+                                </td>
                                 <td>
-
                                     <input type="radio" name="participation"  value="PRIMARY"
                                         {% if group.1 == "PRIMARY" %}
                                             checked
@@ -44,23 +39,19 @@
 
                                     >&nbsp Primary &nbsp&nbsp
                                  </td>
-                                <td>
-
+                                 <td>
                                     <input type="radio" name="participation"  value="CARBON_COPY"
                                     {% if group.1 == "CARBON_COPY" %}
                                             checked
                                         {% endif %}
                                     >&nbsp CC &nbsp&nbsp
-
-                              </td>
+                                </td>
                                 <td>
                                     <input type="radio" name="participation" value="BLIND_COPY"
                                     {% if group.1 == "BLIND_COPY" %}
                                             checked
                                         {% endif %}
                                     >&nbsp BC
-
-
                                 </td>
                                 <td>
                                     <button class="btn btn-primary btn-fill btn-md" type="submit" name="edit">Save</button>
@@ -69,13 +60,11 @@
                                     <button class="btn btn-primary btn-fill btn-md" type="submit" name="remove">Remove</button>
                                 </td>
                             </tr>
-
                             </form>
                         {% endfor %}
                         </tbody>
                     </table>
                  </div>
-
                     <div class="row">
                         <div class="col-md-3">
                             <div class="entry">
@@ -87,7 +76,6 @@
                 </div>
             </div>
         </div>
-
         </div>
     </div>
 </div>

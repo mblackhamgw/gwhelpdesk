@@ -8,7 +8,6 @@
                 <div class="widget-header">
                     <h5 class="widget-title bigger lighter">Administrator Login</h5>
                 </div>
-
                 <div class="widget-body">
                     <div class="widget-main">
                         <div class="space-10"></div>
@@ -21,50 +20,36 @@
                                             <i class="ace-icon fa fa-user"></i>
                                         </span>
                                     </label>
-
                                     <label class="block clearfix">
                                         <span class="block input-icon input-icon-right">
                                             <input name="password" type="password" class="form-control" placeholder="Password" />
                                             <i class="ace-icon fa fa-lock"></i>
                                         </span>
                                     </label>
-
                                     <div class="space"></div>
-
                                     <div class="clearfix">
-
-
                                         <button type="submit" class="width-35 pull-right btn btn-sm btn-primary">
                                             <i class="ace-icon fa fa-key"></i>
                                             <span class="bigger-110">Login</span>
                                         </button>
                                     </div>
-
                                     <div class="space-4"></div>
                                 </fieldset>
                             </form>
-
                         {% if messages %}
                         <p>
                             {% for message in messages %}
                                 {% if message.level == 40 %}
-
                             <div class="alert alert-danger alert-dismissable">
                                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                                  <a href="#" class="alert-link">{{ message }}</a>.
                             </div>
-
                                 {% endif %}
                             {% endfor %}
                         </p>
                         {% endif %}
-
-
-
-
-                    </div>
-                </div>
             </div>
         </div>
-
+    </div>
+</div>
 {% endblock %}

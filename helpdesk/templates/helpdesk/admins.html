@@ -9,87 +9,72 @@
                     <h5 class="widget-title bigger lighter">Adminstrator List</h5>
                 </div>
             </div>
-
-                <div class="widget-body">
-                    <div class="widget-main">
-                        <h5>You may edit First Name, Last Name or Role.  Admin ID is read-only as it is used for authentication.</h5
-
-                        <div class="content table-responsive table-full-width">
-                            <table class="table table-hover" width="90%">
-                        <thead>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <h5>You may edit First Name, Last Name or Role.  Admin ID is read-only as it is used for authentication.</h5
+                    <div class="content table-responsive table-full-width">
+                        <table class="table table-hover" width="90%">
+                    <thead>
+                        <tr>
+                            <th>Admin ID</th>
+                            <div class="col-md-3">
+                            <th>First Name</th>
+                            </div>
+                            <div class="col-md-3">
+                            <th>Last Name</th>
+                            </div>
+                            <th>Role</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ad in ads %}
+                        <form id="ad.id" method="post" action="">
+                        {% csrf_token %}
                             <tr>
-                                <th>Admin ID</th>
-                                <div class="col-md-3">
-                                <th>First Name</th>
-                                </div>
-                                <div class="col-md-3">
-                                <th>Last Name</th>
-                                </div>
-
-                                <th>Role</th>
-                                <th></th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for ad in ads %}
-                            <form id="ad.id" method="post" action="">
-                            {% csrf_token %}
-                                <tr>
-                                    <td style="vertical-align:middle;"> {{ ad.username}}</td>
+                                <td style="vertical-align:middle;"> {{ ad.username}}</td>
                                     <input type="hidden" name="username" value="{{ ad.username }}">
-                                    <td>
-                                        <input class="form-control" name="first_name"
-                                            value="{{ ad.first_name}}"
-                                               >
-                                    </td>
-                                    <td><input class="form-control" name="last_name"
-                                            value="{{ ad.last_name}}"
-                                               >
-                                    </td>
-                                    <td><select id="id_role" name="role" class="form-control">
+                                <td>
+                                    <input class="form-control" name="first_name"
+                                        value="{{ ad.first_name}}">
+                                </td>
+                                <td><input class="form-control" name="last_name"
+                                        value="{{ ad.last_name}}">
+                                </td>
+                                <td><select id="id_role" name="role" class="form-control">
                                         {% for x,y in form.role.field.choices %}
                                         <option value="{{x}}"
                                             {% if x == ad.role %}
                                                 selected="selected"
-                                            {% endif %}
-                                            >{{y}}</option>
+                                            {% endif %}>{{y}}
+                                        </option>
                                         {% endfor %}
-                                        </select>
-                                    </td>
-                                    <td><button type="submit" name="save" id="save" class="btn btn-fill btn-primary btn-sm"">Save</button>
-
-                                        <button class="btn btn-white btn-error btn-primary btn-bold" type="submit", id="delete" name="delete">
-                                            <i class="ace-icon fa fa-trash-o bigger-120 red"></i>
-                                                        Delete
-                                        </button>
-
-                                    </td>
-                                </tr>
-                                <input type="hidden" name="password"  value="{{ ad.password}} "/>
-                                <input type="hidden" name="password2"  value="{{ ad.password}} "/>
-                            </form>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                        </div>
-
-
-
-
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="entry">
-                                    <button class="btn btn-primary btn-fill btn-wd" onclick="window.location.href='{% url "addadmin" %}';">Add Administrator</button>
-                                </div>
-                                <br>
-                            </div>
-                        </div>
-
+                                    </select>
+                                </td>
+                                <td><button type="submit" name="save" id="save" class="btn btn-fill btn-primary btn-sm"">Save</button>
+                                    <button class="btn btn-white btn-error btn-primary btn-bold" type="submit", id="delete" name="delete">
+                                        <i class="ace-icon fa fa-trash-o bigger-120 red"></i>
+                                                    Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <input type="hidden" name="password"  value="{{ ad.password}} "/>
+                            <input type="hidden" name="password2"  value="{{ ad.password}} "/>
+                        </form>
+                        {% endfor %}
+                    </tbody>
+                </table>
+             </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="entry">
+                        <button class="btn btn-primary btn-fill btn-wd" onclick="window.location.href='{% url "addadmin" %}';">Add Administrator</button>
                     </div>
+                    <br>
                 </div>
+            </div>
 
         </div>
-
-
+    </div>
+</div>
 {% endblock %}
