@@ -64,9 +64,6 @@ def addadmin(request):
             obj.save()
             if 'username' in cd.keys():
                 log(request,'Admin: %s added' % cd['username'])
-            else:
-                print "no username"
-
             return HttpResponseRedirect(reverse('admins'))
     else:
         form = AdminForm()
@@ -110,22 +107,16 @@ def admins(request):
     return render(request, 'helpdesk/admins.html', {'form': form, 'ads': ads})
 
 def addtogroups(request):
-
-    request.session.header = 'Add User to Groups'
     gw = gwInit()
-
     if request.method == "POST":
-
         form = Groups(request.POST)
         return render(request, 'helpdesk/groups.html',
                      {'form': form})
     else:
         form = Groups()
         groupList = gw.getGroups2()
-
         return render(request, 'helpdesk/addtogroups.html',
                       {'form': form, 'groups': groupList})
-
 
 def adduser(request):
     request.session.header = 'New GroupWise User'
@@ -224,7 +215,6 @@ def changepassword(request):
             return render(request, 'helpdesk/changepassword.html')
     else:
         return render(request, 'helpdesk/changepassword.html')
-
 
 def checkLdap(postoffice, polist):
     for po in polist:
@@ -598,7 +588,6 @@ def updatedata(formdata, uid, allowed):
     return changedData
 
 def userdata(request):
-    request.session.header = 'GroupWise User Settings'
     gw = gwInit()
     idoms = gw.iDomains()
     idomChoices = []
@@ -629,6 +618,7 @@ def userdata(request):
                 return render(request, 'helpdesk/userdata.html',
                               {'form': form, 'user': userData, 'addressFormats': addressFormats,
                                'emailAddrs': emailAddrs, 'idomains': idomChoices})
+
         elif 'delete' in request.POST:
 
             request.session.header = "GroupWise User deleted"
@@ -713,7 +703,7 @@ def userlist(request):
             addressFormats = gw.addrFormats()
             id = request.POST['id']
             request.session['name'] = request.POST['name']
-
+            request.session['id'] = id
             userData = gw.getObject(id)
             emailAddrs = gw.userAddresses(userData['@url'])
             ldap = gw.checkPoLdap(userData['postOfficeName'])
