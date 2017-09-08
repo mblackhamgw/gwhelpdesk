@@ -70,6 +70,17 @@ class Command(BaseCommand):
             exit()
 
         nginxConfig = 'helpdesk/management/commands/nginx.conf'
+        nginxScript = 'helpdesk/management/commands/rcnginx'
+
+        if os.path.isfile(nginxScript):
+            try:
+                dest = '/usr/sbin/rcnginx'
+                if os.path.isfile(nginxScript):
+                    pass
+                else:
+                    copy2(nginxScript, dest)
+            except IOError as e:
+                print e
 
         if os.path.isfile(nginxConfig):
             try:
@@ -93,6 +104,8 @@ class Command(BaseCommand):
 
         if os.path.isfile('/usr/sbin/rcgwhelpdesk'):
             os.remove('/usr/sbin/rcgwhelpdesk')
+
+
 
         os.symlink('/etc/init.d/gwhelpdesk', '/usr/sbin/rcgwhelpdesk')
         os.chmod('/etc/init.d/gwhelpdesk', stat.S_IRWXU)
