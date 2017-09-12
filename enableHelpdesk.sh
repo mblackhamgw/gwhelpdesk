@@ -6,6 +6,7 @@ chkconfig nginx on
 
 chmod +x /var/gwhelpdesk/update_gwhelpdesk.sh
 chmod +x /var/gwhelpdesk/install_gwhelpdesk.sh
+chmod +x /usr/sbin/rcnginx
 
 read -p "Start gwhelpdesk application now?  (y/n) : " choice
 case "$choice" in
