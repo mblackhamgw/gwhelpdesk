@@ -37,7 +37,7 @@ GIT_SSL_NO_VERIFY=true git clone https://github.com/mblackhamgw/gwhelpdesk.git /
 
 dos2unix /var/gwhelpdesk/*.sh
 dos2unix /var/gwhelpdesk/helpdesk/management/commands/gwhelpdesk
-dos2unix/ var/gwhelpdesk/helpdesk/management/commands/nginx.conf
+dos2unix /var/gwhelpdesk/helpdesk/management/commands/nginx.conf
 dos2unix /var/gwhelpdesk/helpdesk/management/commands/rcnginx
 
 chmod a+x /var/gwhelpdesk/*.sh /var/gwhelpdesk/manage.py
