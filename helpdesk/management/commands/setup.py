@@ -75,7 +75,7 @@ class Command(BaseCommand):
         if os.path.isfile(nginxScript):
             try:
                 dest = '/usr/sbin/rcnginx'
-                if os.path.isfile(nginxScript):
+                if os.path.isfile(dest):
                     print "rcnginx exists"
                 else:
                     print "copying rcnginx to /usr/sbin"
