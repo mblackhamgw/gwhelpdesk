@@ -31,7 +31,6 @@ rc_reset
 
 case "$1" in
   start)
-        cd /var/gwhelpdesk
         echo "Starting " "$APPNAME"
         #source $ACTIVATE
         $DAEMON --daemon --bind=$BIND --pid=$PIDFILE --workers=$WORKERS --user=$USER --log-file=$LOGFILE $APPMODULE
