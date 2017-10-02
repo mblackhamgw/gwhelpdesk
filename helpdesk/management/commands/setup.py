@@ -9,6 +9,8 @@ from helpdesk.models import Admin
 from getpass import getpass
 from django.contrib.auth.hashers import PBKDF2PasswordHasher
 
+import gwhelp.settings
+
 
 # The class must be named Command, and subclass BaseCommand
 class Command(BaseCommand):
@@ -16,10 +18,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        # settings = self.editSettings(ipaddr, host)
 
-        # exit()
-
+        baseDir = gwhelp.settings.BASE_DIR
         print "Let's get the info about your GroupWise Admin Server..."
         gwconfig = GWSettings.objects.all()
         if len(gwconfig) == 0:
