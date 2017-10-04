@@ -152,6 +152,8 @@ Thanks and good luck with the application.
             newline = "ALLOWED_HOSTS = ['%s']" % ipaddr
         elif host and not ipaddr:
             newline = "ALLOWED_HOSTS = ['%s']" % host
+            
+        print "allowed line = %s" % newline
 
         if ipaddr != None:
             print "Using IP address: %s " % ipaddr
