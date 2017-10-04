@@ -17,7 +17,7 @@
 					<div class="input-group custom-search-form">
 					    <input type="text" class="form-control" placeholder="Filter..." name="userid" id="textbox">
 						<span class="input-group-btn">
-							<button class="btn btn-primary " type="submit">
+							<button class="btn btn-primary btn-sm" type="submit">
 								<i class="fa fa-search"></i>
 							</button>
 						</span>
@@ -28,7 +28,7 @@
 				<div class="col-md-5">
 					<form action="{% url 'groups' %}" method="post" role="form">
 					   {% csrf_token %}
-						<select id="select" class="form-control" name="groups" multiple="multiple" size="20" style="width: 250px; max-height: 450px; overflow:auto;">
+						<select id="select" class="form-control" name="groups" multiple="multiple" size="20" style="width: 320px; max-height: 260px; overflow:auto;">
 							{% for grp in groups %}
 								<option value="{{grp.1}}">{{grp.0}}</option>
 							{% endfor %}
