@@ -114,7 +114,7 @@ def addtogroups(request):
                      {'form': form})
     else:
         form = Groups()
-        groupList = gw.getGroups2()
+        groupList = gw.getGroups()
         return render(request, 'helpdesk/addtogroups.html',
                       {'form': form, 'groups': groupList})
 

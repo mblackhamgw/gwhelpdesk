@@ -78,23 +78,25 @@ class GWConfig(ModelForm):
 
 
 class Groups(forms.Form):
-    gw = gwInit()
-    grps = gw.getGroups2()
-    choices = []
-    for g in grps:
-        #print g
-        choice = (g[1], g[0])
-        choices.append(choice)
-    #print choices
-    #groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,label="",choices=choices, required=False)
-    #groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,label="",choices=choices, required=False)
+    try:
+        gw = gwInit()
+        grps = gw.getGroups()
+        choices = []
+        for g in grps:
+            #print g
+            choice = (g[1], g[0])
+            choices.append(choice)
+        #print choices
+        #groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,label="",choices=choices, required=False)
+        #groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,label="",choices=choices, required=False)
 
-    groups = forms.ChoiceField(choices=choices, widget=forms.SelectMultiple, required=False)
-    participation = forms.CharField(max_length=64, required=False)
-    #groups = forms.ChoiceField(choices=choices, widget=forms.CheckboxSelectMultiple)
-#    groups = forms.ChoiceField()
-    #groups = forms.SelectMultiple()
-
+        groups = forms.ChoiceField(choices=choices, widget=forms.SelectMultiple, required=False)
+        participation = forms.CharField(max_length=64, required=False)
+        #groups = forms.ChoiceField(choices=choices, widget=forms.CheckboxSelectMultiple)
+    #    groups = forms.ChoiceField()
+        #groups = forms.SelectMultiple()
+    except:
+        pass
 
 
 class LoginForm(Form):
