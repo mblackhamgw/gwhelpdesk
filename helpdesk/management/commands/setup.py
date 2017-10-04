@@ -23,13 +23,12 @@ class Command(BaseCommand):
         print "Let's get the info about your GroupWise Admin Server..."
         gwconfig = GWSettings.objects.all()
         if len(gwconfig) == 0:
-
             print 'GroupWise Admin Server Settings Configuration\n'
             gwhost = raw_input("GroupWise Admin Server IP/Hostname: ")
             gwport = raw_input('Admin Server PORT: ')
             gwadmin = raw_input('GroupWise System Administrator: ')
             gwpass = raw_input('Administrator Password: ')
-            gwconfig = GWSettings(gwHost=gwhost, gwPort=gwport, gwadmin=gwadmin, gwPass=gwpass)
+            gwconfig = GWSettings(gwHost=gwhost, gwPort=gwport, gwAdmin=gwadmin, gwPass=gwpass)
             try:
                 gwconfig.save()
                 print 'Record saved'
