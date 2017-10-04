@@ -14,7 +14,6 @@
 #
 #
 
-APPDIR
 APPNAME=gwhelpdesk
 USER=root
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
