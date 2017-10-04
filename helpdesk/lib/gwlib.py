@@ -78,20 +78,24 @@ class gw:
             retvalue['nextId'] = nextId
         else:
             retvalue['nextId'] = 1
+
         retvalue['groupList'] = self.groupList
 
         return retvalue
 
-    def getGroups2(self):
+    def getGroups(self):
         glist = []
         url = '%s/gwadmin-service/list/group' % self.baseUrl
-        response = self.session.get(url)
-        g = self.checkResponse(response)
-        for grp in g:
-            data = [grp['name'], grp['id']]
-            glist.append(data)
+        try:
+            response = self.session.get(url)
+            g = self.checkResponse(response)
+            for grp in g:
+                data = [grp['name'], grp['id']]
+                glist.append(data)
 
-        return glist
+            return glist
+        except:
+            pass
 
     def addUserToGroups(self, groups, userid):
         user = self.getObject(userid)
@@ -302,17 +306,6 @@ class gw:
             doc = json.loads(resp.text)
 
         return doc
-
-    def getGroups(self):
-        groups = []
-        url = '%s/gwadmin-service/list/group' % self.baseUrl
-        response = self.session.get(url)
-        objects = self.checkResponse(response)
-
-        for obj in objects:
-            groups.append([obj['name'], obj['id']])
-
-        return groups
 
     def userGroupMembership(self, id):
         membership = []
