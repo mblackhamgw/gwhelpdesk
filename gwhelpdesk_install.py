@@ -12,6 +12,10 @@ if data[0] == 'openSUSE':
 elif 'SUSE' in data[0]:
     print 'OS is %s' % data[0]
     print data[1], data[2]
+    print "Adding SDK repository for git install"
+
+    p = subprocess.Popen(['SUSEConnect','-p', 'sle-sdk/12.2/x86_64'], stdout=subprocess.PIPE)
+
     print 'Adding repository for nginx install...'
     p = subprocess.Popen(['zypper', 'addrepo', '-G', '-t', 'yum', '-c', 'http://nginx.org/packages/sles/12', 'nginix'], stdout=subprocess.PIPE)
     for line in p.stdout:
