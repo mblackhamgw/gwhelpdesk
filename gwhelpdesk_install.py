@@ -31,6 +31,7 @@ else:
     sys.exit()
 
 #install some needed rpms - python-pip fails on sles,  but pip is in python-setuptools
+print 'Installing some needed rpms from Suse repository.. Please be patient'
 rpms = ['python-pip', 'nginx', 'git', 'python-setuptools', 'dos2unix']
 for rpm in rpms:
     p = subprocess.Popen(['zypper', '-n', 'in', rpm],stdout=subprocess.PIPE)
@@ -77,7 +78,7 @@ origin.pull(origin.refs[0].remote_head)
 # modify gwhelpdesk init script to add install directory
 gwfile = '%s/helpdesk/management/commands/gwhelpdesk' % installDir
 newgwfile = '%s/helpdesk/management/commands/gwhelpdesk.bak' % installDir
-appdirline = 'APPDIR=%s/gwhelpdesk' % installDir
+appdirline = 'APPDIR=%s' % installDir
 os.rename(gwfile, newgwfile)
 with open(newgwfile, 'r') as inputfile, open(gwfile,'w') as outputfile:
     for line in inputfile:
