@@ -3,6 +3,7 @@ from helpdesk.models import GWSettings
 from helpdesk.lib import gwlib
 from shutil import copy2, move
 import stat, os
+from socket import gethostbyname, gethostname, getfqdn
 from sys import exit
 from stat import *
 from helpdesk.models import Admin
@@ -130,11 +131,12 @@ Thanks and good luck with the application.
         print ''
 
     def editSettings(self):
-        host = None
-        ipaddr = None
+        host = ''
+        ipaddr = gethostbyname(gethostname())
         print 'First, we need the ip address and/or hostname and port for the'
         print 'application to listen on.  (Yeh I now,  bad grammer)'
         print ''
+
         answer = raw_input('Use IP address, DNS hostname, or Both (ip / host/ both): ')
         if answer.lower() == 'ip':
             ipaddr = self.ip()
@@ -143,6 +145,8 @@ Thanks and good luck with the application.
         elif answer.lower() == 'both':
             ipaddr = self.ip()
             host = self.host()
+        else:
+            ipaddr = gethostbyname(gethostname())
 
         nginxport = raw_input("Listen port for ")
 
@@ -152,6 +156,9 @@ Thanks and good luck with the application.
             newline = "ALLOWED_HOSTS = ['%s']" % ipaddr
         elif host and not ipaddr:
             newline = "ALLOWED_HOSTS = ['%s']" % host
+
+
+
 
         if ipaddr != None:
             print "Using IP address: %s " % ipaddr
@@ -205,12 +212,23 @@ Thanks and good luck with the application.
                     output_file.write(line)
 
     def ip(self):
-        prompt = raw_input('IP address: ')
-        return prompt
+        print 'Server IP is %s' % gethostbyname(gethostname())
+        use = raw_input('Use %s ? (y/n): ' % gethostbyname(gethostname()))
+        if use.lower() == 'y' or use.lower() == 'yes':
+            ipaddr = gethostbyname(gethostname())
+        else:
+            ipaddr = raw_input('Enter IP Address: ')
+        return ipaddr
 
     def host(self):
-        prompt = raw_input('Fully qualified hostname: ')
-        return prompt
+        print 'Server FQDN name is %s' % getfqdn()
+
+        use = raw_input('Use %s ? (y/n): ' % getfqdn())
+        if use.lower() == 'y' or use.lower() == 'yes':
+            host = getfqdn()
+        else:
+            host = raw_input('Enter FQDN : ')
+            return host
 
     def whoami(self, gwhost, gwport, gwadmin, gwpass):
         gw = gwlib.gw(gwhost, gwport, gwadmin, gwpass)
