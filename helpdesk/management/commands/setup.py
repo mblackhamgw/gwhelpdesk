@@ -132,7 +132,7 @@ Thanks and good luck with the application.
 
     def editSettings(self):
         host = ''
-        ipaddr = gethostbyname(gethostname())
+        ipaddr = ''
         print 'First, we need the ip address and/or hostname and port for the'
         print 'application to listen on.  (Yeh I now,  bad grammer)'
         print ''
