@@ -1,6 +1,6 @@
 #!/bin/bash
 
-systemctl enable gwhelpdesk
+#systemctl enable gwhelpdesk
 chkconfig gwhelpdesk on
 chkconfig nginx on
 
