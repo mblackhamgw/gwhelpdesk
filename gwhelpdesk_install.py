@@ -7,11 +7,11 @@ with open('/etc/SuSE-release') as f:
     data = f.readlines()
 
 print "OS is %s" % data[0]
-if data[0] == 'openSUSE':
+if 'openSUSE' in data[0]:
     print "openSuse is supported"
-elif 'SUSE' in data[0]:
+elif '12' in data[1]:
     print 'OS is %s' % data[0]
-    print data[1], data[2]
+
     print "Adding SDK repository for git install"
 
     p = subprocess.Popen(['SUSEConnect','-p', 'sle-sdk/12.2/x86_64'], stdout=subprocess.PIPE)
@@ -31,7 +31,7 @@ else:
     sys.exit()
 
 #install some needed rpms - python-pip fails on sles,  but pip is in python-setuptools
-rpms = ['python-pip', 'nginx', 'git', 'python-setuptools']
+rpms = ['python-pip', 'nginx', 'git', 'python-setuptools', 'dos2unix']
 for rpm in rpms:
     p = subprocess.Popen(['zypper', '-n', 'in', rpm],stdout=subprocess.PIPE)
     for line in p.stdout:
@@ -39,17 +39,18 @@ for rpm in rpms:
 
 # install some python modules using pip
 import pip
-
-piplist = ['django', 'gunicorn', 'requests', 'django-baseurl' ,'django-ipware']
+from time import sleep
+piplist = ['django', 'gunicorn', 'requests', 'django-baseurl' ,'django-ipware', 'gitpython']
 for mod in piplist:
     print 'pip installing: %s' % mod
-    pip.main(['install', mod])
 
-# gitpython fail using normal pip install,  had to do it this way.
-p = subprocess.Popen(['pip', 'install', '--trusted-host', 'pypi.python.org' , 'gitpython'], stdout=subprocess.PIPE)
-for line in p.stdout:
-    print line
-p.wait()
+
+    p = subprocess.Popen(['pip', 'install', '--trusted-host', 'pypi.python.org' , mod], stdout=subprocess.PIPE)
+    for line in p.stdout:
+        print line
+    p.wait()
+    sleep(1)
+
 
 import git
 print "Getting the gwhelpdesk app from git.."
@@ -72,6 +73,19 @@ repo = git.Repo.init(installDir)
 origin = repo.create_remote('origin', gitUrl)
 origin.fetch()
 origin.pull(origin.refs[0].remote_head)
+
+# modify gwhelpdesk init script to add install directory
+gwfile = '%s/helpdesk/management/commands/gwhelpdesk' % installDir
+newgwfile = '%s/helpdesk/management/commands/gwhelpdesk.bak' % installDir
+appdirline = 'APPDIR=%s/gwhelpdesk' % installDir
+os.rename(gwfile, newgwfile)
+with open(newgwfile, 'r') as inputfile, open(gwfile,'w') as outputfile:
+    for line in inputfile:
+        line.strip()
+        if 'APPDIR' in line:
+            outputfile.write(appdirline + '\n')
+        else:
+            outputfile.write(line)
 
 # need to modify nginx.conf to point the static dir to install directory
 nginxConf = '%s/helpdesk/management/commands/nginx.conf' % installDir
