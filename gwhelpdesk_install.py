@@ -20,10 +20,16 @@ with open('/etc/SuSE-release') as f:
     data = f.readlines()
 
 log("OS is %s" % data[0])
+sp2 = ''
+sp3 = ''
 if 'openSUSE' in data[0]:
     log("openSuse is supported")
 
+
+
 elif '12' in data[1]:
+
+
     log("Adding SDK repository for git install")
     if '2' in data[2]:
         sp2 = True
