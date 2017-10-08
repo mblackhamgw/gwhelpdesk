@@ -111,7 +111,6 @@ class Command(BaseCommand):
 
         os.symlink('/etc/init.d/gwhelpdesk', '/usr/sbin/rcgwhelpdesk')
         os.chmod('/etc/init.d/gwhelpdesk', stat.S_IRWXU)
-        os.chmod('enableHelpdesk.sh', stat.S_IRWXU)
         print "That's done.."
 
         print ''
