@@ -11,6 +11,7 @@ from getpass import getpass
 from django.contrib.auth.hashers import PBKDF2PasswordHasher
 
 import gwhelp.settings
+from subprocess import Popen, PIPE
 
 
 # The class must be named Command, and subclass BaseCommand
@@ -117,18 +118,36 @@ class Command(BaseCommand):
         print ''
         self.editSettings()
 
-        print '''
-OK,  one more step for you..
+        self.enable()
 
-Run the enableHelpdesk.sh script to enable the gwhelpdesk script for systemd.
-It also enables gwhelpdesk and nginx to start at boot time. and will start
-both services if you wish.
 
-Thanks and good luck with the application.
-'''
+    def enable(self):
+        print "Enabling gwhelpdesk and nginx init scripts"
+        p = Popen(['chkconfig', 'gwhelpdesk', 'on'], stdout=PIPE)
+        for line in p.stdout:
+            print line
 
-        print ''
-        print ''
+        p = Popen(['chkconfig', 'nginx', 'on'], stdout=PIPE)
+        for line in p.stdout:
+            print line
+
+        p = Popen(['chmod', '+x', '/usr/sbin/rcnginx'], stdout=PIPE)
+        for line in p.stdout:
+            print line
+
+        start = raw_input('Start gwhelpdesk application now? (y/n) : ')
+        if start.lower() == 'y' or start.lower() == 'yes':
+            p = Popen(['rcnginx', 'start'], stdout=PIPE)
+            for line in p.stdout:
+                print line
+
+            p = Popen(['rcgwhelpdesk', 'start'], stdout=PIPE)
+            for line in p.stdout:
+                print line
+
+        else:
+            print "To manually start services"
+            print "Run rcnginx start and gwhelpdesk start"
 
     def editSettings(self):
         host = ''
