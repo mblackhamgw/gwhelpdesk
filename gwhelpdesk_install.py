@@ -141,7 +141,6 @@ with open(newfile, 'r') as input_file, open(nginxConf, 'w') as output_file:
 
 # run dos2unix for some files
 files = ['%s/updateHelpdesk.sh' % installDir,
-            '%s/enableHelpdesk.sh' % installDir,
             '%s/helpdesk/management/commands/gwhelpdesk' % installDir,
             '%s/helpdesk/management/commands/nginx.conf' % installDir,
             '%s/helpdesk/management/commands/rcnginx' % installDir,
@@ -153,7 +152,6 @@ for f in files:
         log(line)
 
 # set executable bit on some files
-os.chmod('%s/enableHelpdesk.sh' % installDir, stat.S_IRWXU)
 os.chmod('%s/updateHelpdesk.sh' % installDir, stat.S_IRWXU)
 os.chmod('%s/manage.py' % installDir, stat.S_IRWXU)
 log('')
