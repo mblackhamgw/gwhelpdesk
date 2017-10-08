@@ -1,60 +1,89 @@
 import sys
 import subprocess
 import os, stat
+from time import sleep
+import logging
+
+def log(msg):
+    logging.info(msg)
+    print msg
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(message)s',
+                    datefmt='%m-%d-%Y %H:%M',
+                    filename='gwhelpdesk_install.log',
+                    filemode='w')
+
 
 #check version of Suse
 with open('/etc/SuSE-release') as f:
     data = f.readlines()
 
-print "OS is %s" % data[0]
+log("OS is %s" % data[0])
 if 'openSUSE' in data[0]:
-    print "openSuse is supported"
+    log("openSuse is supported")
+
 elif '12' in data[1]:
-    print 'OS is %s' % data[0]
+    log("Adding SDK repository for git install")
+    if '2' in data[2]:
+        sp2 = True
+        repo = 'sle-sdk/12.2/x86_64'
+    if '3' in data[2]:
+        sp3 = True
+        repo = 'sle-sdk/12.3/x86_64'
 
-    print "Adding SDK repository for git install"
-
-    p = subprocess.Popen(['SUSEConnect','-p', 'sle-sdk/12.2/x86_64'], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['SUSEConnect','-p', repo] , stdout=subprocess.PIPE)
+    for line in p.stdout:
+        log(line)
 
     print 'Adding repository for nginx install...'
     p = subprocess.Popen(['zypper', 'addrepo', '-G', '-t', 'yum', '-c', 'http://nginx.org/packages/sles/12', 'nginix'], stdout=subprocess.PIPE)
     for line in p.stdout:
-        print line
+        log(line)
 
 # Check python verision- 2.7 is required
 pyver = '%s.%s' % (sys.version_info[0], sys.version_info[1])
 
 if pyver == '2.7':
-    print 'Python version is: %s' % pyver
+    log('Python version is: %s' % pyver)
 else:
-    print "Incorrect Python version.  Python 2.7 is required.  Ending install."
+    log("Incorrect Python version.  Python 2.7 is required.  Ending install.")
     sys.exit()
 
 #install some needed rpms - python-pip fails on sles,  but pip is in python-setuptools
-print 'Installing some needed rpms from Suse repository.. Please be patient'
+log('Installing some needed rpms from Suse repository.. Please be patient')
 rpms = ['python-pip', 'nginx', 'git', 'python-setuptools', 'dos2unix']
 for rpm in rpms:
     p = subprocess.Popen(['zypper', '-n', 'in', rpm],stdout=subprocess.PIPE)
     for line in p.stdout:
-        print line
+        log(line)
+
+# have to install pip using easy_install
+if sp3 == True:
+    from setuptools.command import easy_install
+    easy_install.main(['-U','pip'])
+    sleep(3)
 
 # install some python modules using pip
-import pip
-from time import sleep
+#import pip
+
+p = subprocess.Popen(['pip', 'install', '--trusted-host', 'pypi.python.org', '--upgrade', 'pip'], stdout=subprocess.PIPE)
+for line in p.stdout:
+    log(line)
+p.wait()
+
 piplist = ['django', 'gunicorn', 'requests', 'django-baseurl' ,'django-ipware', 'gitpython']
 for mod in piplist:
-    print 'pip installing: %s' % mod
-
-
+    log('pip installing: %s' % mod)
     p = subprocess.Popen(['pip', 'install', '--trusted-host', 'pypi.python.org' , mod], stdout=subprocess.PIPE)
     for line in p.stdout:
-        print line
+        log(line)
     p.wait()
     sleep(1)
 
 
 import git
-print "Getting the gwhelpdesk app from git.."
+log("Getting the gwhelpdesk app from git..")
 
 # Prompt for where you want gwhelpdesk installed
 baseDir = raw_input('Enter path for gwhelpdesk directory: ')
@@ -83,7 +112,7 @@ os.rename(gwfile, newgwfile)
 with open(newgwfile, 'r') as inputfile, open(gwfile,'w') as outputfile:
     for line in inputfile:
         line.strip()
-        if 'APPDIR' in line:
+        if 'APPDIR=' in line:
             outputfile.write(appdirline + '\n')
         else:
             outputfile.write(line)
@@ -108,22 +137,22 @@ with open(newfile, 'r') as input_file, open(nginxConf, 'w') as output_file:
 files = ['%s/updateHelpdesk.sh' % installDir,
             '%s/enableHelpdesk.sh' % installDir,
             '%s/helpdesk/management/commands/gwhelpdesk' % installDir,
-            '%s/helpdesk/management/commands/nginix.conf' % installDir,
+            '%s/helpdesk/management/commands/nginx.conf' % installDir,
             '%s/helpdesk/management/commands/rcnginx' % installDir,
             ]
 
 for f in files:
     p = subprocess.Popen(['dos2unix', f], stdout=subprocess.PIPE)
-    for lin in p.stdout:
-        print lin
+    for line in p.stdout:
+        log(line)
 
 # set executable bit on some files
 os.chmod('%s/enableHelpdesk.sh' % installDir, stat.S_IRWXU)
 os.chmod('%s/updateHelpdesk.sh' % installDir, stat.S_IRWXU)
 os.chmod('%s/manage.py' % installDir, stat.S_IRWXU)
-print ''
-print '---- Done with installation ----'
-print ''
+log('')
+log('---- Done with installation ----')
+log('')
 
 print '--  cd to %s,  then run python manage.py setup to modify some db records.' % installDir
 
