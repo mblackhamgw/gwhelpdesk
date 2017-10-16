@@ -4,11 +4,11 @@ When GroupWise 2014 was released, it included a brand new web based administrati
 
 GWHelpdesk is an attempt to address this need.   It uses the GroupWise REST API for all  GroupWise admin functions.  The application configuration consists of a record for your GroupWise Admin server, with IP addr/hostname, admin port, system admin name and password.  These settings are used for all communication to GroupWise admin service.  
 The application has the ability to have 4 administrative roles:
+
   •	Administrator - Has all access to all GroupWise user objects.  Also use this role to create other administrators.
   •	Helpdesk – Can add/modify/delete GroupWise users.
   •	HelpDesk Light – Can only modify users, not add or delete.
-
-•	Password – Can only be used to change user passwords.
+  •	Password – Can only be used to change user passwords.
 
 Requirements:
 
