@@ -280,6 +280,11 @@ class gw:
 
         return poList
 
+
+    #def getPoIds(self, polist):
+
+
+
     def addUser(self, pourl, data):
         url = '%s%s/users' % (self.baseUrl, pourl)
         name = data['name']
@@ -345,3 +350,35 @@ class gw:
         user = self.getObject(userid)
         url = '%s%s/groupmemberships/%s' % (self.baseUrl, user['@url'], grpid)
         results = self.session.delete(url)
+
+
+    def renameUser(self, id, newid):
+        user = self.getObject(id)
+        pourl = '%s%s/rename' % (self.baseUrl, user['links'][1]['@href'])
+        print pourl
+        data = {'objectId': id,
+                'newObjectId': newid,
+                'createNickname':'false'
+                }
+        response = self.session.post(pourl,data=json.dumps(data))
+        #print response.text
+        #print response.headers
+
+    def moveUser(self, userid, poid):
+        url = '%s/gwadmin-service/system/moverequests' % self.baseUrl
+        data = {
+              "sources" : [ {
+                "id" : userid
+              } ],
+              "postOfficeId" : poid,
+              "directoryUser" : 'false'
+            }
+
+        response = self.session.post(url, data=json.dumps(data))
+
+        print response.text
+        print response.headers
+
+        status = self.session.get(url)
+        print status.text
+        print status.headers
