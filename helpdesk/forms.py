@@ -103,6 +103,17 @@ class LoginForm(Form):
     username = forms.CharField(max_length=128)
     password = forms.CharField(max_length=128)
 
+class Move(forms.Form):
+    id = forms.CharField(max_length=128)
+#    poid = forms.CharField(max_length=128)
+    postoffice = forms.CharField(max_length=64)
+
+
+class Rename(forms.Form):
+    newid = forms.CharField(max_length=64)
+    id = forms.CharField(max_length=128)
+    name = forms.CharField(max_length=64)
+
 class Search(forms.Form):
     userid = forms.CharField(max_length=64)
 

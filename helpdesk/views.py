@@ -451,6 +451,89 @@ def logout(request):
     request.session.modified = True
     return HttpResponseRedirect('/login/')
 
+def move(request):
+    gw = gwInit()
+    if request.method == "POST":
+        print request.POST
+        form = Move(request.POST)
+        print form.errors
+        if form.is_valid():
+            print 'valid'
+            cd = form.cleaned_data
+            print cd
+
+            move = gw.moveUser(cd['id'], cd['postoffice'])
+
+
+            form = UserDetails()
+
+            #return render(request, 'helpdesk/userdata.html',
+               #           {'form': form, 'user': userData, 'addressFormats': addressFormats,
+               #            'emailAddrs': emailAddrs})
+
+        return render(request, 'helpdesk/move.html', {'form': form})
+
+    else:
+
+        form = Move()
+
+        polist = gw.getPolist()
+        print polist
+        for postoffice in polist:
+
+            dom = str(postoffice['url']).split('/')[3]
+            po = str(postoffice['url']).split('/')[5]
+
+            poid = 'POST_OFFICE.%s.%s' % (dom, po)
+            print poid
+            postoffice['id'] = poid
+
+        return render(request, 'helpdesk/move.html', {'form': form, 'polist': polist})
+
+
+
+def rename(request):
+    if request.method == "POST":
+        print request.POST
+        form = Rename(request.POST)
+        print form.errors
+        if form.is_valid():
+            if 'id' in request.session.keys():
+                del request.session['id']
+            if 'name' in request.session.keys():
+                del request.session['name']
+            cd = form.cleaned_data
+            id = cd['id']
+            newname = cd['newid']
+            print "old id: " + id
+            oldname = cd['name']
+            popart = id.rsplit('.',1)[0]
+            print 'new name: ' + newname
+            newid = '%s.%s' % (popart, newname)
+            print 'new id: ' + newid
+            gw = gwInit()
+            rename = gw.renameUser(id, newname)
+            request.session['id'] = newid
+            request.session['name'] = newname
+            addressFormats = gw.addrFormats()
+            userData = gw.getObject(newid)
+            emailAddrs = gw.userAddresses(userData['@url'])
+            ldap = gw.checkPoLdap(userData['postOfficeName'])
+
+            if (ldap == 1) and 'ldapDn' in userData.keys():
+                userData['ldap'] = 'true'
+            else:
+                userData['ldap'] = 'false'
+            form = UserDetails()
+
+            return render(request, 'helpdesk/userdata.html',
+                          {'form': form, 'user': userData, 'addressFormats': addressFormats,
+                           'emailAddrs': emailAddrs})
+
+    else:
+        form = Rename()
+        return render(request, 'helpdesk/rename.html', {'form': form})
+
 def search(request):
     request.session.header = 'GroupWise User Search'
     form = Search()
@@ -607,7 +690,9 @@ def userdata(request):
                 gwid = cd['id']
                 request.session['id'] = cd['id']
                 request.session['name'] = cd['name']
+
                 userData = gw.getObject(gwid)
+                request.session['poname'] = userData['postOfficeName']
                 emailAddrs = gw.userAddresses(userData['@url'])
                 ldap = gw.checkPoLdap(userData['postOfficeName'])
                 if (ldap == 1) and 'ldapDn' in userData.keys():
