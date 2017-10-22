@@ -20,7 +20,14 @@
                         <li>
                             <a href="{% url 'changepassword' %}">Change Password</a>
                         </li>
+
                         {% if request.session.role == "AD" or request.session.role == "HD" %}
+                             <li>
+                                <a href="{% url 'rename' %}">Rename User</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'move' %}">Move User</a>
+                            </li>
                             <li>
                                 <a href="{% url 'deluser' %}">Delete User</a>
                             </li>
@@ -40,6 +47,7 @@
                         <li>
                             <a href="{% url 'addtogroups' %}">Add to Groups</a>
                         </li>
+
 
                     </ul>
             </li>
@@ -87,6 +95,11 @@
                                 <a data-toggle="tab" href="#inet">
                                     Internet Addressing
                                 </a>
+                                <li>
+                                <a data-toggle="tab" href="">
+                                    Nicknames
+                                </a>
+                            </li>
                             </li>
                         </ul>
 
