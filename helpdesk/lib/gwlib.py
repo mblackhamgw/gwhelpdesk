@@ -167,11 +167,8 @@ class gw:
         url = '%s/gwadmin-service/object/%s' % (self.baseUrl, id)
         response = self.session.get(url, timeout=5)
         object = self.checkResponse(response)
-
         user = object['name']
         userurl = object['@url']
-#        picname = self.getPic(userurl, user)
- #       object['picname'] = picname
         return object
 
     def getObjectByUrl(self, userurl):
@@ -361,8 +358,6 @@ class gw:
                 'createNickname':'false'
                 }
         response = self.session.post(pourl,data=json.dumps(data))
-        #print response.text
-        #print response.headers
 
     def moveUser(self, userid, poid):
         url = '%s/gwadmin-service/system/moverequests' % self.baseUrl
@@ -375,10 +370,13 @@ class gw:
             }
 
         response = self.session.post(url, data=json.dumps(data))
-
-        print response.text
-        print response.headers
-
-        status = self.session.get(url)
-        print status.text
-        print status.headers
+        statusurl = '%s?name=%s' % (url, userid.split('.')[3])
+        status = self.session.get(statusurl)
+        if status.text:
+            dict = json.loads(status.text)
+            if 'succeeded' in dict.keys():
+                return 'Succeeded'
+            else:
+                if 'lastAction' in dict.keys():
+                    lastaction = dict['object']['moveStatus']['lastAction']
+                    return lastaction
