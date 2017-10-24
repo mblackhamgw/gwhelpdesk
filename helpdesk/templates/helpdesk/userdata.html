@@ -39,34 +39,41 @@
                                 </li>
                             {% endif %}
                         {% endif %}
-
-
                         <li>
                             <a href="{% url 'groups' %}">Group Membership</a>
                         </li>
                         <li>
                             <a href="{% url 'addtogroups' %}">Add to Groups</a>
                         </li>
-
-
                     </ul>
             </li>
         </ul>
     </div>
 </div><!-- /.page-header -->
 
-<div class="widget-box widget-color-blue">
+<h6 class="widget-box widget-color-blue">
     <div class="widget-header">
         <h5 class="widget-title bigger lighter"></h5>
         <h6> <b>{{ user.givenName }} {{ user.surname }}</b>&nbsp;&nbsp; (GroupWise UserID: <b>{{ user.name }}</b> &nbsp;&nbsp; FID: <b>{{ user.fileId }}</b> )
                &nbsp;&nbsp; Domain:  <b>{{ user.domainName }}</b>  &nbsp;&nbsp; Post Office:  <b>{{ user.postOfficeName }}</b>
                 {% if user.ldapDn %}
                 <br>
-            LDAP DN:  <b>{{ user.ldapDn }}</b>
-            &nbsp;&nbsp;DirectoryId:  <b>{{ user.directoryId }}</b>
+                LDAP DN:  <b>{{ user.ldapDn }}</b>
+            &nbsp;&nbsp;    DirectoryId:  <b>{{ user.directoryId }}</b>
                 {% endif %}
         </h6>
     </div>
+        {% if user.moveStatus %}
+            <h6>
+              <div class="col-md-6">
+                    {% ifequal user.moveStatus.action "UDB_MOVE_USER_FINISHED" %}
+                        &nbsp
+                    {% else %}
+                        A previous user move operation has not yet completed.
+                    {% endifequal %}
+              </div>
+            </h6>
+        {% endif %}
 </div>
 <div class="widget-body">
     <div class="widget-main">
