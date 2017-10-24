@@ -454,43 +454,50 @@ def logout(request):
 def move(request):
     gw = gwInit()
     if request.method == "POST":
-        print request.POST
+        #
         form = Move(request.POST)
         print form.errors
         if form.is_valid():
             print 'valid'
             cd = form.cleaned_data
-            print cd
+            POST, DOMAIN, PONAME = cd['postoffice'].split('.')
+            USER, DOM, PO, USERID = cd['id'].split('.')
 
-            move = gw.moveUser(cd['id'], cd['postoffice'])
-
-
+            oldpoid =  '%s.%s' % (DOM, PO)
+            newpoid = '%s.%s.%s' % (POST, DOMAIN, PONAME)
+            PO = cd['postoffice']
+            newid = '%s.%s.%s.%s' % (USER, DOMAIN, PONAME, USERID)
             form = UserDetails()
+            usermove = gw.moveUser(cd['id'], PO)
+            request.session['id'] = newid
+            addressFormats = gw.addrFormats()
 
-            #return render(request, 'helpdesk/userdata.html',
-               #           {'form': form, 'user': userData, 'addressFormats': addressFormats,
-               #            'emailAddrs': emailAddrs})
+            userData = gw.getObject(newid)
+            emailAddrs = gw.userAddresses(userData['@url'])
+            ldap = gw.checkPoLdap(userData['postOfficeName'])
+            if (ldap == 1) and 'ldapDn' in userData.keys():
+                userData['ldap'] = 'true'
+            else:
+                userData['ldap'] = 'false'
+            log(request, '%s move from %s to %s' % (USERID, oldpoid, '.'.join(cd['postoffice'].rsplit('.')[-2:])))
+
+            return render(request, 'helpdesk/userdata.html',
+                          {'form': form, 'user': userData, 'addressFormats': addressFormats,
+                           'emailAddrs': emailAddrs})
 
         return render(request, 'helpdesk/move.html', {'form': form})
 
     else:
-
         form = Move()
-
         polist = gw.getPolist()
         print polist
         for postoffice in polist:
-
             dom = str(postoffice['url']).split('/')[3]
             po = str(postoffice['url']).split('/')[5]
-
             poid = 'POST_OFFICE.%s.%s' % (dom, po)
             print poid
             postoffice['id'] = poid
-
         return render(request, 'helpdesk/move.html', {'form': form, 'polist': polist})
-
-
 
 def rename(request):
     if request.method == "POST":
@@ -525,6 +532,7 @@ def rename(request):
             else:
                 userData['ldap'] = 'false'
             form = UserDetails()
+            log(request,'%s Renamed to %s' % (oldname, newname))
 
             return render(request, 'helpdesk/userdata.html',
                           {'form': form, 'user': userData, 'addressFormats': addressFormats,
