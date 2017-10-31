@@ -230,10 +230,14 @@ class Command(BaseCommand):
                     output_file.write(line)
 
     def ip(self):
+        ipaddr = ''
         print 'Server IP is %s' % gethostbyname(gethostname())
         use = raw_input('Use %s ? (y/n): ' % gethostbyname(gethostname()))
         if use.lower() == 'y' or use.lower() == 'yes':
-            ipaddr = gethostbyname(gethostname())
+            try:
+                ipaddr = gethostbyname(gethostname())
+            except:
+                ipaddr = raw_input('Enter IP Address: ')
         else:
             ipaddr = raw_input('Enter IP Address: ')
         return ipaddr
