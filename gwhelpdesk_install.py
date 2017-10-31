@@ -38,12 +38,12 @@ elif '12' in data[1]:
         sp3 = True
         repo = 'sle-sdk/12.3/x86_64'
 
-    p = subprocess.Popen(['SUSEConnect','-p', repo] , stdout=subprocess.PIPE)
+    p = subprocess.Popen('SUSEConnect v -p %s' % repo , shell=True, stdout=subprocess.PIPE)
     for line in p.stdout:
         log(line)
 
     print 'Adding repository for nginx install...'
-    p = subprocess.Popen(['zypper', 'addrepo', '-G', '-t', 'yum', '-c', 'http://nginx.org/packages/sles/12', 'nginix'], stdout=subprocess.PIPE)
+    p = subprocess.Popen('zypper addrepo -G -t yum -c http://nginx.org/packages/sles/12 nginix', shell=True, stdout=subprocess.PIPE)
     for line in p.stdout:
         log(line)
 
@@ -60,7 +60,7 @@ else:
 log('Installing some needed rpms from Suse repository.. Please be patient')
 rpms = ['python-pip', 'nginx', 'git', 'python-setuptools', 'dos2unix']
 for rpm in rpms:
-    p = subprocess.Popen(['zypper', '-n', 'in', rpm],stdout=subprocess.PIPE)
+    p = subprocess.Popen('zypper -n in %s' % rpm ,shell=True, stdout=subprocess.PIPE)
     for line in p.stdout:
         log(line)
 
@@ -73,7 +73,7 @@ if sp3 == True:
 # install some python modules using pip
 #import pip
 
-p = subprocess.Popen(['pip', 'install', '--trusted-host', 'pypi.python.org', '--upgrade', 'pip'], stdout=subprocess.PIPE)
+p = subprocess.Popen('pip install --trusted-host "pypi.python.org" --upgrade pip', shell=True, stdout=subprocess.PIPE)
 for line in p.stdout:
     log(line)
 p.wait()
@@ -81,20 +81,21 @@ p.wait()
 piplist = ['django', 'gunicorn', 'requests', 'django-baseurl' ,'django-ipware', 'gitpython']
 for mod in piplist:
     log('pip installing: %s' % mod)
-    p = subprocess.Popen(['pip', 'install', '--trusted-host', 'pypi.python.org' , mod], stdout=subprocess.PIPE)
+    p = subprocess.Popen('pip install --trusted-host "pypi.python.org" %s' % mod, shell=True, stdout=subprocess.PIPE)
+
     for line in p.stdout:
         log(line)
     p.wait()
     sleep(1)
 
 
-import git
+
 log("Getting the gwhelpdesk app from git..")
 
 # Prompt for where you want gwhelpdesk installed
 baseDir = raw_input('Enter path for gwhelpdesk directory: ')
 if not os.path.isdir(baseDir):
-    answer = raw_input("%s path not found,  create it?  (y/n)" % baseDir)
+    answer = raw_input("%s path not found,  crmbeate it?  (y/n)" % baseDir)
     if answer.lower() == 'yes' or answer.lower() == 'y':
         os.mkdir(baseDir)
     else:
@@ -102,23 +103,30 @@ if not os.path.isdir(baseDir):
         sys.exit()
 
 installDir = '%s/gwhelpdesk' % baseDir
-
+import git
 # run git to fetch the code.
 gitUrl = "https://github.com/mblackhamgw/gwhelpdesk.git"
-repo = git.Repo.init(installDir)
-origin = repo.create_remote('origin', gitUrl)
-origin.fetch()
-origin.pull(origin.refs[0].remote_head)
+#repo = git.Repo.init(installDir)
+#origin = repo.create_remote('origin', gitUrl)
+#origin.fetch()
+#origin.pull(origin.refs[0].remote_head)
+
+p = subprocess.Popen('GIT_SSL_NO_VERIFY=true git clone %s %s' % (gitUrl, installDir ), shell=True, stdout=subprocess.PIPE)
 
 # modify gwhelpdesk init script to add install directory
 gwfile = '%s/helpdesk/management/commands/gwhelpdesk' % installDir
-newgwfile = '%s/helpdesk/management/commands/gwhelpdesk.bak' % installDir
+#newgwfile = '%s/helpdesk/management/commands/gwhelpdesk.bak' % installDir
 appdirline = 'APPDIR=%s' % installDir
-os.rename(gwfile, newgwfile)
-with open(newgwfile, 'r') as inputfile, open(gwfile,'w') as outputfile:
-    for line in inputfile:
+
+
+#s.rename(gwfile, newgwfile)
+
+with open(gwfile,'w') as outputfile:
+    print outputfile
+    for line in outputfile:
         line.strip()
         if 'APPDIR=' in line:
+            print 'Line = %s' % line
             outputfile.write(appdirline + '\n')
         else:
             outputfile.write(line)
@@ -147,7 +155,7 @@ files = ['%s/updateHelpdesk.sh' % installDir,
             ]
 
 for f in files:
-    p = subprocess.Popen(['dos2unix', f], stdout=subprocess.PIPE)
+    p = subprocess.Popen('dos2unix %s' % f, shell=True, stdout=subprocess.PIPE)
     for line in p.stdout:
         log(line)
 
