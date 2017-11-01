@@ -112,18 +112,21 @@ gitUrl = "https://github.com/mblackhamgw/gwhelpdesk.git"
 #origin.pull(origin.refs[0].remote_head)
 
 p = subprocess.Popen('GIT_SSL_NO_VERIFY=true git clone %s %s' % (gitUrl, installDir ), shell=True, stdout=subprocess.PIPE)
+for line in p.stdout:
+        log(line)
+    p.wait()
+    sleep(1)
 
-# modify gwhelpdesk init script to add install directory
+modify gwhelpdesk init script to add install directory
 gwfile = '%s/helpdesk/management/commands/gwhelpdesk' % installDir
-#newgwfile = '%s/helpdesk/management/commands/gwhelpdesk.bak' % installDir
+newgwfile = '%s/helpdesk/management/commands/gwhelpdesk.bak' % installDir
 appdirline = 'APPDIR=%s' % installDir
 
 
-#s.rename(gwfile, newgwfile)
+os.rename(gwfile, newgwfile)
 
-with open(gwfile,'w') as outputfile:
-    print outputfile
-    for line in outputfile:
+with open(newgwfile, 'r') as inputfile, open(gwfile,'w') as outputfile:
+    for line in inputfile:
         line.strip()
         if 'APPDIR=' in line:
             print 'Line = %s' % line
