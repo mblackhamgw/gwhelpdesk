@@ -262,7 +262,7 @@ class Command(BaseCommand):
         gwhost = raw_input("GroupWise Admin Server IP/Hostname: ")
         gwport = raw_input('Admin Server PORT: ')
         gwadmin = raw_input('GroupWise System Administrator: ')
-        gwpass = raw_input('Administrator Password: ')
+        gwpass = getpass('Administrator Password: ')
         gwconfig = GWSettings.objects.all()[0]
 
         gwconfig.gwHost = gwhost
