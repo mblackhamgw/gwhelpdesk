@@ -113,7 +113,7 @@ gitUrl = "https://github.com/mblackhamgw/gwhelpdesk.git"
 
 p = subprocess.Popen('GIT_SSL_NO_VERIFY=true git clone %s %s' % (gitUrl, installDir ), shell=True, stdout=subprocess.PIPE)
 for line in p.stdout:
-        log(line)
+    log(line)
     p.wait()
     sleep(1)
 
