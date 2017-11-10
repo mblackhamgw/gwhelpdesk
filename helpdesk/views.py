@@ -97,6 +97,7 @@ def admins(request):
         return render(request, 'helpdesk/admins.html', {'form': form, 'admins': admins})
     else:
         form = AdminForm()
+        admins = Admin.objects.all()
     return render(request, 'helpdesk/admins.html', {'form': form, 'admins': admins})
 
 def addtogroups(request):
