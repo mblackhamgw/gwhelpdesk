@@ -14,7 +14,8 @@ Requirements:
 
   •	A Linux server.  Tested and supported on openSuse 42.2, 42.3 - (Leap distribution)  https://software.opensuse.org/distributions/leap
     
-    Also tested on SLES12 Sp2 and Sp3.  (on your own for licensing this OS,  the GroupWise SLES entitlement does not apply to this application.
+    Also tested on SLES12 Sp2 and Sp3.  (on your own for licensing this OS,  the GroupWise SLES entitlement 
+    does not apply to this application.
   
   •	A valid internet connection, required to have access to github.
   
