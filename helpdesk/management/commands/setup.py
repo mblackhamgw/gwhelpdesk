@@ -5,22 +5,17 @@ from shutil import copy2, move
 import stat, os
 from socket import gethostbyname, gethostname, getfqdn
 from sys import exit
-from stat import *
 from helpdesk.models import Admin
 from getpass import getpass
 from django.contrib.auth.hashers import PBKDF2PasswordHasher
-
 import gwhelp.settings
 from subprocess import Popen, PIPE
-
 
 # The class must be named Command, and subclass BaseCommand
 class Command(BaseCommand):
     help = "This doesn't do anything yet"
 
     def handle(self, *args, **options):
-
-
         baseDir = gwhelp.settings.BASE_DIR
         print "Let's get the info about your GroupWise Admin Server..."
         gwconfig = GWSettings.objects.all()
@@ -57,7 +52,6 @@ class Command(BaseCommand):
                 admin.delete()
                 self.createAdmin()
 
-
         print "Two more tasks to go, create a gwhelpdesk init script and the nginx conf file"
         helpdeskScript = 'helpdesk/management/commands/gwhelpdesk'
         if os.path.isfile(helpdeskScript):
@@ -87,7 +81,6 @@ class Command(BaseCommand):
         if os.path.isfile(nginxConfig):
             try:
                 destination = '/etc/nginx/nginx.conf'
-
                 if os.path.isfile(destination):
                     os.remove(destination)
                     bak = '/etc/nginx/nginx.conf.bak'
@@ -107,18 +100,14 @@ class Command(BaseCommand):
         if os.path.isfile('/usr/sbin/rcgwhelpdesk'):
             os.remove('/usr/sbin/rcgwhelpdesk')
 
-
-
         os.symlink('/etc/init.d/gwhelpdesk', '/usr/sbin/rcgwhelpdesk')
         os.chmod('/etc/init.d/gwhelpdesk', stat.S_IRWXU)
         print "That's done.."
+        print ''
+        print ''
 
-        print ''
-        print ''
         self.editSettings()
-
         self.enable()
-
 
     def enable(self):
         print "Enabling gwhelpdesk and nginx init scripts"
@@ -175,9 +164,6 @@ class Command(BaseCommand):
         elif host and not ipaddr:
             newline = "ALLOWED_HOSTS = ['%s']" % host
 
-
-
-
         if ipaddr != None:
             print "Using IP address: %s " % ipaddr
 
@@ -186,7 +172,6 @@ class Command(BaseCommand):
 
         filename = os.path.join(os.getcwd(), 'gwhelp/settings.py')
         newfile = os.path.join(os.getcwd(), 'gwhelp/settings.py.bak')
-
         os.rename(filename, newfile)
         with open(newfile, 'r') as input_file, open(filename, 'w') as output_file:
             for line in input_file:
@@ -199,8 +184,6 @@ class Command(BaseCommand):
         ngconf = '/etc/nginx/nginx.conf'
         newngconf = '/etc/nginx/nginx.conf.bak'
 
-        # ngconf = 'nginx.conf'
-        # newngconf = 'nginx.conf.bak'
         if not os.path.isfile(newngconf):
             os.rename(ngconf, newngconf)
 
@@ -210,22 +193,18 @@ class Command(BaseCommand):
                 if 'proxy_set_header' in line:
                     output_file.write(line)
                     continue
-
                 if 'listen' in line:
                     listenline = '''
                 listen     %s;
         ''' % nginxport
                     output_file.write(listenline)
                     continue
-
                 if 'server_name' in line:
                     serverline = '''
                 server_name     %s;
-
         ''' % ipaddr
                     output_file.write(serverline)
                     continue
-
                 else:
                     output_file.write(line)
 
@@ -244,7 +223,6 @@ class Command(BaseCommand):
 
     def host(self):
         print 'Server FQDN name is %s' % getfqdn()
-
         use = raw_input('Use %s ? (y/n): ' % getfqdn())
         if use.lower() == 'y' or use.lower() == 'yes':
             host = getfqdn()
@@ -254,8 +232,8 @@ class Command(BaseCommand):
 
     def whoami(self, gwhost, gwport, gwadmin, gwpass):
         gw = gwlib.gw(gwhost, gwport, gwadmin, gwpass)
-        who = gw.whoami()
-        return who
+        whoami = gw.whoami()
+        return whoami
 
     def updateConfig(self):
         print 'GroupWise Admin Server Settings Configuration\n'
@@ -264,22 +242,17 @@ class Command(BaseCommand):
         gwadmin = raw_input('GroupWise System Administrator: ')
         gwpass = getpass('Administrator Password: ')
         gwconfig = GWSettings.objects.all()[0]
-
         gwconfig.gwHost = gwhost
         gwconfig.gwPort = gwport
         gwconfig.gwAdmin = gwadmin
         gwconfig.gwPass = gwpass
         gwconfig.save()
         whoami = self.whoami(gwhost, gwport, gwadmin, gwpass)
-        # print whoami
         if whoami == 1:
             print "Connection to GroupWise Admin Service Failed"
-
         elif 'roles' in whoami.keys():
             if 'SYSTEM_RECORD' in whoami['roles']:
-
                 print "Login to GroupWise Admin service successful"
-
             else:
                 print "%s is not a System Administrator.  Supply proper GroupWise system admin credentials" % gwadmin
                 answer = raw_input('Shall we try again?  (y/n) :')
@@ -309,5 +282,3 @@ class Command(BaseCommand):
         admin.role = 'AD'
         admin.save()
         print "Administrator: %s created" % admin.username
-
-

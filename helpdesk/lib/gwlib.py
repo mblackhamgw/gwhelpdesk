@@ -52,16 +52,13 @@ class gw:
         else:
             retvalue['nextId'] = 1
         retvalue['userList'] = self.userList
-
         return retvalue
 
     def allUsers(self):
         self.userList = []
         url = '%s/gwadmin-service/list/user?count=1000' % self.baseUrl
         nextId = self.getUsers(url)
-
         while nextId != 1:
-
             nextUrl = '%s&nextId=%s' % (url, nextId)
             nextId = self.getUsers(nextUrl)
         return self.userList
@@ -78,9 +75,7 @@ class gw:
             retvalue['nextId'] = nextId
         else:
             retvalue['nextId'] = 1
-
         retvalue['groupList'] = self.groupList
-
         return retvalue
 
     def getGroups(self):
@@ -92,7 +87,6 @@ class gw:
             for grp in g:
                 data = [grp['name'], grp['id']]
                 glist.append(data)
-
             return glist
         except:
             pass
@@ -100,7 +94,6 @@ class gw:
     def addUserToGroups(self, groups, userid):
         user = self.getObject(userid)
         url = '%s%s/groupmemberships' % (self.baseUrl, user['@url'])
-
         for group in groups:
             data = {'add': {'id': group}}
             results = self.session.put(url, data=json.dumps(data))
@@ -109,7 +102,6 @@ class gw:
         url = '%s/gwadmin-service/system/info' % self.baseUrl
         response = self.session.get(url)
         info = self.checkResponse(response)
-        #
         if info:
             total = info['userCount'] + info['externalUserCount']
             return total
@@ -117,13 +109,11 @@ class gw:
     def getUsers(self, url):
         #self.session.auth = (self.gwAdmin, self.gwPass)
         response = self.session.get(url)
-
         if response.text:
             sj = json.loads(response.text)
             if 'object' in sj.keys():
                 for user in sj['object']:
                     self.userList.append(user)
-
             if 'resultInfo' in sj.keys():
                 if 'nextId' in sj['resultInfo']:
                     nextId = sj['resultInfo']['nextId']
@@ -148,7 +138,6 @@ class gw:
             userUrl = "%s%s" % (self.baseUrl, obj['@url'])
             resp = self.session.get(userUrl)
             user = self.checkResponse(resp)
-
             if 'USER' in user['id']:
                 details = self.getObject(user['id'])
                 details['pendingOp'] = 'false'
@@ -160,7 +149,6 @@ class gw:
                     if 'ldapDn' in user.keys():
                         details['ldap'] = 'true'
                 gwusers.append(details)
-
         return gwusers
 
     def getObject(self, id):
@@ -217,7 +205,6 @@ class gw:
 
     def iDomains(self):
         idomains = []
-
         url = '%s/gwadmin-service/system/internetdomains' % self.baseUrl
         try:
             response = self.session.get(url, timeout=5)
@@ -260,7 +247,6 @@ class gw:
         url = '%s/gwadmin-service/list/post_office' % self.baseUrl
         response = self.session.get(url, timeout=5)
         objects = self.checkResponse(response)
-
         for object in objects:
             podict = {}
             podict['name'] = object['name']
@@ -274,13 +260,7 @@ class gw:
             else:
                 podict['external'] = False
             poList.append(podict)
-
         return poList
-
-
-    #def getPoIds(self, polist):
-
-
 
     def addUser(self, pourl, data):
         url = '%s%s/users' % (self.baseUrl, pourl)
@@ -306,8 +286,9 @@ class gw:
         resp = self.session.get(newurl)
         if resp.text:
             doc = json.loads(resp.text)
-
-        return doc
+            return doc
+        else:
+            return "Unable to get user info"
 
     def userGroupMembership(self, id):
         membership = []
@@ -316,7 +297,6 @@ class gw:
         object = self.checkResponse(response)
         newurl = '%s%s/groupmemberships' % (self.baseUrl, object['@url'])
         response = self.session.get(newurl)
-
         if response.text:
             dict = json.loads(response.text)
             if 'object' in dict.keys():
@@ -327,9 +307,7 @@ class gw:
                     data.append(grp['participation'])
                     data.append(grp['id'])
                     membership.append(data)
-
                 return membership
-
             elif 'resultInfo' in dict.keys():
                 return None
 
@@ -347,7 +325,6 @@ class gw:
         user = self.getObject(userid)
         url = '%s%s/groupmemberships/%s' % (self.baseUrl, user['@url'], grpid)
         results = self.session.delete(url)
-
 
     def renameUser(self, id, newid):
         user = self.getObject(id)

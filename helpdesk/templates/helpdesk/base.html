@@ -1,5 +1,4 @@
 {% load staticfiles %}
-
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -26,21 +25,13 @@
 			<link rel="stylesheet" href="{% static 'css/ace-part2.min.css' %}" class="ace-main-stylesheet" />
 		<![endif]-->
 		<link rel="stylesheet" href="{% static 'css/ace-skins.min.css' %}" />
-
-
 		<link rel="stylesheet" href="{% static 'css/ace-rtl.min.css' %}" />
-
-
 		<!--[if lte IE 9]>
 		  <link rel="stylesheet" href="{% static 'css/ace-ie.min.css' %}" />
 		<![endif]-->
 
-		<!-- inline styles related to this page -->
-
 		<!-- ace settings handler -->
 		<script src="{% static 'js/ace-extra.min.js' %}"></script>
-
-		<!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
 
 		<!--[if lte IE 8]>
 		<script src="{% static 'js/html5shiv.min.js' %}"></script>
@@ -215,7 +206,6 @@
 
 <!--[if !IE]> -->
 <script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
-
 <!-- <![endif]-->
 
 <!--[if IE]>
@@ -224,34 +214,22 @@
 
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
 
-<!-- page specific plugin scripts -->
-
 <!-- ace scripts -->
 <script src="{% static 'js/ace-elements.min.js' %}"></script>
 <script src="{% static 'js/ace.min.js' %}"></script>
 
-<!-- inline scripts related to this page -->
-
 <!-- show/hide some divs on the intet addr page	-->
-
 <script type="text/javascript">
 	$('#preferredAddressFormatInherited').click(function(){
 		this.checked?$('#showPref').show(10):$('#showPref').hide(10); //time for show
 	});
-
 </script>
-
-
-
 <script type="text/javascript">
 	$('#internetDomainNameOverride').click(function(){
 		this.checked?$('#showDomain').show(10):$('#showDomain').hide(10); //time for show
 	});
-
 </script>
-
 <script type="text/javascript">
-
 jQuery.fn.filterByText = function(textbox, selectSingleMatch) {
   return this.each(function() {
     var select = this;
@@ -284,8 +262,6 @@ jQuery.fn.filterByText = function(textbox, selectSingleMatch) {
   $(function() {
         $('#select').filterByText($('#textbox'), true);
     });
-
 </script>
-
 </body>
 </html>

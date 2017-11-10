@@ -44,7 +44,7 @@ class AddUser(forms.Form):
                     #self.errors['No Match'] = self.error_class(['Passwords do not match'])
                     self.add_error('password2','Passwords do not match')
     except:
-        print 'init failed'
+        print 'Init failed'
 
 class AdminForm(ModelForm):
     class Meta:
@@ -56,13 +56,11 @@ class AdminForm(ModelForm):
         if "password" in data and "password2" in data:
             if data['password'] != data['password2']:
                 password2 = data['password2']
-                #self.errors['No Match'] = self.error_class(['Passwords do not match'])
                 self.add_error('password2','Passwords do not match')
 
         return data
 
 class changePassword(Form):
-    #userid = forms.CharField(max_length=64)
     password = forms.CharField(max_length=64, required=True)
     password2 = forms.CharField(max_length=64, required=True)
     id = forms.CharField(max_length=128)
@@ -73,10 +71,6 @@ class GWConfig(ModelForm):
         model = GWSettings
         fields = '__all__'
 
-
-
-
-
 class Groups(forms.Form):
     try:
         gw = gwInit()
@@ -86,15 +80,10 @@ class Groups(forms.Form):
             #print g
             choice = (g[1], g[0])
             choices.append(choice)
-        #print choices
-        #groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,label="",choices=choices, required=False)
-        #groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,label="",choices=choices, required=False)
 
         groups = forms.ChoiceField(choices=choices, widget=forms.SelectMultiple, required=False)
         participation = forms.CharField(max_length=64, required=False)
-        #groups = forms.ChoiceField(choices=choices, widget=forms.CheckboxSelectMultiple)
-    #    groups = forms.ChoiceField()
-        #groups = forms.SelectMultiple()
+
     except:
         pass
 
@@ -105,9 +94,7 @@ class LoginForm(Form):
 
 class Move(forms.Form):
     id = forms.CharField(max_length=128)
-#    poid = forms.CharField(max_length=128)
     postoffice = forms.CharField(max_length=64)
-
 
 class Rename(forms.Form):
     newid = forms.CharField(max_length=64)
@@ -123,7 +110,6 @@ class SearchResults(forms.Form):
 
 class UserDetails(forms.Form):
     gw = gwInit()
-
     try:
         idoms = gw.iDomains()
         idomChoices = []
@@ -139,6 +125,7 @@ class UserDetails(forms.Form):
         ('POST_OFFICE','Post Office'),
         ('NONE', 'None')
     ]
+
     addrFormats = [
         ('HOST', 'Username.PostOffice@InternetDomain'),
         ('USER', ' Username@InternetDomain'),
@@ -183,29 +170,12 @@ class UserDetails(forms.Form):
     preferredEmailId = forms.CharField(max_length=128, required=False)
     internetDomainNameOverride = forms.BooleanField(required=False)
     iDomainValue = forms.ChoiceField(choices=idomChoices, required=False)
-
     iDomainExclusive = forms.BooleanField(required=False)
 
-    #groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,label="Add user to following Groups")
-
 class UserGroups(forms.Form):
-    #gw = gwInit()
-    #grps = gw.getGroups()
-    #choices = []
-    #pchoices = [
-    #    ('PRIMARY', 'PRIMARY'),
-    #    ('CC', 'CARBON_COPY'),
-    #    ['BC', 'BLIND_COPY']
-    #]
-    #for g in grps:
-    #    choice = (g, g)
-    #    choices.append(choice)
-        #    groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,label="",choices=choices, required=False)
     group = forms.CharField(max_length=64, required=False)
     participation = forms.CharField(max_length=64, required=False)
     grpid = forms.CharField(max_length=256, required=False)
-
-
 
 class UserList(forms.Form):
     name = forms.CharField(max_length=64)
@@ -213,5 +183,3 @@ class UserList(forms.Form):
     givenName = forms.CharField(max_length=64)
     surname = forms.CharField(max_length=64)
     postOfficeName = forms.CharField(max_length=64)
-
-

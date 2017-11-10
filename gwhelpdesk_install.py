@@ -1,8 +1,5 @@
-import sys
-import subprocess
-import os, stat
+import sys, subprocess, os, stat, logging
 from time import sleep
-import logging
 
 def log(msg):
     logging.info(msg)
@@ -14,7 +11,6 @@ logging.basicConfig(level=logging.DEBUG,
                     filename='gwhelpdesk_install.log',
                     filemode='w')
 
-
 #check version of Suse
 with open('/etc/SuSE-release') as f:
     data = f.readlines()
@@ -25,11 +21,7 @@ sp3 = ''
 if 'openSUSE' in data[0]:
     log("openSuse is supported")
 
-
-
 elif '12' in data[1]:
-
-
     log("Adding SDK repository for git install")
     if '2' in data[2]:
         sp2 = True
@@ -65,13 +57,12 @@ for rpm in rpms:
         log(line)
 
 # have to install pip using easy_install
-if sp3 == True:
+if sp3 == True or sp2 == True:
     from setuptools.command import easy_install
     easy_install.main(['-U','pip'])
     sleep(3)
 
 # install some python modules using pip
-#import pip
 
 p = subprocess.Popen('pip install --trusted-host "pypi.python.org" --upgrade pip', shell=True, stdout=subprocess.PIPE)
 for line in p.stdout:
@@ -82,13 +73,10 @@ piplist = ['django', 'gunicorn', 'requests', 'django-baseurl' ,'django-ipware', 
 for mod in piplist:
     log('pip installing: %s' % mod)
     p = subprocess.Popen('pip install --trusted-host "pypi.python.org" %s' % mod, shell=True, stdout=subprocess.PIPE)
-
     for line in p.stdout:
         log(line)
     p.wait()
     sleep(1)
-
-
 
 log("Getting the gwhelpdesk app from git..")
 
@@ -103,25 +91,19 @@ if not os.path.isdir(baseDir):
         sys.exit()
 
 installDir = '%s/gwhelpdesk' % baseDir
-import git
+
 # run git to fetch the code.
 gitUrl = "https://github.com/mblackhamgw/gwhelpdesk.git"
-#repo = git.Repo.init(installDir)
-#origin = repo.create_remote('origin', gitUrl)
-#origin.fetch()
-#origin.pull(origin.refs[0].remote_head)
-
 p = subprocess.Popen('GIT_SSL_NO_VERIFY=true git clone %s %s' % (gitUrl, installDir ), shell=True, stdout=subprocess.PIPE)
 for line in p.stdout:
     log(line)
-    p.wait()
-    sleep(1)
+p.wait()
+sleep(1)
 
-modify gwhelpdesk init script to add install directory
+#modify gwhelpdesk init script to add install directory
 gwfile = '%s/helpdesk/management/commands/gwhelpdesk' % installDir
 newgwfile = '%s/helpdesk/management/commands/gwhelpdesk.bak' % installDir
 appdirline = 'APPDIR=%s' % installDir
-
 
 os.rename(gwfile, newgwfile)
 
@@ -170,4 +152,3 @@ log('---- Done with installation ----')
 log('')
 
 print '--  cd to %s,  then run python manage.py setup to modify some db records.' % installDir
-
