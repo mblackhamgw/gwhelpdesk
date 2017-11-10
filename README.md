@@ -14,12 +14,12 @@ Requirements:
 
   •	A Linux server.  Tested and supported on openSuse 42.2, 42.3 - (Leap distribution)  https://software.opensuse.org/distributions/leap
     
-    Also tested on SLES12 Sp2 and Sp3.  (on your own for licensing this OS,  the GroupWise SLES entitlement 
+    Also tested on SLES12 Sp2 and Sp3.  (on your own for licensing SLES,  the GroupWise SLES entitlement 
     does not apply to this application.
   
-  •	A valid internet connection, required to have access to github.
+  •	A valid internet connection, required to download applcation from github.
   
-  •	A GroupWise 2014 system.  Only  tested against GroupWise 2014 SP2, no testing prior to that.
+  •	A GroupWise 2014 system.  Only tested against GroupWise 2014 SP2, no testing on prior versions.
 
 You can get by with a text only install for the OS, but you can do the whole GUI thing if you want. After you install, copy the gwhelpdesk_install.py script to the server, then run "python gwhelpdesk_install.py". This will install a few needed rpm's, python modules and download gwhelpdesk from github.com
 
