@@ -13,7 +13,7 @@ The application has the ability to have 4 administrative roles:
 Requirements:
 
   •	A Linux server.  Tested and supported on openSuse 42.2, 42.3 - (Leap distribution)  https://software.opensuse.org/distributions/leap
-    Also tested on SLES12 Sp2 and Sp3.  (on your own for licensing this OS,  the GroupWise SLES entitlement would not valid for this         application)
+    Also tested on SLES12 Sp2 and Sp3.  (on your own for licensing this OS,  the GroupWise SLES entitlement does not apply to this application.
   •	A valid internet connection, required to have access to github.
   •	A GroupWise 2014 system.  Only  tested against GroupWise 2014 SP2, no testing prior to that.
 
