@@ -70,7 +70,7 @@ def addadmin(request):
     return render(request, 'helpdesk/addadmin.html', {'form': form})
 
 def admins(request):
-    ads = Admin.objects.all()
+    admins = Admin.objects.all()
     if request.method == "POST":
         form = AdminForm(request.POST)
         print form.errors
