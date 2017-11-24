@@ -413,6 +413,91 @@ def logout(request):
     request.session.modified = True
     return HttpResponseRedirect('/login/')
 
+
+def maintenance(request):
+    if request.method == "POST":
+        id = request.POST['id']
+        name = request.POST['name']
+        gw = gwInit()
+
+        if 'analyzeok' in request.POST:
+            gwcheckoptions = {}
+            options = ['structure','contents', 'checkIndex', 'fixProblems','updateTotals','checkAttachments']
+            for option in request.POST:
+                if option in options:
+                    gwcheckoptions[option] = request.POST[option]
+            print gwcheckoptions
+            gwcheck = gw.gwcheck('ANALYZE', id, gwcheckoptions)
+            if gwcheck == 0:
+                log(request, "gwcheck %s task has been sent to the POA for %s" % ('Analyze/Fix', name))
+                messages.add_message(request, messages.SUCCESS, "A Maintenace task has been sent to the POA")
+
+        elif 'expireok' in request.POST:
+            gwcheckoptions = {}
+            options = ['expireDays', 'expireSize', 'expireTrashDays', 'expireUntil' ,'boxLimit', 'expireType', 'expireFlags', 'expireDownloadedDays']
+            expireFlags = [ "INBOX", "OUTBOX", "CALENDAR", "ONLY_BACKED_UP", "ONLY_RETAINED", "LIMITED_SIZE" ]
+            if 'olderthan' in request.POST and request.POST['olderthan'] == 'on':
+                gwcheckoptions['expireDays'] = request.POST['expireDays']
+            if 'largerthan' in request.POST and request.POST['largerthan'] == 'on':
+                gwcheckoptions['expireSize'] = request.POST['expireSize']
+            if 'trashdays' in request.POST and request.POST['trashdays'] == 'on':
+                gwcheckoptions['expireTrashDays'] = request.POST['expireTrashDays']
+            if 'downloadeddays' in request.POST and request.POST['downloadeddays'] == 'on' :
+                gwcheckoptions['expireDownloadedDays'] = request.POST['expireDownloadedDays']
+
+            flags = []
+            for flag in expireFlags:
+                if flag in request.POST:
+                    print flag
+                    flags.append(flag)
+            gwcheckoptions['expireFlags'] = flags
+            gwcheck = gw.gwcheck('EXPIRE', id, gwcheckoptions)
+            if gwcheck == 0:
+                log(request, "gwcheck %s task has been sent to the POA for %s" % ('Expire/Reduce', name))
+                messages.add_message(request, messages.SUCCESS, "A Maintenace task has been sent to the POA")
+
+        elif 'rebuildok' in request.POST:
+            data = {
+              "files" : [ "USER", "MSG" ],
+              "action" : "REBUILD",
+              "eventType" : "MAINTENANCE",
+              "message" : "",
+              "sendToCc" : "",
+              "verbose" : 'true',
+              "exclude" : 'null',
+              "distribute" : [ "ADMIN", 'USERS' ]
+            }
+
+            gwcheck = gw.gwcheck('REBUILD', id, data)
+            print 'gwcheck val = %s' % gwcheck
+            if gwcheck == 0:
+                log(request, "gwcheck %s task has been sent to the POA for %s" % ('Structural Rebuild', name))
+                messages.add_message(request, messages.SUCCESS, "A Maintenace task has been sent to the POA")
+
+
+        elif 'resetok' in request.POST:
+            data = {
+              "files" : [ "USER" ],
+              "action" : "PREFS",
+              "eventtype" : "maintenance",
+              "message" : "",
+              "resetpassword" : "********",
+              "sendtocc" : "",
+              "verbose" : 'true',
+              "exclude" : 'null',
+              "distribute" : [ "ADMIN",'USERS' ]
+            }
+            gwcheck = gw.gwcheck('PREFS', id, data)
+            if gwcheck == 0:
+                log(request, "gwcheck %s task has been sent to the POA for %s" % ('Reset Client Options', name))
+                messages.add_message(request, messages.SUCCESS, "A Maintenace task has been sent to the POA")
+
+        form = Maintenence(request.POST)
+        return render(request, 'helpdesk/maintenance.html', {'form': form})
+    else:
+        form = Maintenence()
+        return render(request, 'helpdesk/maintenance.html', {'form':form})
+
 def move(request):
     gw = gwInit()
     if request.method == "POST":

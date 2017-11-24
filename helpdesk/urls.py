@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^userdata/$', views.userdata, name='userdata'),
     url(r'^groups/$', views.groups, name='groups'),
     url(r'^move/$', views.move, name='move'),
+    url(r'^maintenance/$', views.maintenance, name='maintenance'),
     url(r'^addtogroups/$', views.addtogroups, name='addtogroups'),
     url(r'^adduser/$', views.adduser, name='adduser'),
     url(r'^deluser/$', views.deluser, name='deluser'),

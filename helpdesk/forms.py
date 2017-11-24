@@ -92,6 +92,19 @@ class LoginForm(Form):
     username = forms.CharField(max_length=128)
     password = forms.CharField(max_length=128)
 
+class Maintenence(forms.Form):
+
+    actions = [
+        ('analyze', 'Analyze/Fix Database' ),
+        ('expire', 'Expire/Reduce'),
+        ('rebuild','Structural Rebuild'),
+        ('reset','Reset Client Options')
+    ]
+    action = forms.ChoiceField(choices=actions)
+
+
+
+
 class Move(forms.Form):
     id = forms.CharField(max_length=128)
     postoffice = forms.CharField(max_length=64)
