@@ -1,0 +1,260 @@
+{% extends 'helpdesk/base.html' %}
+{% block content %}
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<div class="page-header">
+    <h1>Maintenance for {{ request.session.name }} </h1>
+</div><!-- /.page-header -->
+
+<div class="col-md-10 ">
+	<div class="widget-box widget-color-blue">
+		<div class="widget-header">
+			<h5 class="widget-title bigger lighter">Mailbox Maintenance</h5>
+		</div>
+    </div>
+
+    <form name="analyzeform" id="analyzeform" method="post" action="{% url 'maintenance' %}">
+        {% csrf_token %}
+        <br>
+         <div class="col-md-10">
+            <label>Action &nbsp&nbsp</label>
+            <select name="action" id="action" >
+               <option value="0">Select Action</option>
+            {% for key, value in form.action.field.choices %}
+                <option value="{{ key }}">{{ value }}</option>
+            {% endfor %}
+            </select>
+         </div>
+
+         <br></br>
+         <div class="analyze" id="analyze" style="display: none;">
+             <input type="hidden" name="id" value="{{ request.session.id }}"/>
+             <input type="hidden" name="name" value="{{ request.session.name }}"/>
+             <div class="col-md-10">
+               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="checkbox" name="structure" checked >&nbsp&nbsp Structure</input>
+             </div>
+             <div class="col-md-10">
+               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="checkbox" name="checkIndex">&nbsp&nbsp Index Check</input>
+             </div>
+             <div class="col-md-10">
+               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="checkbox" name="contents" checked>&nbsp&nbsp Content</input>
+             </div>
+             <div class="col-md-10">
+               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="checkbox" name="statistics">&nbsp&nbsp Collect Statistics</input>
+             </div>
+             <div class="col-md-10">
+               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="checkbox" name="checkAttachments">&nbsp&nbsp Attachment File Check</input>
+             </div>
+             <div class="col-md-10">
+               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="checkbox" name="fixProblems" checked>&nbsp&nbsp  Fix Problems</input>
+             </div>
+             <div class="col-md-10">
+               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="checkbox" name="updateTotals">&nbsp&nbsp Update user disk space totals</input>
+             </div>
+
+             <br></br>
+             <div class="row">
+                <div class="col-lg-8">
+                    <div class="col-lg-3">
+                        <br></br>
+                        <button class="btn btn-fill btn-primary" type="submit" name="analyzeok">OK</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+
+    <div class="expire" id="expire" style="display: none;">
+         <form name="expireform" id="expireform" method="post" action="{% url 'maintenance' %}">
+
+        {% csrf_token %}
+            <input type="hidden" name="id" value="{{ request.session.id }}"/>
+             <input type="hidden" name="name" value="{{ request.session.name }}"/>
+             <div class="col-md-10">
+               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="checkbox" name="reduceOnly" checked>&emsp; Reduce Only</input>
+             </div>
+
+
+             <div class="col-md-10">
+               &emsp;&emsp;&emsp;<input  id="group1" type="checkbox" name="expirereduce">&emsp; Expire and Reduce</input>
+             </div>
+
+
+             <div class="col-md-5">
+               &emsp;&emsp;&emsp;&emsp;<input class="group1" type="checkbox" checked name="olderthan">&emsp; Items older than &nbsp&nbsp&nbsp&nbsp&nbsp</input>
+                 <input class="group1" type="number" size="4" min="1" max="999999" value="60" name="expireDays">&emsp; Days</input></td>
+             </div>
+
+
+             <div class="col-md-6">
+                   &emsp;&emsp;&emsp;<input class="group1" type="checkbox" name="largerthan">&emsp;Items larger than &emsp;&emsp;&emsp;&emsp;</input>
+                     <input  class="group1" type="number" size="4" min="1" max="999999" value="1000" name="expireSize">&emsp;  KB</input>
+                 </div>
+                <div class="col-md-5">
+                   &emsp;&emsp;&emsp;&emsp;<input class="group1" type="checkbox" checked name="trashdays"> &emsp; Trash older than &emsp; </input>
+
+                     <input  class="group1" type="number" size="4" min="1" max="999999" value="60" name="expireTrashDays">&emsp;  Days</input>
+
+                </div>
+            <div class="col-md-6">
+               &emsp;&emsp;&emsp;<input class="group1" type="checkbox"  name="downloadeddays">&emsp;Downloaded older than &emsp;</input>
+                 <input class="group1" type="number" size="4" min="1" max="999999" value="30" name="expireDownloadedDays">&emsp;Days</input></td>
+             </div>
+
+
+
+           <div class="col-md-10">
+               &emsp;&emsp;&emsp;&emsp;<input class="group1 limit" id = "limit" type="checkbox" name="reduceto">&emsp;  Reduce mailbox to &nbsp&nbsp</input>
+                 <input  class="group1 limit"  type="number" size="4" min="1" max="999999" value="5" name="expireUntil">&nbsp&nbsp  MB</input>
+            </div>
+           <div class="col-md-5">
+               &emsp;&emsp;&emsp;&emsp;<input class="group1 reduceto"  id="reduceto" type="checkbox" name="LIMITED_SIZE">&nbsp&nbsp  Reduce mailbox to limited size </input>
+
+            </div>
+
+
+
+           <div class="col-md-10">
+               <br>
+               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b>Include</b>
+               <hr>
+
+            </div>
+           <div class="col-md-5">
+               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input class="group1" checked type="checkbox" name="INBOX">&nbsp&nbsp  Received items </input>
+
+            </div>
+           <div class="col-md-5">
+               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input class="group1" checked type="checkbox" name="OUTBOX">&nbsp&nbsp  Sent items </input>
+
+            </div>
+           <div class="col-md-5">
+               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input class="group1" checked type="checkbox" name="CALENDAR">&nbsp&nbsp  Calendar items </input>
+
+            </div>
+           <div class="col-md-5">
+               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input class="group1" type="checkbox" name="ONLY_BACKED_UP">&nbsp&nbsp  Only backed-up items </input>
+
+            </div>
+           <div class="col-md-5">
+               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input class="group1" type="checkbox" name="ONLY_RETAINED">&nbsp&nbsp  Only retained items </input>
+
+            </div>
+
+
+    <br></br>
+     <div class="row">
+        <div class="col-lg-8">
+            <div class="col-lg-3">
+                <br></br>
+                <button class="btn btn-fill btn-primary" type="submit" name="expireok">OK</button>
+            </div>
+        </div>
+    </div>
+
+    </form>
+
+    </div>
+
+    <div class="rebuild" id="rebuild" style="display: none;">
+         <form name="rebuildform" id="rebuildform" method="post" action="{% url 'maintenance' %}">
+            {% csrf_token %}
+            <input type="hidden" name="id" value="{{ request.session.id }}"/>
+             <input type="hidden" name="name" value="{{ request.session.name }}"/>
+
+            <div class="row">
+                <div class="col-lg-3">
+                    <br></br>
+                        <button class="btn btn-fill btn-primary" type="submit" name="rebuildok">OK</button>
+                    </div>
+            </div>
+         </form>
+    </div>
+
+    <div class="reset" id="reset" style="display: none;">
+         <form name="resetform" id="resetform" method="post" action="{% url 'maintenance' %}">
+            {% csrf_token %}
+               <input type="hidden" name="id" value="{{ request.session.id }}"/>
+               <input type="hidden" name="name" value="{{ request.session.name }}"/>
+           <div class="row">
+                <div class="col-lg-3">
+                    <br></br>
+                    <button class="btn btn-fill btn-primary" type="submit" name="resetok">OK</button>
+                </div>
+            </div>
+         </form>
+    </div>
+    <p>
+        {% for message in messages %}
+            {% if message.level == 25 %}
+        <div class="alert alert-danger alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+             <a href="#" class="alert-link">{{ message }}</a>.
+        </div>
+            {% endif %}
+        {% endfor %}
+    </p>
+</div>
+
+<script type="text/javascript">
+	document.getElementById('action').addEventListener('change', function () {
+    var style = this.value == 'analyze' ? 'block' : 'none';
+    document.getElementById('analyze').style.display = style;
+    });
+</script>
+
+<script type="text/javascript">
+	document.getElementById('action').addEventListener('change', function () {
+    var style = this.value == 'rebuild' ? 'block' : 'none';
+    document.getElementById('rebuild').style.display = style;
+    });
+</script>
+
+<script type="text/javascript">
+	document.getElementById('action').addEventListener('change', function () {
+    var style = this.value == 'reset' ? 'block' : 'none';
+    document.getElementById('reset').style.display = style;
+    });
+</script>
+
+<script type="text/javascript">
+	document.getElementById('action').addEventListener('change', function () {
+    var style = this.value == 'expire' ? 'block' : 'none';
+    document.getElementById('expire').style.display = style;
+    });
+</script>
+
+<script type="text/javascript">
+	function enable() {
+    document.getElementById("check").disabled= false;
+
+}
+
+function disable() {
+     document.getElementById("check").disabled= true;
+}
+</script>
+
+<script type="text/javascript">
+$(function() {
+    enable_cb();
+    $("#group1").click(enable_cb);
+});
+
+function enable_cb() {
+    $("input.group1").prop("disabled", !this.checked);
+}
+</script>
+
+<script type="text/javascript">
+$(function() {
+    enable_cb();
+    $("#limit).click(enable_cb);
+});
+
+function enable_cb() {
+    $("input.reduceto").prop("disabled", !this.checked);
+}
+</script>
+
+{% endblock %}
