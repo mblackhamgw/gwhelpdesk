@@ -78,6 +78,64 @@ class gw:
         retvalue['groupList'] = self.groupList
         return retvalue
 
+    def gwcheck(self, action, id, options):
+        user = self.getObject(id)
+        checkurl = '%s%s/gwcheck' % (self.baseUrl, user['@url'])
+        if action == 'ANALYZE':
+            checkoptions = ['checkAttachments', 'checkIndex', 'statistics', 'updateTotals', 'fixProblems', 'structure', 'contents']
+            analyzeOptions = {}
+            verify = []
+            for option in checkoptions:
+                if option in options:
+                    if option == 'structure':
+                        verify.append('STRUCTURE')
+                    elif option == 'contents':
+                        verify.append('CONTENTS')
+                    else:
+                        op = 'true'
+                else:
+                    op = 'false'
+                analyzeOptions['verify'] = verify
+                analyzeOptions[option] = op
+
+            data = {
+                "analyzeOptions": analyzeOptions,
+                "files": ["USER", "MSG"],
+                "action": "ANALYZE",
+                "eventType": "MAINTENANCE",
+                "message": "",
+                "sendToCc": "",
+                "verbose": 'true',
+                "distribute": ["ADMIN", 'USERS']
+            }
+
+        elif action == 'EXPIRE':
+            print 'Expire'
+            data = {
+                'expireOptions': options,
+                "files": ["USER"],
+                "action": "EXPIRE",
+                "eventType": "MAINTENANCE",
+                "message": "",
+                "sendToCc": "",
+                "verbose": 'true',
+                "exclude": 'null',
+                "distribute": ["ADMIN",'USERS']
+            }
+
+        elif action == 'REBUILD':
+            data = options
+
+        elif action == 'PREFS':
+            data = options
+
+        results = self.session.post(checkurl, data=json.dumps(data))
+
+        if results.text:
+            return results.text
+        else:
+            return 0
+
     def getGroups(self):
         glist = []
         url = '%s/gwadmin-service/list/group' % self.baseUrl
