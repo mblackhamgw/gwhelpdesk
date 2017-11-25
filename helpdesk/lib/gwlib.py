@@ -110,7 +110,7 @@ class gw:
             }
 
         elif action == 'EXPIRE':
-            print 'Expire'
+
             data = {
                 'expireOptions': options,
                 "files": ["USER"],
@@ -387,7 +387,7 @@ class gw:
     def renameUser(self, id, newid):
         user = self.getObject(id)
         pourl = '%s%s/rename' % (self.baseUrl, user['links'][1]['@href'])
-        print pourl
+
         data = {'objectId': id,
                 'newObjectId': newid,
                 'createNickname':'false'
