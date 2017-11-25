@@ -426,7 +426,7 @@ def maintenance(request):
             for option in request.POST:
                 if option in options:
                     gwcheckoptions[option] = request.POST[option]
-            print gwcheckoptions
+
             gwcheck = gw.gwcheck('ANALYZE', id, gwcheckoptions)
             if gwcheck == 0:
                 log(request, "gwcheck %s task has been sent to the POA for %s" % ('Analyze/Fix', name))
@@ -448,7 +448,6 @@ def maintenance(request):
             flags = []
             for flag in expireFlags:
                 if flag in request.POST:
-                    print flag
                     flags.append(flag)
             gwcheckoptions['expireFlags'] = flags
             gwcheck = gw.gwcheck('EXPIRE', id, gwcheckoptions)
@@ -469,7 +468,7 @@ def maintenance(request):
             }
 
             gwcheck = gw.gwcheck('REBUILD', id, data)
-            print 'gwcheck val = %s' % gwcheck
+
             if gwcheck == 0:
                 log(request, "gwcheck %s task has been sent to the POA for %s" % ('Structural Rebuild', name))
                 messages.add_message(request, messages.SUCCESS, "A Maintenace task has been sent to the POA")
@@ -504,7 +503,7 @@ def move(request):
         form = Move(request.POST)
         print form.errors
         if form.is_valid():
-            print 'valid'
+
             cd = form.cleaned_data
             POST, DOMAIN, PONAME = cd['postoffice'].split('.')
             USER, DOM, PO, USERID = cd['id'].split('.')
@@ -533,18 +532,18 @@ def move(request):
     else:
         form = Move()
         polist = gw.getPolist()
-        print polist
+
         for postoffice in polist:
             dom = str(postoffice['url']).split('/')[3]
             po = str(postoffice['url']).split('/')[5]
             poid = 'POST_OFFICE.%s.%s' % (dom, po)
-            print poid
+
             postoffice['id'] = poid
         return render(request, 'helpdesk/move.html', {'form': form, 'polist': polist})
 
 def rename(request):
     if request.method == "POST":
-        print request.POST
+
         form = Rename(request.POST)
         print form.errors
         if form.is_valid():
@@ -555,12 +554,12 @@ def rename(request):
             cd = form.cleaned_data
             id = cd['id']
             newname = cd['newid']
-            print "old id: " + id
+
             oldname = cd['name']
             popart = id.rsplit('.',1)[0]
-            print 'new name: ' + newname
+
             newid = '%s.%s' % (popart, newname)
-            print 'new id: ' + newid
+
             gw = gwInit()
             rename = gw.renameUser(id, newname)
             request.session['id'] = newid
