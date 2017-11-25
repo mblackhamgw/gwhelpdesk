@@ -18,16 +18,30 @@
                         <b class="caret"></b>
                     </p>
                 </a>
-                            <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle">
-                                                More
-                                                <span class="ace-icon fa fa-caret-down"></span>
-                                            </button>
+
+                {% if request.session.role == "AD" or request.session.role == "HD" %}
+
+                    <button class="btn  btn-sm ">
+
+                        <a href="{% url 'maintenance' %}">Maintenance</a>
+                            </font>
+                    </button>
+
+                    <button class="btn  btn-sm ">
+                        <a href="{% url 'changepassword' %}">Change Password</a>
+                    </button>
+
+                {% endif %}
+
+                    <button data-toggle="dropdown" class="btn btn-sm dropdown-toggle">
+                        More
+                        <span class="ace-icon fa fa-caret-down"></span>
+                    </button>
 
 
                     <ul class="dropdown-menu">
                         <li>
-                            <a href="{% url 'changepassword' %}">Change Password</a>
-                        </li>
+
 
                         {% if request.session.role == "AD" or request.session.role == "HD" %}
                              <li>
@@ -37,7 +51,7 @@
                                 <a href="{% url 'move' %}">Move User</a>
                             </li>
                             <li>
-                                <a href="{% url 'maintenance' %}">Maintenance</a>
+
                             </li>
                             <li>
                                 <a href="{% url 'deluser' %}">Delete User</a>
