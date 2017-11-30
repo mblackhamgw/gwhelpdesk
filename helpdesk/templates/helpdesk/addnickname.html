@@ -1,0 +1,132 @@
+{% extends 'helpdesk/base.html' %}
+{% block content %}
+{% load staticfiles %}
+<div class="page-header">
+    <h1>Add Nickname for {{ request.session.id}} </h1>
+    </div><!-- /.page-header -->
+        <div class="col-xs-8 ">
+            <div class="widget-box widget-color-blue">
+                <div class="widget-header">
+                    <h5 class="widget-title bigger lighter">Add Nickname</h5>
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main">
+
+             </h5>
+            <form name="addresourceform" method="post" action="" class="form-horizontal">
+                 {% csrf_token %}
+
+            <div class="row">
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Nickname</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="nickname" placeholder="Name"/>
+                    </div>
+                </div>
+
+
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Given Name</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="givenName" placeholder="Given Name"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Surname</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="surname" placeholder="Surname"/>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Nicknamed Object</label>
+                     <div class="col-md-5">
+                        <input class="form-control" type="text" name="referreduser" value="{{request.session.id}}" readonly="readonly"/>
+                    </div>
+                </div>
+
+                 <div class="form-group">
+                    <label class="col-md-3 control-label">Post Office</label>
+                    <div class="col-md-5">
+                        <select  class="form-control" name="postOfficeName">
+                            {% for po in polist %}
+                                {% if po.external == True %}
+                                    <option value="{{ po.id }}">{{ po.name }} (External)</option>
+                                {% else %}
+                                    <option value="{{ po.id }}">{{ po.name }}</option>
+                                {% endif %}
+
+                            {% endfor %}
+                        </select>
+                    </div>
+                 </div>
+
+
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Visibility</label>
+                    <div class="col-md-5">
+                        <select  class="form-control" name="visibility">
+                            {% for key, value in form.visibility.field.choices %}
+                            <option {% if key == "NONE" %}
+                                    selected="selected"
+                                {% endif %}
+
+                                value="{{ key }}">{{ value }}
+
+                            </option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                 </div>
+
+
+
+            </div>
+
+
+        <div class="card-footer">
+            <div class="form-group">
+                <label class="col-md-3"></label>
+                <div class="col-md-9">
+                    <button type="submit" class="btn btn-fill btn-primary">
+                        Save
+                    </button>
+                </div>
+            </div>
+            {% if form.errors.password2 %}
+                 <div class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <div class="alert-link">{{ form.errors.password2  }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.level == 40 %}
+                        <div class="col-lg-8">
+                        <div class="alert alert-danger alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                {{ message }}
+                        </div>
+                    {% endif %}
+
+                {% endfor %}
+            {% endif %}
+        </div>
+        </div>
+            </form>
+
+            </div>
+
+            </div><!-- end panel-body -->
+        </div> <!-- end panel-default -->
+
+
+{% endblock %}

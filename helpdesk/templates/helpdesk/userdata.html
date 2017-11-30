@@ -50,9 +50,7 @@
                             <li>
                                 <a href="{% url 'move' %}">Move User</a>
                             </li>
-                            <li>
 
-                            </li>
                             <li>
                                 <a href="{% url 'deluser' %}">Delete User</a>
                             </li>
@@ -131,13 +129,16 @@
                                 <a data-toggle="tab" href="#inet">
                                     Internet Addressing
                                 </a>
-                                <li>
-                                <!-- for future                                
-                                <a data-toggle="tab" href="">
+                            <li>
+                                <a  href="{% url 'nicknames' %}">
                                     Nicknames
+
                                 </a>
-                                -->
                             </li>
+                            <li>
+                                <a href="{% url 'resources' %}">
+                                    Resources
+                                </a>
                             </li>
                         </ul>
 
@@ -548,6 +549,32 @@
                         </div>
 
                         </div><!-- end tab content -->
+
+
+                        <div id="nicknames" class="tab-pane">
+                            <a href="{% url 'nicknames' %}"> Nicknames</a>
+
+
+                        </div><!-- end nickname tab content -->
+
+                            <div id="resources" class="tab-pane">
+
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <input name="x1" type="text"/>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="col-lg-3">
+                                        <div class="form-group">
+
+                                        </div>
+                                    </div>
+                                </div>
+                        </div><!-- end resources tab content -->
+
+
+
                     <div class="row">
                         <div class="col-lg-8">
                             <div class="col-lg-3">

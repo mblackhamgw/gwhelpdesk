@@ -1,0 +1,76 @@
+{% extends 'helpdesk/base.html' %}
+{% load staticfiles %}
+{% block content %}
+    <div class="col-lg-12">
+    <div class="widget-box widget-color-blue">
+        <div class="widget-header">
+            <h5 class="widget-title bigger lighter">Resources owned by {{request.session.name }}</h5>
+        </div>
+
+                <div class="widget-body">
+                    <div class="widget-main">
+                    <table id="simple-table" class="table  table-bordered table-hover">
+
+                    <thead>
+                            <th>Resource</th>
+                            <th>Post Office</th>
+                            <th>Domain</th>
+
+                            {% if request.session.role != "HL" %}
+                                <th>Action</th>
+                                <th><a href="{% url 'addresource' %}" class="btn btn-primary btn-sm" aria-label="Left Align">
+                                          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                            Add Resource</a>
+                             </th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    <form method="POST" action="{% url 'resources' %}">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <input name="ownerid" type="hidden" value="{{ request.session.id }}"/>
+                            {% for r in resources %}
+                                <input type="hidden" name="resourceid" value="{{r.2}}"/>
+                                <input type="hidden" name="resourceurl" value="{{r.1}}"/>
+                                <input type="hidden"  name="resourcename" value="{{r.0}}"/>
+
+
+                            <tr>
+                                <div class="form-group">
+                                    <td>{{r.0}}</td>
+                                </div>
+                                <div class="form-group">
+                                    <td>{{r.3}}</td>
+                                </div>
+                                <div class="form-group">
+                                   <td>{{r.4}}</td>
+                                </div>
+
+                                    {% if request.session.role != "HL" %}
+                                        <td>
+                                            <button name="delete" type="submit" class="btn btn-primary btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                                    Delete
+                                            </button>
+
+
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                        </tbody>
+                        </table>
+                    </form>
+
+           </div>
+                </div>
+    </div>
+
+
+
+</div>
+
+{% endblock %}

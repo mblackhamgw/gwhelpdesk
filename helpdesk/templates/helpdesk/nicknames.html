@@ -1,0 +1,126 @@
+{% extends 'helpdesk/base.html' %}
+{% load staticfiles %}
+{% block content %}
+    <div class="col-lg-12">
+    <div class="widget-box widget-color-blue">
+        <div class="widget-header">
+            <h5 class="widget-title bigger lighter">Nicknames for {{request.session.name }}</h5>
+        </div>
+
+                <div class="widget-body">
+                    <div class="widget-main">
+                    <table id="simple-table" class="table  table-bordered table-hover">
+
+                    <thead>
+                        <tr>
+                            <th>Nickname</th>
+                            <th>Given Name</th>
+                            <th>Surname</th>
+                            <th>Post Office</th>
+                            <th>Visibility</th>
+
+                            {% if request.session.role != "HL" %}
+                            <th>Action</th>
+                            {% endif %}
+                            <th><a href="{% url 'addnickname' %}" class="btn btn-primary btn-sm" aria-label="Left Align">
+                                          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                            Add Nickname</a></th>
+
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+
+                    <form method="POST" action="{% url 'nicknames' %}">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <input name="ownerid" type="hidden" value="{{ request.session.id }}"/>
+                            {% for nick in nicknames %}
+
+                            <tr>
+                                <div class="form-group">
+                                    <td>{{nick.name}}</td>
+                                </div>
+                                <div class="form-group">
+                                    <td>
+                                    {% if nick.givenName%}
+                                        {{nick.givenName}}
+                                    {% endif %}
+                                    </td>
+                                </div>
+                                <div class="form-group">
+                                   <td>
+                                       {% if nick.surname %}
+                                        {{nick.surname}}
+                                    {% endif %}
+                                   </td>
+                                </div>
+
+                                <div class="form-group">
+                                   <td>
+                                       {% if nick.postOfficeName %}
+                                        {{nick.postOfficeName}}
+                                    {% endif %}
+                                   </td>
+                                </div>
+
+                                <div class="form-group">
+                                   <td>
+
+                                        {{nick.visibility}}
+
+                                   </td>
+                                </div>
+
+                                {% if request.session.role != "HL" %}
+                                        <td>
+                                            <button name="delete" type="submit" class="btn btn-primary btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                                    Delete
+                                            </button>
+
+
+                                        </td>
+                                    {% endif %}
+                                </tr>
+
+
+
+                                <!--
+                                <div class="form-group">
+                                   <td>{{nick.10}}</td>
+                                </div>
+
+
+
+                                    {% if request.session.role != "HL" or request.session.rold != "PW" %}
+                                        <td>
+                                            <button name="delete" type="submit" class="btn btn-primary btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                                    Delete Resource
+                                            </button>
+                                    {% endif %}
+                                        <a href="{% url 'addresource' %}" class="btn btn-primary btn-sm" aria-label="Left Align">
+                                          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                            Add Resource</a>
+                                        </button>
+                                        </td>
+
+                                        -->
+                                </tr>
+                                {% endfor %}
+                        </tbody>
+                        </table>
+                    </form>
+
+           </div>
+                </div>
+    </div>
+
+
+
+</div>
+
+{% endblock %}
