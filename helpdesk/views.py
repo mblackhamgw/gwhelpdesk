@@ -100,6 +100,74 @@ def admins(request):
         admins = Admin.objects.all()
     return render(request, 'helpdesk/admins.html', {'form': form, 'admins': admins})
 
+
+def addnickname(request):
+    gw = gwInit()
+    polist = gw.getPolist()
+
+    if request.method == "POST":
+        form = Nicknames(request.POST)
+        print form.errors
+        if form.is_valid():
+            cd = form.cleaned_data
+            form = Nicknames(request.POST)
+            data ={}
+            poname = request.POST['postOfficeName']
+            nickpo = poname.split('.')[2]
+            nickdom = poname.split('.')[1]
+            referreduser = request.POST['referreduser']
+            userpo = referreduser.split('.')[2]
+            userdom = referreduser.split('.')[1]
+            username = referreduser.split('.')[3]
+
+            data['name'] = cd['nickname']
+            data['domainName'] = nickdom
+            data['postOfficeName'] = nickpo
+            data['visibility'] = cd['visibility']
+            data['givenName'] = cd['givenName']
+            data['surname'] = cd['surname']
+            data['referredUserName'] = referreduser
+            data['userName'] = username
+            data['userPostOfficeName'] = userpo
+            data['userDomainName'] = userdom
+
+            newnick = gw.addNickname(**data)
+            if newnick == 0:
+                log(request, "Added nickname of %s for %s" % (cd['nickname'], username))
+
+
+        #new = gw.addResource(request.POST['resourcename'], po, dom, request.session['name'] )
+            id = request.session['id']
+        #nicklist = gw.nicknames(id)
+
+            return render(request, 'helpdesk/addnickname.html', {'form':form, 'polist': polist})
+
+
+    form = Nicknames()
+    return render(request, 'helpdesk/addnickname.html', {'form':form,  'polist': polist})
+
+def addresource(request):
+    gw= gwInit()
+    polist = gw.getPolist()
+
+    if request.method == "POST":
+
+        form = Addresource(request.POST)
+        ownerid = request.POST['ownerid']
+        po = ownerid.split('.')[2]
+        dom = ownerid.split('.')[1]
+        newresource = gw.addResource(request.POST['resourcename'], po, dom, request.session['name'] )
+
+        if newresource == 0:
+            log(request, "Added resource  %s for %s" % (request.POST['resourcename'], request.session['name']))
+
+        id = request.session['id']
+        resourcelist = gw.resources(id)
+        id = request.session['id']
+        return render(request, 'helpdesk/resources.html', {'form':form, 'resources': resourcelist, 'polist': polist})
+    form = Addresource()
+    return render(request, 'helpdesk/addresource.html', {'form': form, 'polist': polist})
+
 def addtogroups(request):
     gw = gwInit()
     if request.method == "POST":
@@ -541,6 +609,13 @@ def move(request):
             postoffice['id'] = poid
         return render(request, 'helpdesk/move.html', {'form': form, 'polist': polist})
 
+def nicknames(request):
+    gw = gwInit()
+    id = request.session['id']
+    nicknamelist = gw.nicknames(id)
+    id = request.session['id']
+    return render(request, 'helpdesk/nicknames.html', {'nicknames': nicknamelist})
+
 def rename(request):
     if request.method == "POST":
 
@@ -580,6 +655,36 @@ def rename(request):
     else:
         form = Rename()
         return render(request, 'helpdesk/rename.html', {'form': form})
+
+def resources(request):
+    gw = gwInit()
+    id = request.session['id']
+    resourcelist = gw.resources(id)
+    id = request.session['id']
+    if request.POST:
+        form = Resources(request.POST)
+        print form.errors
+        url = request.POST['resourceurl']
+
+        if 'delete' in request.POST:
+            delresource = gw.delResource(url)
+            resourcelist = gw.resources(id)
+            return render(request, 'helpdesk/resources.html', {'resources': resourcelist})
+
+        if 'add' in request.POST:
+            pourl = request.POST['resourceurl']
+            parts = pourl.split('/')
+            parts.pop(-1)
+            sep = '/'
+
+            u = sep.join(parts)
+
+
+
+        return render(request, 'helpdesk/resources.html', {'resources': resourcelist})
+
+    return render(request, 'helpdesk/resources.html', {'resources': resourcelist})
+
 
 def search(request):
     request.session.header = 'GroupWise User Search'
@@ -751,6 +856,7 @@ def userdata(request):
                 parts = id.split('.')
                 log(request, 'GroupWise User %s deleted '% parts[3])
                 return render(request, 'helpdesk/deluser.html')
+
         elif 'changepwd' in request.POST:
             request.session.header = 'Change GroupWise Password for %s' % request.POST['name']
             form = SearchResults(request.POST)
@@ -765,6 +871,7 @@ def userdata(request):
                 request.session['name'] = name
                 pwdform = changePassword(request.POST)
                 return render(request, 'helpdesk/changepassword.html', {'form': pwdform, 'name': name, 'id': id})
+
         elif 'update' in request.POST:
             uid = request.session['id']
             form = UserDetails(request.POST)

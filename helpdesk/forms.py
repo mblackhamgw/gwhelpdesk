@@ -77,23 +77,18 @@ class Groups(forms.Form):
         grps = gw.getGroups()
         choices = []
         for g in grps:
-            #print g
             choice = (g[1], g[0])
             choices.append(choice)
-
         groups = forms.ChoiceField(choices=choices, widget=forms.SelectMultiple, required=False)
         participation = forms.CharField(max_length=64, required=False)
-
     except:
         pass
-
 
 class LoginForm(Form):
     username = forms.CharField(max_length=128)
     password = forms.CharField(max_length=128)
 
 class Maintenence(forms.Form):
-
     actions = [
         ('analyze', 'Analyze/Fix Database' ),
         ('expire', 'Expire/Reduce'),
@@ -101,9 +96,6 @@ class Maintenence(forms.Form):
         ('reset','Reset Client Options')
     ]
     action = forms.ChoiceField(choices=actions)
-
-
-
 
 class Move(forms.Form):
     id = forms.CharField(max_length=128)
@@ -113,6 +105,25 @@ class Rename(forms.Form):
     newid = forms.CharField(max_length=64)
     id = forms.CharField(max_length=128)
     name = forms.CharField(max_length=64)
+
+class Resources(forms.Form):
+    resourcename = forms.CharField(max_length=64)
+    resourceid = forms.CharField(max_length=128)
+    resourceurl = forms.CharField(max_length=128)
+    ownerid = forms.CharField(max_length=128)
+
+class Addresource(forms.Form):
+    resourcename = forms.CharField(max_length=64)
+    ownername = forms.CharField(max_length=32)
+    ownerid = forms.CharField(max_length=128)
+    visChoices = [
+        ('SYSTEM', 'System'),
+        ('DOMAIN', 'Domain'),
+        ('POST_OFFICE', 'Post Office'),
+        ('NONE', 'None')
+    ]
+    visibility = forms.ChoiceField(choices=visChoices)
+
 
 class Search(forms.Form):
     userid = forms.CharField(max_length=64)
@@ -196,3 +207,32 @@ class UserList(forms.Form):
     givenName = forms.CharField(max_length=64)
     surname = forms.CharField(max_length=64)
     postOfficeName = forms.CharField(max_length=64)
+
+class Nicknames(forms.Form):
+
+    try:
+        gw = gwInit()
+        pos = gw.getPolist()
+        doms = gw.getDomlist()
+        pochoices = []
+        for po  in pos:
+            choice = (po['id'],po['name'])
+            pochoices.append(choice)
+
+        visChoices = [
+            ('SYSTEM', 'System'),
+            ('DOMAIN', 'Domain'),
+            ('POST_OFFICE', 'Post Office'),
+            ('NONE', 'None')
+        ]
+    except:
+        pass
+    nickname = forms.CharField(max_length=64, required=True)
+
+    postOfficeName = forms.ChoiceField(choices=pochoices, required=True)
+    visibility = forms.ChoiceField(choices=visChoices)
+    surname = forms.CharField(max_length=64, required=False)
+    givenName = forms.CharField(max_length=64, required=False)
+    #userdomain = forms.CharField(max_length=64)
+    #userpo = forms.CharField(max_length=64)
+    referreduser = forms.CharField(max_length=128)

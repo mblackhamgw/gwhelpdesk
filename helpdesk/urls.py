@@ -29,5 +29,10 @@ urlpatterns = [
     url(r'^rename/$', views.rename, name='rename'),
     url(r'^dissociate/$', views.dissociate, name='dissociate'),
     url(r'^viewlog/$', views.viewlog, name='viewlog'),
+    url(r'^nicknames/$', views.nicknames, name='nicknames'),
+    url(r'^addnickname/$', views.addnickname, name='addnickname'),
+    url(r'^resources/$', views.resources, name='resources'),
+    url(r'^addresource/$', views.addresource, name='addresource'),
+
 
 ]
