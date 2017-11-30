@@ -225,14 +225,15 @@ class Nicknames(forms.Form):
             ('POST_OFFICE', 'Post Office'),
             ('NONE', 'None')
         ]
-    except:
-        pass
-    nickname = forms.CharField(max_length=64, required=True)
+    
+        nickname = forms.CharField(max_length=64, required=True)
 
-    postOfficeName = forms.ChoiceField(choices=pochoices, required=True)
-    visibility = forms.ChoiceField(choices=visChoices)
-    surname = forms.CharField(max_length=64, required=False)
-    givenName = forms.CharField(max_length=64, required=False)
-    #userdomain = forms.CharField(max_length=64)
-    #userpo = forms.CharField(max_length=64)
-    referreduser = forms.CharField(max_length=128)
+        postOfficeName = forms.ChoiceField(choices=pochoices, required=True)
+        visibility = forms.ChoiceField(choices=visChoices)
+        surname = forms.CharField(max_length=64, required=False)
+        givenName = forms.CharField(max_length=64, required=False)
+        #userdomain = forms.CharField(max_length=64)
+        #userpo = forms.CharField(max_length=64)
+        referreduser = forms.CharField(max_length=128)
+    except:
+        print "fail"
