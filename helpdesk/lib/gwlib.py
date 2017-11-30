@@ -309,6 +309,7 @@ class gw:
             podict = {}
             podict['name'] = object['name']
             podict['url'] = object['@url']
+            podict['id'] = object['id']
             if 'LDAP' in object['securitySettings']:
                 podict['ldap'] = True
             else:
@@ -319,6 +320,24 @@ class gw:
                 podict['external'] = False
             poList.append(podict)
         return poList
+
+
+    def getDomlist(self):
+        domList = []
+        url = '%s/gwadmin-service/list/domain' % self.baseUrl
+        response = self.session.get(url, timeout=5)
+        objects = self.checkResponse(response)
+        for object in objects:
+            domdict = {}
+            domdict['name'] = object['name']
+            domdict['url'] = object['@url']
+
+            if 'externalRecord' in object.keys():
+                domdict['external'] = True
+            else:
+                domdict['external'] = False
+            domList.append(domdict)
+        return domList
 
     def addUser(self, pourl, data):
         url = '%s%s/users' % (self.baseUrl, pourl)
@@ -365,7 +384,9 @@ class gw:
                     data.append(grp['participation'])
                     data.append(grp['id'])
                     membership.append(data)
+                    print type(membership)
                 return membership
+
             elif 'resultInfo' in dict.keys():
                 return None
 
@@ -415,3 +436,97 @@ class gw:
                 if 'lastAction' in dict.keys():
                     lastaction = dict['object']['moveStatus']['lastAction']
                     return lastaction
+
+
+    def resources(self, id):
+        user = self.getObject(id)
+        url = '%s%s/resources' % (self.baseUrl,user['@url'])
+        resourcelist = []
+        response = self.session.get(url)
+        if response.text:
+            dict = json.loads(response.text)
+            if 'object' in dict.keys():
+                objects = dict['object']
+                for resource in objects:
+                    data = []
+                    data.append(resource['name'])
+                    data.append(resource['@url'])
+                    data.append(resource['id'])
+                    data.append(resource['postOfficeName'])
+                    data.append(resource['domainName'])
+                    resourcelist.append(data)
+                return resourcelist
+            elif 'resultInfo' in dict.keys():
+                return None
+        return resourcelist
+
+    def delResource(self, url ):
+        delurl = '%s%s' % (self.baseUrl, url)
+
+        results = self.session.delete(delurl)
+        return results.text
+
+    def addResource(self,name, po, domain, owner ):
+        data = {
+            "name": name,
+            "domainName": domain,
+            "postOfficeName": po,
+            "owner": owner,
+        }
+
+        url = '%s/gwadmin-service/domains/%s/postoffices/%s/resources' % (self.baseUrl, domain, po )
+        results = self.session.post(url, data=json.dumps(data))
+        if 'location' in results.headers:
+            return 0
+        else:
+            return 1
+
+
+    def nicknames(self, id):
+        user = self.getObject(id)
+        url = '%s%s/nicknames' % (self.baseUrl, user['@url'])
+        nicknamelist = []
+
+        response = self.session.get(url)
+        if response.text:
+            dict = json.loads(response.text)
+            if 'object' in dict.keys():
+                objects = dict['object']
+                for nickname in objects:
+                    data = {}
+                    data['name'] =(nickname['name'])
+                    if 'givenName' in nickname:
+                        data['givenName'] = nickname['givenName']
+                    if 'surname' in nickname:
+                        data['surname'] = nickname['surname']
+                    data['@url'] = nickname['@url']
+                    data['id'] = nickname['id']
+                    data['postOfficeName'] = nickname['postOfficeName']
+                    data['domainName'] = nickname['domainName']
+                    data['userDomainName'] = nickname['userDomainName']
+                    data['userPostOfficeName'] = nickname['userPostOfficeName']
+                    data['userName'] = nickname['userName']
+                    data['visibility'] = nickname['visibility']
+                    #data.append(nickname['preferredEmailAddress'])
+                    #if 'expirationDate' in nickname:
+                    #    data.append(nickname['expirationDate'])
+                    nicknamelist.append(data)
+
+                return nicknamelist
+            elif 'resultInfo' in dict.keys():
+                return None
+        return nicknamelist
+
+    def addNickname(self, **kwargs):
+        data = {}
+        for key, value in kwargs.iteritems():
+            data[key] = value
+        url = '%s/gwadmin-service/domains/%s/postoffices/%s/nicknames' % (self.baseUrl, data['domainName'], data['postOfficeName'] )
+        results = self.session.post(url, data=json.dumps(data))
+
+        if 'location' in results.headers:
+            return 0
+        else:
+            return 1
+
+
