@@ -384,7 +384,7 @@ class gw:
                     data.append(grp['participation'])
                     data.append(grp['id'])
                     membership.append(data)
-                    print type(membership)
+
                 return membership
 
             elif 'resultInfo' in dict.keys():
@@ -499,7 +499,7 @@ class gw:
                         data['givenName'] = nickname['givenName']
                     if 'surname' in nickname:
                         data['surname'] = nickname['surname']
-                    data['@url'] = nickname['@url']
+                    data['url'] = nickname['@url']
                     data['id'] = nickname['id']
                     data['postOfficeName'] = nickname['postOfficeName']
                     data['domainName'] = nickname['domainName']
@@ -525,6 +525,14 @@ class gw:
         results = self.session.post(url, data=json.dumps(data))
 
         if 'location' in results.headers:
+            return 0
+        else:
+            return 1
+
+    def delNickname(self, url):
+        delurl = '%s%s' % (self.baseUrl, url)
+        results = self.session.delete(delurl)
+        if not results.text:
             return 0
         else:
             return 1
