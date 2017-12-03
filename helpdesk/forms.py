@@ -235,5 +235,6 @@ class Nicknames(forms.Form):
         #userdomain = forms.CharField(max_length=64)
         #userpo = forms.CharField(max_length=64)
         referreduser = forms.CharField(max_length=128)
+#        nickid = forms.CharField(max_length=128)
     except:
         print "fail"

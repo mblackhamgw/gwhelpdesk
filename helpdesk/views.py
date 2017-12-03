@@ -134,11 +134,11 @@ def addnickname(request):
             newnick = gw.addNickname(**data)
             if newnick == 0:
                 log(request, "Added nickname of %s for %s" % (cd['nickname'], username))
+                id = request.session['id']
+                nicknamelist = gw.nicknames(id)
+                id = request.session['id']
+                return render(request, 'helpdesk/nicknames.html', {'nicknames': nicknamelist})
 
-
-        #new = gw.addResource(request.POST['resourcename'], po, dom, request.session['name'] )
-            id = request.session['id']
-        #nicklist = gw.nicknames(id)
 
             return render(request, 'helpdesk/addnickname.html', {'form':form, 'polist': polist})
 
@@ -613,7 +613,18 @@ def nicknames(request):
     gw = gwInit()
     id = request.session['id']
     nicknamelist = gw.nicknames(id)
-    id = request.session['id']
+
+    if request.POST:
+        if 'delete' in request.POST:
+            url = request.POST['url']
+            nickname = request.POST['name']
+            owner = id.split('.')[3]
+            delnick = gw.delNickname(url)
+            if delnick == 0:
+                log(request, 'Deleted nickname %s for %s' % (nickname, owner))
+                nicknamelist = gw.nicknames(id)
+                return render(request, 'helpdesk/nicknames.html', {'nicknames': nicknamelist})
+
     return render(request, 'helpdesk/nicknames.html', {'nicknames': nicknamelist})
 
 def rename(request):
@@ -676,15 +687,9 @@ def resources(request):
             parts = pourl.split('/')
             parts.pop(-1)
             sep = '/'
-
             u = sep.join(parts)
-
-
-
         return render(request, 'helpdesk/resources.html', {'resources': resourcelist})
-
     return render(request, 'helpdesk/resources.html', {'resources': resourcelist})
-
 
 def search(request):
     request.session.header = 'GroupWise User Search'
