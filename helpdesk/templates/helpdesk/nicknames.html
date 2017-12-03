@@ -35,9 +35,16 @@
                     <form method="POST" action="{% url 'nicknames' %}">
                         {% csrf_token %}
 
+
+
                         <div class="form-group">
                             <input name="ownerid" type="hidden" value="{{ request.session.id }}"/>
                             {% for nick in nicknames %}
+
+                            <input name="url" value="{{ nick.url}}" type="hidden"/>
+                            <input name="name" value="{{ nick.name}}" type="hidden"/>
+
+
 
                             <tr>
                                 <div class="form-group">
