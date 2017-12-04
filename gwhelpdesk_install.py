@@ -50,7 +50,7 @@ else:
 
 #install some needed rpms - python-pip fails on sles,  but pip is in python-setuptools
 log('Installing some needed rpms from Suse repository.. Please be patient')
-rpms = ['python-pip', 'nginx', 'git', 'python-setuptools', 'dos2unix']
+rpms = ['python-pip', 'nginx', 'git', 'python-setuptools', 'dos2unix', 'net-tools']
 for rpm in rpms:
     p = subprocess.Popen('zypper -n in %s' % rpm ,shell=True, stdout=subprocess.PIPE)
     for line in p.stdout:
