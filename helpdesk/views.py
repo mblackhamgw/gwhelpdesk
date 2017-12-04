@@ -590,7 +590,7 @@ def move(request):
                 userData['ldap'] = 'true'
             else:
                 userData['ldap'] = 'false'
-            log(request, '%s move from %s to %s' % (USERID, oldpoid, '.'.join(cd['postoffice'].rsplit('.')[-2:])))
+            log(request, '%s moved from %s to %s' % (USERID, oldpoid, '.'.join(cd['postoffice'].rsplit('.')[-2:])))
             return render(request, 'helpdesk/userdata.html',
                           {'form': form, 'user': userData, 'addressFormats': addressFormats,
                            'emailAddrs': emailAddrs})
