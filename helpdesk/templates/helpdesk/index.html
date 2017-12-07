@@ -9,14 +9,18 @@
                 <div class="widget-main">
                     <h5>
                     <p>
-                   Use the left menus to search for GroupWise Users, or performing site administration functions.
+                        Use the left menus to <a href="{% url 'search' %}">search</a> for or <a href="{% url 'userlist' %}">list </a>GroupWise Users, or performing site administration functions.
                     </p>
+
+                        Edit the <a href="{% url 'gwconfig' %}">GroupWise Configuration</a> settings to allow the application to  connect to your GroupWise Admin Service.
+                        The Administrator must be a GroupWise System Administrator.
+                    </p>
+
                             <p>
-                                Edit the GroupWise Configuration settings to allow the application to  connect to your GroupWise Admin Service.
-                                The Administrator must be a GroupWise System Administrator.
+                                You can also <a href="{% url 'addadmin' %}">Add additional administrators</a> with an administrator role.
                             </p>
                             <p>
-                                There are currently 4 administrator roles:
+                                There are currently four administrator roles:
                                <ul>
                                     <p></p>
                                     <li><strong>Administrator</strong> -  This role allows all functions of the application and is also used to add other administrators.</li>
@@ -28,7 +32,7 @@
                                     <li><strong>Helpdesk Lite</strong> - This role allows modification and password change, but not add or delete rights for all GroupWise user objects.</li>
                                     </p>
                                     <p>
-                                    <li><strong>Password</strong> - This role is restriction to only GroupWise user password changes.</li>
+                                    <li><strong>Password</strong> - This role is restricted to only allow GroupWise user password changes.</li>
                                     </p>
                                 </ul>
                             </p>
