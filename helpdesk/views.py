@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.shortcuts import render, redirect, HttpResponseRedirect, reverse, render_to_response
+from django.shortcuts import render, redirect, HttpResponseRedirect, render_to_response
 from django.contrib.auth.hashers import check_password, make_password, is_password_usable, PBKDF2PasswordHasher
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
