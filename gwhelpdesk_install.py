@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sys, subprocess, os, stat, logging
 from time import sleep
 
