@@ -70,7 +70,7 @@ for line in p.stdout:
     log(line)
 p.wait()
 
-piplist = ['Django==1.9', 'gunicorn', 'requests', 'django-baseurl' ,'django-ipware', 'gitpython']
+piplist = ['Django==1.10', 'gunicorn', 'requests', 'django-baseurl' ,'django-ipware', 'gitpython']
 for mod in piplist:
     log('pip installing: %s' % mod)
     p = subprocess.Popen('pip install --trusted-host "pypi.python.org" %s' % mod, shell=True, stdout=subprocess.PIPE)
