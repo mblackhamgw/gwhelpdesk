@@ -66,10 +66,14 @@
 										<i class="ace-icon fa fa-users bigger-200"></i>
 										<a href="{% url 'userlist' %}">All Users</a>
 									</button>
+
+									{% if request.session.role == "AD" %}
 									<button class="btn btn-info">
 										<i class="ace-icon fa fa-user bigger-200"></i>
 										<a href="{% url 'admins' %}">Administrators</a>
 									</button>
+
+									{% endif %}
 									<button class="btn btn-info">
 										<i class="ace-icon fa fa-newspaper-o bigger-200"></i>
 										<a href="{% url 'viewlog' %}">View Log</a>
