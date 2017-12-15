@@ -85,7 +85,14 @@
 						<li class=" dark-blue dropdown-modal">
 							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
 								<span class="user-info">
-									<small>Welcome - {{ request.session.adminname }}</small>
+									<small>Hi!
+										{% if request.session.givenName %}
+											{{ request.session.givenName }}
+										{% else %}
+											{{ request.session.adminname }}
+										{% endif %}
+										</small>
+
 								</span>
 								<i class="ace-icon fa fa-caret-down"></i>
 							</a>

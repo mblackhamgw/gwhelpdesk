@@ -35,6 +35,8 @@
                 </thead>
                  <tbody>
                     {% for user in users %}
+
+
                         <form name="userform" id="userform" class="userform" method="post" action="{% url 'userdata' %}">
                             <span>{% csrf_token %}</span>
                             <input type="hidden" name="id" value="{{ user.id}}">

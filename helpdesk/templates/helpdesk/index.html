@@ -1,15 +1,27 @@
 {% extends 'helpdesk/base.html' %}
 {% block content %}
-<div class="col-xs-8 ">
-     <div class="widget-box">
-            <div class="widget-header">
-                     <h4>Welcome to the GroupWise Helpdesk Application - {{ request.session.adminname}}</h4>
-            </div>
+<div class="page-header">
+    <h1>GroupWise Helpdesk</h1>
+</div><!-- /.page-header -->
+
+<div class="widget-box widget-color-blue">
+    <div class="widget-header">
+        <h5 class="widget-title bigger lighter">Welcome
+            {% if request.session.givenName %}
+                {{ request.session.givenName }} {{ request.session.surname }}
+            {% else %}
+                {{ request.session.adminname }}
+            {% endif %}
+        </h5>
+
+    </div>
+</div>
+
             <div class="widget-body">
                 <div class="widget-main">
                     <h5>
                     <p>
-                        Use the left menus to <a href="{% url 'search' %}">search</a> for or <a href="{% url 'userlist' %}">list </a>GroupWise Users, or performing site administration functions.
+                        Use the menus on the left or the buttons at the top to <a href="{% url 'search' %}">search</a> for or <a href="{% url 'userlist' %}">list </a>GroupWise Users, or performing site administration functions.
                     </p>
 
                         Edit the <a href="{% url 'gwconfig' %}">GroupWise Configuration</a> settings to allow the application to  connect to your GroupWise Admin Service.
@@ -20,7 +32,7 @@
                                 You can also <a href="{% url 'addadmin' %}">Add additional administrators</a> with an administrator role.
                             </p>
                             <p>
-                                There are currently four administrator roles:
+                                There are four administrator roles:
                                <ul>
                                     <p></p>
                                     <li><strong>Administrator</strong> -  This role allows all functions of the application and is also used to add other administrators.</li>
