@@ -461,7 +461,8 @@ def login(request):
                 role = adminuser.role
                 request.session['adminname'] = username
                 request.session['role'] = role
-                request.session['last_name'] = adminuser.last_name
+                request.session['surname'] = adminuser.last_name
+                request.session['givenName'] = adminuser.first_name
                 from ipware.ip import get_ip
                 ip = get_ip(request)
                 if ip is not None:
