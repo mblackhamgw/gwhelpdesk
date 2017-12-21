@@ -1,0 +1,478 @@
+{% extends 'helpdesk/base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+<div class="page-header">
+    <h1>Group Settings for {{ group.name }}</h1>
+    <div class="collapse navbar-collapse">
+         <ul class="nav navbar-nav navbar-right">
+
+
+
+
+                    <ul class="dropdown-menu">
+                        <li>
+
+
+                        {% if request.session.role == "AD" or request.session.role == "HD" %}
+                             <li>
+                                <a href="{% url 'rename' %}">Rename</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'move' %}">Move</a>
+                            </li>
+
+                            <li>
+                                <a href="{% url 'deluser' %}">Delete</a>
+                            </li>
+                        {% endif %}
+                        {% if request.session.role == "AD" %}
+                            {% if user.ldapDn %}
+                                <li>
+                                    <a href="{% url 'dissociate' %}">Dissociate</a>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+
+                    </ul>
+            </li>
+        </ul>
+    </div>
+</div><!-- /.page-header -->
+
+<h6 class="widget-box widget-color-blue">
+    <div class="widget-header">
+        <h5 class="widget-title bigger lighter"></h5>
+        <h6> <b> Domain:  <b>{{ group.domainName }}</b>  &nbsp;&nbsp; Post Office:  <b>{{ group.postOfficeName }}</b>
+                {% if group.ldapDn %}
+                <br>
+                LDAP DN:  <b>{{ group.ldapDn }}</b>
+            &nbsp;&nbsp;    DirectoryId:  <b>{{ group.directoryId }}</b>
+                {% endif %}
+        </h6>
+    </div>
+
+    <!--
+        {% if group.moveStatus %}
+            <h6>
+              <div class="col-md-6">
+                    {% ifequal group.moveStatus.action "UDB_MOVE_group_FINISHED" %}
+                        &nbsp
+                    {% else %}
+                        A previous group move operation has not yet completed.
+                    {% endifequal %}
+              </div>
+            </h6>
+        {% endif %}
+        -->
+</div>
+<div class="widget-body">
+    <div class="widget-main">
+        <div class="col-lg-12">
+            {% if group.ldapDn %}
+            <p><b>Most attributes are read-only as {{ group.name }} is associated to a directory.</b></p>
+            {% endif %}
+
+
+            <div class="row">
+                <div class="col-sm-10">
+
+                    <br>
+
+
+
+                    <div class="tabbable">
+                        <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="tab1">
+                            <li >
+                                <a data-toggle="tab" href="#general">General</a>
+                            </li>
+                            <li class="active">
+                                <a data-toggle="tab" href="#membership">Membership</a>
+                            </li>
+                            <li>
+                                <a data-toggle="tab" href="#inet">Internet Addressing</a>
+                            </li>
+                        </ul>
+
+
+                            <div class="tab-content">
+                                <div id="general" class="tab-pane">
+
+                                    <div class="col-lg-8">
+                                        <form class="form-horizontal" id="gen" name="gen" action="{% url 'groupdetails' %}" method="post">
+                                        {% csrf_token %}
+                                            <input type="hidden" name="id" value="{{ group.id }}">
+
+                                        <div class="form-group">
+                                            <label>Description</label>
+                                            <textarea class="form-control" rows="2" name="description"
+                                                      style="text-align:left; overflow:auto;"
+                                                      {% if user.ldap == "true" %} disabled {% endif %}>{{ group.description }}</textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label>Visibility</label>
+                                            <select  class="form-control" name="visibility">
+                                                {% for key, value in form.visibility.field.choices %}
+                                                    <option
+                                                        {% if key == group.visibility %}
+                                                            selected="selected"
+                                                        {% endif %}
+                                                        value="{{ key }}">{{ value }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-12 col-sm-6">
+											<div class="control-group">
+												<label class="control-label">Replication Override</label>
+												<div class="radio">
+													<label>
+														<input
+                                                            {% if group.replicationOverride == "EVERYWHERE" %}
+                                                                checked="checked"
+                                                            {% endif %}
+                                                            name="replicationOverride" type="radio" class="ace" value="EVERYWHERE"
+                                                        />
+
+														<span class="lbl"> Replicate regardless of visibility</span>
+													</label>
+												</div>
+
+												<div class="radio">
+													<label>
+														<input name="replicationOverride" type="radio" class="ace" value="ACCORDING_TO_VISIBILITY"
+                                                            {% if group.replicationOverride == "ACCORDING_TO_VISIBILITY" %}
+                                                                checked="checked"
+                                                            {% endif %}
+                                                        />
+														<span class="lbl"> Replicate according to visibility</span>
+													</label>
+												</div>
+                                            </div>
+                                    </div>
+
+                                    <div class="col-lg-10 ">
+                                        <label>Email Address: </label>
+                                        {{ group.preferredEmailAddress }}
+                                    </div>
+                                    <br><br>
+                                    <div class="col-lg-10 ">
+                                       <div class="clearfix">
+                                        <button type="submit" name="general" class="btn btn-md btn-primary">
+                                            <span class="bigger-110">Save</span>
+                                        </button>
+                                    </div>
+                                    </div>
+                                    </form>
+
+                                </div>
+                                <!-- end general tab -->
+
+
+                                <div id="membership" class="tab-pane in active">
+                                    <div class="col-xs-12 ">
+
+
+
+
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Membership</th>
+                                                    <th>First Name</th>
+                                                    <th>Last Name</th>
+                                                    <th>Participation</th>
+                                                    <th></th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% if members != 0 %}
+
+                                                {% for member in members %}
+                                                    <form class="form-horizontal" id="members" name="members" action="{% url 'groupdetails' %}" method="post">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="id" value="{{ group.id }}">
+                                                    <input type="hidden" name="memberid" value="{{ member.id }}">
+                                                    <input type="hidden" name="participation" value="{{ member.participation }}">
+                                                    <tr>
+                                                        <td>
+                                                            {{ member.id }}
+                                                        </td>
+
+                                                        <td>
+                                                            {{ member.givenName }}
+                                                        </td>
+                                                        <td>
+                                                            {{ member.surname }}
+                                                        </td>
+
+                                                        <td>
+                                                            <select class="form-control" name="participation">
+                                                                <option value="PRIMARY"
+                                                                    {% if member.participation == "PRIMARY" %}
+                                                                        selected="selected"
+                                                                    {% endif %}
+                                                                >TO</option>
+
+
+                                                                <option value="CARBON_COPY"
+                                                                    {% if member.participation == "CARBON_COPY" %}
+                                                                        selected="selected"
+                                                                    {% endif %}
+
+                                                                >CC</option>
+                                                                <option value="BLIND_COPY"
+                                                                    {% if member.participation == "BLIND_COPY" %}
+                                                                        selected="selected"
+                                                                    {% endif %}
+
+                                                                >BC</option>
+                                                            </select>
+
+                                                        </td>
+
+                                                        <td>
+                                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="membership">&nbspSave&nbsp</button>
+                                                        </td><td>
+                                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="delete">Remove</button>
+                                                        </td>
+
+
+
+                                                    </tr>
+                                                    </form>
+
+
+                                                {% endfor %}
+                                            {% endif %}
+
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- end membership tab -->
+
+                                <div id="inet" class="tab-pane">
+
+                                    <div id="inet" class="tab-pane">
+                                    <h4>Internet Addressing</h4>
+
+                                    <div class="col-lg-12">
+                                        <div class="col-lg-6">
+                                            <label>Allowed Addressing Formats</label>
+
+                                            <form class="form-horizontal" id="inetaddressing" name="inetaddressing" action="{% url 'groupdetails' %}" method="post">
+                                                {% csrf_token %}
+                                              <input type="hidden" name="id" value="{{ group.id }}">
+                                              <input type="hidden" name="name" value="{{ group.name }}">
+
+                                                <div class="form-group">
+                                                <div id="showAllowedOverride">
+                                                     <div class="checkbox">
+                                                        <label>
+                                                            <input type="checkbox", id="allowedOverride" name="allowedOverride" data-toggle="checkbox"
+                                                                {% if group.allowedAddressFormats.inherited == False %}
+                                                                    checked
+                                                                {% endif %}
+                                                            >
+                                                            Override
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                {% for format in addressFormats %}
+                                                    {% if format != "FULL" %}
+                                                        <div class="checkbox">
+                                                            <label>
+                                                            <input type="checkbox" data-toggle="checkbox"
+                                                                {% if format  in group.allowedAddressFormats.value %}
+                                                                        checked
+                                                                 {% endif %}
+                                                                   {% if group.allowedAddressFormats.inherited == False %}
+                                                                    readonly="readonly"
+                                                                {% endif %}
+
+                                                                   {% if format == "HOST" %}
+                                                                        name="HOST" id="{{format}}"
+                                                                    {% endif %}
+                                                                {% if format == "USER" %}
+                                                                        name="USER" id="{{format}}"
+                                                                    {% endif %}
+                                                                {% if format == "FIRST_LAST" %}
+                                                                        name="FIRST_LAST" id="{{format}}"
+                                                                    {% endif %}
+                                                                {% if format == "LAST_FIRST" %}
+                                                                        name="LAST_FIRST" id="{{format}}"
+                                                                    {% endif %}
+                                                                 {% if format == "FLAST" %}
+                                                                        name="FLAST" id="{{format}}"
+                                                                    {% endif %}
+                                                                 >
+
+                                                                {% if format == "HOST" %}
+                                                                   Username.PostOffice@InternetDomain
+                                                                {% endif %}
+                                                                {% if format == "USER" %}
+                                                                   Username@InternetDomain
+                                                                {% endif %}
+                                                                {% if format == "FIRST_LAST" %}
+                                                                    First.Last@InternetDomain
+                                                                {% endif %}
+                                                                {% if format == "LAST_FIRST" %}
+                                                                    Last_FIRST@InternetDomain
+                                                                {% endif %}
+                                                                {% if format == "FLAST" %}
+                                                                    FirstInitialLastName@InternetDomain
+                                                                {% endif %}
+                                                            </label>
+                                                        </div>
+                                                    {% endif %}
+                                               {% endfor %}
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-lg-5">
+                                            <label>Preferred Address Format</label>
+                                            <div class="form-group">
+                                                {{ group.preferredAddressFormat.value}}@Internet domain name
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox", id="preferredAddressFormatInherited" name="preferredAddressFormatInherited" data-toggle="checkbox"
+                                                            {% if group.preferredAddressFormat.inherited == False %}
+                                                                checked
+                                                            {% endif %}
+                                                        >
+                                                        Override
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                           <div id="showPref" {% if group.preferredAddressFormat.inherited == True %} style="display: none" {% endif %}>
+                                                <div class="form-group">
+                                                    <select {% if group.preferredAddressFormat.inherited == True %}  {% endif %}
+                                                        class="form-control" name="preferredAddressFormatValue" id="preferredAddressFormatValue">
+                                                        {% for x, y in form.preferredAddressFormatValue.field.choices %}
+                                                            <option
+                                                                {% if group.preferredAddressFormat.value == x %}
+                                                                    selected="selected"
+                                                                {% endif %}
+                                                                value="{{ x }}">{{ y }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label   >Preferred Email ID</label>
+                                                    <input class="form-control" name="preferredEmailId" id="preferredEmailId" value="{{ group.preferredEmailId }}"
+                                                    {% if group.preferredAddressFormat.inherited == True %}  {% endif %}
+                                                    >
+                                                </div>
+                                           </div>
+                                        <!-- end col 5 -->
+                                    </div><!-- end col 12 -->
+
+                                    <div class="row"></div>
+
+                                        <div class="col-lg-6">
+                                            <label>Internet Domain Name</label> - <b>{{ group.internetDomainName.value }}</b>
+                                        </div>
+                                        <div class="col-lg-12">
+                                         <div class="col-lg-2">
+                                            <div class="checkbox">
+                                                <input type="checkbox", id="internetDomainNameOverride" name="internetDomainNameOverride" data-toggle="checkbox"
+                                                    {% if group.internetDomainName.inherited == False %}
+                                                        checked
+                                                    {% endif %}
+                                                >
+                                                Override
+                                            </div>
+                                        </div>
+                                        <div id="showDomain" {% if group.internetDomainName.inherited == True %} style="display: none" {% endif %}>
+                                            <div class="col-lg-4">
+                                                <select  class="form-control" name="iDomainValue" id="internetDomainNameValue">
+                                                    {% for idom in idomains %}
+                                                        <option
+                                                            {% if idom.0 == group.internetDomainName.value %}
+                                                                selected="selected"
+                                                            {% endif %}
+                                                            value="{{ idom.0 }}">{{ idom.0}}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                             <div class="col-lg-5">
+                                                 <div id="showExclusive">
+                                                    <div class="checkbox">
+                                                        <input type="checkbox", id="iDomainExclusive" name="iDomainExclusive" data-toggle="checkbox"
+                                                        {% if group.internetDomainName.exclusive == True %}
+                                                            checked
+                                                        {% endif %}
+                                                               >
+                                                        Recipient is known exclusively by this Internet domain name
+                                                    </div>
+                                                 </div>
+                                            </div>
+                                        </div>
+
+                                            <div class="col-lg-8">
+                                <div class="panel-group" id="accordion">
+                                    <div class="panel-heading">
+                                        <button class="btn btn-fill btn-primary" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">View Email Addresses</button>
+                                    </div>
+                                    <div id="collapseOne" class="panel-collapse collapse">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Preferred Email Address</label>
+                                                {{ group.preferredEmailAddress }}
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <div class="form-group">
+                                            <label>Allowed Email Addresses</label>
+                                                <textarea disabled rows="4" cols="40">{{ emailAddrs }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                        <div class="row">
+                                        </div>
+
+
+                                </div><!-- end accordian -->
+                            </div><!-- end col 8 -->
+
+
+                            <div class="col-lg-8">
+                            <div class="col-lg-3">
+                                <button class="btn btn-fill btn-primary" type="submit" name="inetaddressing">Save</button>
+                            </div>
+                            </form>
+                        </div>
+
+
+
+                                </div>
+                            </div>
+
+                    </div><!-- end tabbable -->
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

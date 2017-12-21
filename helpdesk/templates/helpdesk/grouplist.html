@@ -1,0 +1,73 @@
+{% extends 'helpdesk/base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+<div class="page-header">
+    <h1>GroupWise Users</h1>
+</div><!-- /.page-header -->
+
+<div class="widget-box widget-color-blue">
+    <div class="widget-header">
+        <h5 class="widget-title bigger lighter">GroupWise Groups - Total Group Count {{ count }} </h5>
+    </div>
+</div>
+
+<div class="widget-body">
+    <div class="widget-main">
+
+       <div class="col-xs-12 ">
+
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Post Office</th>
+                        <th>Domain</th>
+                        <th>Visibility</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                 <tbody>
+
+                    {% for group in groups%}
+                    {{ group.name}}
+
+                        <form name="grpform" id="grpform" method="post" action="">
+                            <span>{% csrf_token %}</span>
+                            <input type="hidden" name="id" value="{{ group.1}}">
+                                <input type="hidden" name="name" value="{{ group.0}}">
+                                <input type="hidden"  name="postOfficeName" value="{{ group.3}}">
+                                <input  type="hidden" name="domainName" value="{{ group.2}}">
+                                <input  type="hidden" name="visibility" value="{{ group.4}}">
+                            <input  type="hidden" name="url" value="{{ group.5}}">
+
+                            <tr>
+                                <td>{{ group.0}}</td>
+                                <td>{{ group.3}}</td>
+                                <td>{{ group.2}}</td>
+                                <td>{{ group.4}}</td>
+
+                                {% if request.session.role == "AD" or request.session.role != "HL" %}
+                                        <td>
+                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="edit">Edit</button>
+                                         </td>
+                                        <td>
+                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="delete">Delete</button>
+                                         </td>
+                                        <td>
+                                {% endif %}
+
+                            </tr>
+                        </form>
+
+                    {% endfor %}
+
+
+                 </tbody>
+            </table>
+       </div>
+    </div>
+</div>
+
+{% endblock %}
