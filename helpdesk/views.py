@@ -323,216 +323,6 @@ def dissociate(request):
                       {'form': form, 'user': userData, 'addressFormats': addressFormats,
                        'emailAddrs': emailAddrs})
 
-def grouplist(request):
-    gw = gwInit()
-    allgroups = gw.getGroups()
-    count = len(allgroups)
-    if request.method == "POST":
-        form = GroupList(request.POST)
-        id = request.POST['id']
-        groupdata = gw.getGroup(id)
-        groupUrl = request.POST['url']
-        idoms = gw.iDomains()
-        print idoms
-        idomChoices = []
-        for idom in idoms:
-            choice = (idom, idom)
-            idomChoices.append(choice)
-
-        addressFormats = gw.addrFormats()
-        emailAddrs = gw.userAddresses(groupdata['@url'])
-        members = gw.getGroupMembers(groupUrl)
-
-        if members != 0:
-            for member in members:
-                member['id'] = member['id'].split('.',1)[1]
-
-        form = GroupDetails()
-        return render(request, 'helpdesk/groupdetails.html', {'form': form, 'group': groupdata, 'members': members,
-                                'addressFormats': addressFormats,
-                                'emailAddrs': emailAddrs,'idomains': idomChoices} )
-
-
-
-
-    else:
-        form = GroupList()
-        return render(request, 'helpdesk/grouplist.html', {'form': form, 'groups': allgroups, 'count': count} )
-
-def groupdetails(request):
-    gw = gwInit()
-    allgroups = gw.getGroups()
-    count = len(allgroups)
-    idoms = gw.iDomains()
-    print idoms
-    idomChoices = []
-    for idom in idoms:
-        choice = (idom, idom)
-        idomChoices.append(choice)
-    addressFormats = gw.addrFormats()
-
-    if request.method == "POST":
-        #print request.POST
-        form = GroupList(request.POST)
-        id = request.POST['id']
-
-        if 'delete' in request.POST:
-
-            memberid = 'USER.' + request.POST['memberid']
-            type = 'd'
-            data = {
-                'id': id,
-                'memberid': memberid
-            }
-            update = gw.updateGroup(id, data, type)
-            if update == 0:
-                groupdata = gw.getGroup(id)
-                emailAddrs = gw.userAddresses(groupdata['@url'])
-                addressFormats = gw.addrFormats()
-                groupUrl = groupdata['@url']
-                members = gw.getGroupMembers(groupUrl)
-                if members != 0:
-                    for member in members:
-                        member['id'] = member['id'].split('.', 1)[1]
-                form = GroupDetails()
-                return render(request, 'helpdesk/groupdetails.html',
-                              {'form': form, 'group': groupdata, 'members': members, 'addressFormats': addressFormats,
-                               'emailAddrs': emailAddrs,'idomains': idomChoices})
-
-        elif 'general' in request.POST:
-            description = request.POST['description']
-            visibility = request.POST['visibility']
-            replicationOverride = request.POST['replicationOverride']
-            data = {
-                'description': description,
-                'visibility' : visibility,
-                'replicationOverride': replicationOverride
-            }
-
-            type = 'u'
-
-            update = gw.updateGroup(id, data, type)
-            if update == 0:
-                groupdata = gw.getGroup(id)
-                groupUrl = groupdata['@url']
-                emailAddrs = gw.userAddresses(groupdata['@url'])
-                members = gw.getGroupMembers(groupUrl)
-                if members != 0:
-                    for member in members:
-                        member['id'] = member['id'].split('.', 1)[1]
-                form = GroupDetails()
-                return render(request, 'helpdesk/groupdetails.html',
-                              {'form': form, 'group': groupdata, 'members': members, 'addressFormats': addressFormats,
-                               'emailAddrs': emailAddrs,'idomains': idomChoices})
-
-        elif 'membership' in request.POST:
-            print "membership post"
-            memberid = 'USER.' + request.POST['memberid']
-            participation = request.POST['participation']
-            data = {
-                'id': memberid,
-                'participation': participation
-
-            }
-            type = 'm'
-
-            update = gw.updateGroup(id, data, type)
-            if update == 0:
-                groupdata = gw.getGroup(id)
-                groupUrl = groupdata['@url']
-                emailAddrs = gw.userAddresses(groupdata['@url'])
-                members = gw.getGroupMembers(groupUrl)
-                if members != 0:
-                    for member in members:
-                        member['id'] = member['id'].split('.', 1)[1]
-                form = GroupDetails()
-                return render(request, 'helpdesk/groupdetails.html',
-                              {'form': form, 'group': groupdata, 'members': members, 'addressFormats': addressFormats,
-                               'emailAddrs': emailAddrs,'idomains': idomChoices})
-
-
-        elif 'inetaddressing' in request.POST:
-            print "get to inte?"
-            uid = request.POST['id']
-            print uid
-            form = GroupInet(request.POST)
-            if form.is_valid():
-                cd = form.cleaned_data
-                new = groupupdatedata(cd, uid, addressFormats)
-                type = 'u'
-                grpupdate = gw.updateGroup(uid, new, type)
-                groupdata = gw.getGroup(uid)
-                groupUrl = groupdata['@url']
-                emailAddrs = gw.userAddresses(groupdata['@url'])
-                members = gw.getGroupMembers(groupUrl)
-                if members != 0:
-                    for member in members:
-                        member['id'] = member['id'].split('.', 1)[1]
-                form = GroupDetails()
-                return render(request, 'helpdesk/groupdetails.html',
-                              {'form': form, 'group': groupdata, 'members': members,
-                               'addressFormats': addressFormats,
-                               'emailAddrs': emailAddrs, 'idomains': idomChoices})
-
-        return render(request, 'helpdesk/groupdetails.html', {'form': form})
-    else:
-        form = GroupDetails
-        return render(request, 'helpdesk/groupdetails.html', {'form': form})
-
-def groupupdatedata(formdata, uid, allowed):
-    addressFormats = ['HOST', 'USER', 'FIRST_LAST', 'LAST_FIRST', 'FLAST']
-    gw = gwInit()
-    group = gw.getGroup(uid)
-    groupAllowedValues = group['allowedAddressFormats']['value']
-    changedData = {}
-    allowedAddressFormats = {}
-    internetDomainName = {}
-    preferredAddressFormat = {}
-    values = []
-    if formdata['allowedOverride'] == True:
-        allowedAddressFormats['inherited'] = False
-        for format in addressFormats:
-            if formdata[format] == True:
-                values.append(format)
-    else:
-        allowedAddressFormats['inherited'] = True
-        values = groupAllowedValues
-    if formdata['preferredAddressFormatInherited'] == True:
-        preferredAddressFormat['inherited'] = False
-        if formdata['preferredAddressFormatValue'] not in allowed:
-            allowedAddressFormats['inherited'] = False
-            values.append(formdata['preferredAddressFormatValue'])
-        else:
-            allowedAddressFormats['inherited'] = False
-            allowedAddressFormats['value'] = values
-
-        preferredAddressFormat['value'] = formdata['preferredAddressFormatValue']
-        if formdata['preferredEmailId'] == '':
-            formdata.pop('preferredEmailId')
-        else:
-            changedData['preferredEmailId'] = formdata['preferredEmailId']
-    elif formdata['preferredAddressFormatInherited'] == False:
-        preferredAddressFormat['inherited'] = True
-        changedData['preferredEmailId'] = ""
-        if 'preferredAddressFormat' in group.keys():
-            preferredAddressFormat['value'] = group['preferredAddressFormat']['value']
-
-    allowedAddressFormats['value'] = values
-    changedData['preferredAddressFormat'] = preferredAddressFormat
-    changedData['allowedAddressFormats'] = allowedAddressFormats
-    changedData['preferredAddressFormat'] = preferredAddressFormat
-    if formdata['internetDomainNameOverride'] == True:
-        internetDomainName['inherited'] = False
-        internetDomainName['value'] = formdata['iDomainValue']
-    elif formdata['internetDomainNameOverride'] == False:
-        internetDomainName['inherited'] = True
-        if 'internetDomainName' in group.keys():
-            internetDomainName['value'] = group['internetDomainName']['value']
-    internetDomainName['exclusive'] = formdata['iDomainExclusive']
-    changedData['internetDomainName'] = internetDomainName
-    #print changedData
-    return changedData
-
 def groups(request):
     request.session.header = 'Group Membership'
     gw = gwInit()
@@ -945,10 +735,8 @@ def searchresults(request):
         return render(request, 'helpdesk/search.html', {'form': form})
 
 def updatedata(formdata, uid, allowed):
-
     addressFormats = ['HOST','USER','FIRST_LAST','LAST_FIRST','FLAST']
     gwkeys= [
-
         'givenName',
         'surname',
         'middleInitial',
@@ -1025,13 +813,7 @@ def updatedata(formdata, uid, allowed):
             internetDomainName['value'] = user['internetDomainName']['value']
     internetDomainName['exclusive'] = formdata['iDomainExclusive']
     changedData['internetDomainName'] = internetDomainName
-    print changedData
     return changedData
-
-
-
-
-
 
 def userdata(request):
     gw = gwInit()
@@ -1115,7 +897,6 @@ def userdata(request):
                 return render(request, 'helpdesk/userdata.html',
                               {'form': form, 'user': newData, 'addressFormats': addressFormats,
                                'emailAddrs': emailAddrs,'idomains': idomChoices})
-
     else:
         form = u
     return render(request, 'helpdesk/userdata.html')
