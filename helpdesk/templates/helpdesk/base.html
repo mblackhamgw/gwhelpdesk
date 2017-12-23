@@ -53,8 +53,6 @@
 						<small>GroupWise Helpdesk</small>
 					</a>
 				</div>
-
-				{% if request.session.role %}
 				<div class="navbar-buttons navbar-header pull-right" role="navigation">
 					<ul class="nav ace-nav">
 						<li>
@@ -69,29 +67,21 @@
 										<a href="{% url 'userlist' %}">All Users</a>
 									</button>
 
-									{% if request.session.role == "AD" or request.session.role == "HD" %}
-										<button class="btn btn-info">
-											<i class="ace-icon fa fa-user bigger-200"></i>
-											<a href="{% url 'grouplist' %}">Groups</a>
-										</button>
-									{% endif %}
-
-
 									{% if request.session.role == "AD" %}
-										<button class="btn btn-info">
-											<i class="ace-icon fa fa-user bigger-200"></i>
-											<a href="{% url 'admins' %}">Administrators</a>
-										</button>
-									{% endif %}
+									<button class="btn btn-info">
+										<i class="ace-icon fa fa-user bigger-200"></i>
+										<a href="{% url 'admins' %}">Administrators</a>
+									</button>
 
+									{% endif %}
 									<button class="btn btn-info">
 										<i class="ace-icon fa fa-newspaper-o bigger-200"></i>
 										<a href="{% url 'viewlog' %}">View Log</a>
 									</button>
 								</div>
 							</div>
+							&emsp;&emsp;
 						</li>
-
 						<li class=" dark-blue dropdown-modal">
 							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
 								<span class="user-info">
@@ -122,8 +112,6 @@
 								</li>
 							</ul>
 						</li>
-
-						{% endif %}
 					</ul>
 				</div>
 			</div><!-- /.navbar-container -->
@@ -145,8 +133,6 @@
                 <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
 					<i id="sidebar-toggle-icon" class="ace-icon fa fa-angle-double-left ace-save-state" data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
 				</div>
-
-
 				<ul class="nav nav-list">
 					<li class="">
 						<a href="{% url 'index' %}" >
@@ -155,8 +141,6 @@
 						</a>
 						<b class="arrow"></b>
 					</li>
-					{% if request.session.role %}
-
 					<li class="hover">
 						<a href="#" class="dropdown-toggle">
 							<i class="menu-icon fa fa-users"></i>
@@ -187,19 +171,7 @@
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<hr>
-
-							<li class="">
-								<a href="{% url 'grouplist' %}">
-									<i class="menu-icon fa fa-caret-right"></i>
-                                    All GroupWise Groups
-								</a>
-								<b class="arrow"></b>
-							</li>
 							{% endif %}
-							{% endif %}
-
-
 						</ul>
 					</li>
 
