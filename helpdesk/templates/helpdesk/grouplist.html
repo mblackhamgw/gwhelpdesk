@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="page-header">
-    <h1>GroupWise Users</h1>
+    <h1>GroupWise Groups</h1>
 </div><!-- /.page-header -->
 
 <div class="widget-box widget-color-blue">
@@ -14,12 +14,11 @@
 
 <div class="widget-body">
     <div class="widget-main">
-
        <div class="col-xs-12 ">
-
             <table class="table table-hover">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>Name</th>
                         <th>Post Office</th>
                         <th>Domain</th>
@@ -31,39 +30,40 @@
                  <tbody>
 
                     {% for group in groups%}
-                    {{ group.name}}
-
-                        <form name="grpform" id="grpform" method="post" action="">
+                        <form name="grpform" id="grpform" method="post" action="{% url 'groupdetails' %}">
                             <span>{% csrf_token %}</span>
-                            <input type="hidden" name="id" value="{{ group.1}}">
-                                <input type="hidden" name="name" value="{{ group.0}}">
-                                <input type="hidden"  name="postOfficeName" value="{{ group.3}}">
-                                <input  type="hidden" name="domainName" value="{{ group.2}}">
-                                <input  type="hidden" name="visibility" value="{{ group.4}}">
-                            <input  type="hidden" name="url" value="{{ group.5}}">
+                            <input type="hidden" name="id" value="{{ group.id}}">
+                                <input type="hidden" name="name" value="{{ group.name}}">
+                                <input type="hidden"  name="postOfficeName" value="{{ group.postOfficeName}}">
+                                <input  type="hidden" name="domainName" value="{{ group.domainName}}">
+                                <input  type="hidden" name="visibility" value="{{ group.visibility}}">
+                            <input  type="hidden" name="url" value="{{ group.url }}">
 
                             <tr>
-                                <td>{{ group.0}}</td>
-                                <td>{{ group.3}}</td>
-                                <td>{{ group.2}}</td>
-                                <td>{{ group.4}}</td>
+                                <td>
+                                    {% if group.ldapDn %}
+                                       <img src="{% static 'img/associatedgrp.png' %}" style="float:left;width:15px;height:15px;"/>
+                                    {% else %}
+                                        <img src="{% static 'img/grp.png' %}" style="float:left;width:15px;height:15px;"/>
+                                    {% endif %}
+                                </td>
+                                <td>{{ group.name}}</td>
+                                <td>{{ group.postOfficeName}}</td>
+                                <td>{{ group.domainName}}</td>
+                                <td>{{ group.visibility}}</td>
 
                                 {% if request.session.role == "AD" or request.session.role != "HL" %}
                                         <td>
-                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="edit">Edit</button>
+                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="editgroup">Edit</button>
                                          </td>
                                         <td>
-                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="delete">Delete</button>
+                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="deletegroup">Delete</button>
                                          </td>
                                         <td>
                                 {% endif %}
-
                             </tr>
                         </form>
-
                     {% endfor %}
-
-
                  </tbody>
             </table>
        </div>
