@@ -196,6 +196,95 @@ class UserDetails(forms.Form):
     iDomainValue = forms.ChoiceField(choices=idomChoices, required=False)
     iDomainExclusive = forms.BooleanField(required=False)
 
+
+class GroupDetails(forms.Form):
+    gw = gwInit()
+    try:
+        idoms = gw.iDomains()
+        idomChoices = []
+        for idom in idoms:
+            choice = (idom, idom)
+            idomChoices.append(choice)
+    except:
+        idomChoices = []
+
+    visChoices = [
+        ('SYSTEM', 'System'),
+        ('DOMAIN', 'Domain'),
+        ('POST_OFFICE','Post Office'),
+        ('NONE', 'None')
+    ]
+
+    addrFormats = [
+        ('HOST', 'Username.PostOffice@InternetDomain'),
+        ('USER', ' Username@InternetDomain'),
+        ('FIRST_LAST', 'First.Last@InternetDomain'),
+        ('LAST_FIRST','Last.First@InternetDomain'),
+        ('FLAST', 'FirstInitialLastName@InternetDomain')
+    ]
+
+    name = forms.CharField(max_length=64)
+    description = forms.CharField(max_length=256, required=False)
+    visibility = forms.ChoiceField(choices=visChoices)
+    allowedOverride = forms.BooleanField(required=False)
+    HOST = forms.BooleanField(required=False)
+    USER = forms.BooleanField(required=False)
+    FIRST_LAST = forms.BooleanField(required=False)
+    LAST_FIRST = forms.BooleanField(required=False)
+    FLAST = forms.BooleanField(required=False)
+    preferredAddressFormatValue = forms.ChoiceField(choices=addrFormats, required=False)
+    preferredAddressFormatInherited = forms.BooleanField(required=False)
+    preferredEmailId = forms.CharField(max_length=128, required=False)
+    internetDomainNameOverride = forms.BooleanField(required=False)
+    iDomainValue = forms.ChoiceField(choices=idomChoices, required=False)
+    iDomainExclusive = forms.BooleanField(required=False)
+    replication = forms.RadioSelect()
+
+class GroupInet(forms.Form):
+    gw = gwInit()
+    try:
+        idoms = gw.iDomains()
+        idomChoices = []
+        for idom in idoms:
+            choice = (idom, idom)
+            idomChoices.append(choice)
+    except:
+        idomChoices = []
+
+    addrFormats = [
+        ('HOST', 'Username.PostOffice@InternetDomain'),
+        ('USER', ' Username@InternetDomain'),
+        ('FIRST_LAST', 'First.Last@InternetDomain'),
+        ('LAST_FIRST', 'Last.First@InternetDomain'),
+        ('FLAST', 'FirstInitialLastName@InternetDomain')
+    ]
+    name = forms.CharField(max_length=64,required=True)
+    id = forms.CharField(max_length=128)
+    allowedOverride = forms.BooleanField(required=False)
+    HOST = forms.BooleanField(required=False)
+    USER = forms.BooleanField(required=False)
+    FIRST_LAST = forms.BooleanField(required=False)
+    LAST_FIRST = forms.BooleanField(required=False)
+    FLAST = forms.BooleanField(required=False)
+    preferredAddressFormatValue = forms.ChoiceField(choices=addrFormats, required=False)
+    preferredAddressFormatInherited = forms.BooleanField(required=False)
+    preferredEmailId = forms.CharField(max_length=128, required=False)
+    internetDomainNameOverride = forms.BooleanField(required=False)
+    iDomainValue = forms.ChoiceField(choices=idomChoices, required=False)
+    iDomainExclusive = forms.BooleanField(required=False)
+
+
+class GroupList(forms.Form):
+    name = forms.CharField(max_length=64)
+    id = forms.CharField(max_length=128)
+    domain = forms.CharField(max_length=64)
+    visiblity = forms.CharField(max_length=16)
+    postOfficeName = forms.CharField(max_length=64)
+
+
+
+
+
 class UserGroups(forms.Form):
     group = forms.CharField(max_length=64, required=False)
     participation = forms.CharField(max_length=64, required=False)
