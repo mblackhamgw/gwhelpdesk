@@ -5,6 +5,7 @@ from gwhelp import settings
 
 class gw:
     def __init__(self, gwHost, gwPort, gwAdmin, gwPass):
+
         self.session = requests.Session()
         self.session.auth = (gwAdmin, gwPass)
         self.session.verify = False
@@ -143,11 +144,62 @@ class gw:
             response = self.session.get(url)
             g = self.checkResponse(response)
             for grp in g:
-                data = [grp['name'], grp['id']]
-                glist.append(data)
+                data = [grp['name'], grp['id'], grp['domainName'], grp['postOfficeName'], grp['visibility'], grp['@url']]
+                grp['url'] = grp['@url']
+                glist.append(grp)
+
             return glist
         except:
             pass
+
+    def getGroup(self, id):
+        url = '%s/gwadmin-service/object/%s' %( self.baseUrl, id)
+        response = self.session.get(url)
+        groupdata = self.checkResponse(response)
+        return groupdata
+
+    def getGroupMembers(self, url):
+
+
+        geturl = '%s%s/members' % (self.baseUrl, url)
+
+        response = self.session.get(geturl)
+        if response.text:
+
+            j = json.loads(response.text)
+            if j['resultInfo']['outOf'] == 0:
+                return 0
+            else:
+                members = self.checkResponse(response)
+                return members
+
+    def deleteGroup(self, id):
+        grp = self.getObject(id)
+        url = grp['@url']
+        delurl = '%s%s' % (self.baseUrl, url)
+        delgrp = self.session.delete(delurl)
+
+    def updateGroup(self, id, data, type):
+        grp = self.getObject(id)
+        if type == 'u':
+            grpurl = '%s%s' % (self.baseUrl, grp['@url'])
+            update = self.session.put(grpurl, data=json.dumps(data))
+            return 0
+        elif type == 'm':
+            grpurl = '%s%s/members' % (self.baseUrl, grp['@url'])
+            update = self.session.post(grpurl, data=json.dumps(data))
+            return 0
+        elif type == 'd':
+            member = data['memberid']
+            grpurl = '%s%s/members/%s' % (self.baseUrl, grp['@url'], member)
+            update = self.session.delete(grpurl)
+            return 0
+        else:
+            return 0
+
+    def delFromGroup(self, url, userid):
+        delurl = '%s%s/members/%s' % (self.baseUrl, url, userid)
+        response = self.session.delete(delurl)
 
     def addUserToGroups(self, groups, userid):
         user = self.getObject(userid)
@@ -155,9 +207,6 @@ class gw:
         for group in groups:
             data = {'add': {'id': group}}
             results = self.session.put(url, data=json.dumps(data))
-            print results.text
-            print results.headers
-            print results.status_code
 
     def getUserCount(self):
         url = '%s/gwadmin-service/system/info' % self.baseUrl
@@ -212,12 +261,13 @@ class gw:
                 gwusers.append(details)
         return gwusers
 
+
+
+
     def getObject(self, id):
         url = '%s/gwadmin-service/object/%s' % (self.baseUrl, id)
         response = self.session.get(url, timeout=5)
         object = self.checkResponse(response)
-        user = object['name']
-        userurl = object['@url']
         return object
 
     def getObjectByUrl(self, userurl):
