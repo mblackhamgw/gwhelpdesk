@@ -2,7 +2,7 @@ from django.core.management import BaseCommand
 from helpdesk.models import GWSettings
 from helpdesk.lib import gwlib
 from shutil import copy2, move
-import stat, os
+import stat, os, requests, json, sys
 from socket import gethostbyname, gethostname, getfqdn
 from sys import exit
 from helpdesk.models import Admin
@@ -16,6 +16,25 @@ class Command(BaseCommand):
     help = "This doesn't do anything yet"
 
     def handle(self, *args, **options):
+        def checkgw(host, port, admin, pwd):
+            gw = gwlib.gw(host, port, admin, pwd)
+            try:
+                whoami = gw.whoami()
+
+                if 'roles' in whoami.keys():
+                    if 'SYSTEM_RECORD' in whoami['roles']:
+                        print 'Connection to GW Admin Successful.'
+                    else:
+                        print '%s is not a system administrator.  Hit Control-C and rerun manage.py setup.' % admin
+                        sys.exit()
+                else:
+                    status = whoami['statusMsg']
+                    print 'Connection to GW Admin Failed.  Hit Control-C and rerun manage.py setup.'
+
+                    sys.exit()
+            except:
+                print 'Connection to GW Admin Failed.  Hit Control-C and rerun manage.py setup.'
+
         baseDir = gwhelp.settings.BASE_DIR
         print "Let's get the info about your GroupWise Admin Server..."
         gwconfig = GWSettings.objects.all()
@@ -25,6 +44,7 @@ class Command(BaseCommand):
             gwport = raw_input('Admin Server PORT: ')
             gwadmin = raw_input('GroupWise System Administrator: ')
             gwpass = raw_input('Administrator Password: ')
+            check = checkgw(gwhost, gwport, gwadmin, gwpass)
             gwconfig = GWSettings(gwHost=gwhost, gwPort=gwport, gwAdmin=gwadmin, gwPass=gwpass)
             try:
                 gwconfig.save()
