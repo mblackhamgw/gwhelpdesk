@@ -72,6 +72,7 @@ class GWConfig(ModelForm):
         fields = '__all__'
 
 class Groups(forms.Form):
+
     try:
         gw = gwInit()
         grps = gw.getGroups()
@@ -81,6 +82,20 @@ class Groups(forms.Form):
             choices.append(choice)
         groups = forms.ChoiceField(choices=choices, widget=forms.SelectMultiple, required=False)
         participation = forms.CharField(max_length=64, required=False)
+    except:
+        pass
+
+class AddGroup(forms.Form):
+    try:
+        gw = gwInit()
+        pos = gw.getPolist()
+        pochoices = []
+        for po in pos:
+            choice = (po['name'], po['name'])
+            pochoices.append(choice)
+
+        name = forms.CharField(max_length=64)
+        postOfficeName = forms.ChoiceField(choices=pochoices, required=True)
     except:
         pass
 
