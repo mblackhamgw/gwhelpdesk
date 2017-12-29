@@ -30,8 +30,10 @@ class gw:
 
     def whoami(self):
         url = '%s/gwadmin-service/system/whoami' % self.baseUrl
+
         try:
             response = self.session.get(url, timeout=10)
+
         except:
             return 1
         if response.text:
@@ -147,7 +149,6 @@ class gw:
                 data = [grp['name'], grp['id'], grp['domainName'], grp['postOfficeName'], grp['visibility'], grp['@url']]
                 grp['url'] = grp['@url']
                 glist.append(grp)
-
             return glist
         except:
             pass
@@ -178,28 +179,31 @@ class gw:
         url = grp['@url']
         delurl = '%s%s' % (self.baseUrl, url)
         delgrp = self.session.delete(delurl)
+        return 0
 
     def updateGroup(self, id, data, type):
         grp = self.getObject(id)
         if type == 'u':
             grpurl = '%s%s' % (self.baseUrl, grp['@url'])
             update = self.session.put(grpurl, data=json.dumps(data))
-            return 0
+            return 200
         elif type == 'm':
             grpurl = '%s%s/members' % (self.baseUrl, grp['@url'])
             update = self.session.post(grpurl, data=json.dumps(data))
-            return 0
+            return 200
         elif type == 'd':
             member = data['memberid']
             grpurl = '%s%s/members/%s' % (self.baseUrl, grp['@url'], member)
             update = self.session.delete(grpurl)
-            return 0
+            return  200
         else:
             return 0
 
     def delFromGroup(self, url, userid):
         delurl = '%s%s/members/%s' % (self.baseUrl, url, userid)
         response = self.session.delete(delurl)
+        return response.status_code
+
 
     def addUserToGroups(self, groups, userid):
         user = self.getObject(userid)
