@@ -18,7 +18,6 @@ logfile = '%s/logs/helpdesk.log' % settings.BASE_DIR
 if not os.path.isfile(logfile):
     open(logfile, 'a').close()
 
-
 logConfig = {
     'version' : 1,
     'handlers' : {
@@ -100,14 +99,108 @@ def admins(request):
         admins = Admin.objects.all()
     return render(request, 'helpdesk/admins.html', {'form': form, 'admins': admins})
 
+def addgroup(request):
+    gw = gwInit()
+    polist = gw.getPolist()
+    if request.method == "POST":
+        form = AddGroup(request.POST)
+        name = request.POST['name']
+        postOfficeName = request.POST['postOfficeName']
+        visibility = request.POST['visibility']
+        data = {
+            'name': name,
+            'postOfficeName' : postOfficeName,
+            'visibility': visibility
+        }
+        addgrp = gw.addGroup(data)
+        if addgrp == 201:
+            allgroups = gw.getGroups()
+            for group in allgroups:
+                group['url'] = group['@url']
+            count = len(allgroups)
+            form = GroupList()
+            return render(request, 'helpdesk/grouplist.html', {'form': form, 'groups': allgroups, 'count': count})
+
+        return render(request, 'helpdesk/addgroup.html', {'form': form, 'polist': polist})
+    else:
+        allgroups = gw.getGroups()
+        for group in allgroups:
+            group['url'] = group['@url']
+        count = len(allgroups)
+        form = AddGroup()
+        return render(request, 'helpdesk/addgroup.html', {'form': form, 'polist': polist })
+
+def addgrpmember(request):
+    gw = gwInit()
+    addressFormats = gw.addrFormats()
+    polist = gw.getPolist()
+    usercount = gw.getUserCount()
+    if request.method == "POST":
+        if 'next' in request.POST:
+            nextId = request.POST['nextid']
+            userlist = gw.pageUsers(nextId)
+            if int(userlist['nextId']) > 1:
+                firstset = False
+                return render(request, 'helpdesk/addgrpmember.html',
+                              {'users': userlist['userList'], 'nextid': userlist['nextId'], 'firstset': firstset,
+                               'usercount': usercount})
+            else:
+                firstset = True
+                return render(request, 'helpdesk/addgrpmember.html',
+                              {'users': userlist['userList'], 'firstset': firstset, 'usercount': usercount})
+
+        elif 'add' in request.POST:
+            userid = request.POST['id']
+            username = request.POST['name']
+            grpid = request.POST['grpid']
+            grpname = request.POST['grpname']
+            url = request.POST['url']
+            print url
+            data = {
+                'id': userid,
+                'url': url,
+            }
+            addtogrp = gw.addUserToGroup(data)
+            if addtogrp == 201:
+                return HttpResponseRedirect(reverse('grouplist'))
+            else:
+                members = gw.getGroupMembers(url)
+                form = GroupDetails()
+                groupdata = gw.getGroup(id)
+                emailAddrs = gw.userAddresses(url)
+                idoms = gw.iDomains()
+                idomChoices = []
+                for idom in idoms:
+                    choice = (idom, idom)
+                    idomChoices.append(choice)
+                addressFormats = gw.addrFormats()
+                return render(request, 'helpdesk/groupdetails.html',
+                              {'form': form, 'group': groupdata, 'members': members,
+                               'addressFormats': addressFormats,
+                               'emailAddrs': emailAddrs, 'idomains': idomChoices})
+
+        elif 'userform' in request.POST:
+            gw = gwInit()
+
+    else:
+        userlist = gw.pageUsers(0)
+        firstset = False
+        if int(userlist['nextId']) > 1:
+            firstset = True
+            return render(request, 'helpdesk/addgrpmember.html',
+                          {'users': userlist['userList'], 'nextid': userlist['nextId'], 'firstset': firstset,
+                           'usercount': usercount})
+        else:
+            return render(request, 'helpdesk/addgrpmember.html',
+                          {'users': userlist['userList'], 'firstset': firstset, 'usercount': usercount})
+
+    return render(request, 'helpdesk/addgrpmember.html')
 
 def addnickname(request):
     gw = gwInit()
     polist = gw.getPolist()
-
     if request.method == "POST":
         form = Nicknames(request.POST)
-        print form.errors
         if form.is_valid():
             cd = form.cleaned_data
             form = Nicknames(request.POST)
@@ -119,7 +212,6 @@ def addnickname(request):
             userpo = referreduser.split('.')[2]
             userdom = referreduser.split('.')[1]
             username = referreduser.split('.')[3]
-
             data['name'] = cd['nickname']
             data['domainName'] = nickdom
             data['postOfficeName'] = nickpo
@@ -130,7 +222,6 @@ def addnickname(request):
             data['userName'] = username
             data['userPostOfficeName'] = userpo
             data['userDomainName'] = userdom
-
             newnick = gw.addNickname(**data)
             if newnick == 0:
                 log(request, "Added nickname of %s for %s" % (cd['nickname'], username))
@@ -138,29 +229,21 @@ def addnickname(request):
                 nicknamelist = gw.nicknames(id)
                 id = request.session['id']
                 return render(request, 'helpdesk/nicknames.html', {'nicknames': nicknamelist})
-
-
             return render(request, 'helpdesk/addnickname.html', {'form':form, 'polist': polist})
-
-
     form = Nicknames()
     return render(request, 'helpdesk/addnickname.html', {'form':form,  'polist': polist})
 
 def addresource(request):
     gw= gwInit()
     polist = gw.getPolist()
-
     if request.method == "POST":
-
         form = Addresource(request.POST)
         ownerid = request.POST['ownerid']
         po = ownerid.split('.')[2]
         dom = ownerid.split('.')[1]
         newresource = gw.addResource(request.POST['resourcename'], po, dom, request.session['name'] )
-
         if newresource == 0:
             log(request, "Added resource  %s for %s" % (request.POST['resourcename'], request.session['name']))
-
         id = request.session['id']
         resourcelist = gw.resources(id)
         id = request.session['id']
@@ -325,67 +408,52 @@ def dissociate(request):
 
 def grouplist(request):
     gw = gwInit()
-    allgroups = gw.getGroups()
-    for group in allgroups:
-        group['url'] = group['@url']
-    count = len(allgroups)
-    form = GroupList()
-    return render(request, 'helpdesk/grouplist.html', {'form': form, 'groups': allgroups, 'count': count} )
+    grouplist = gw.pageGroups(0)
+    polist = gw.getPolist()
+    groupcount = gw.getGroupCount()
+    if request.method == "POST":
+        if 'next' in request.POST:
+            nextId = request.POST['nextid']
+            grouplist = gw.pageGroups(nextId)
+            for grp in grouplist['groupList']:
+                ldap = checkLdap(grp['postOfficeName'], polist)
+                if ldap == True:
+                    grp['ldap'] = True
+            if int(grouplist['nextId']) > 1:
+                firstset = False
+                return render(request, 'helpdesk/grouplist.html',
+                              {'groups': grouplist['groupList'], 'nextid': grouplist['nextId'], 'firstset': firstset, 'count': groupcount})
+            else:
+                firstset = True
+                return render(request, 'helpdesk/grouplist.html',
+                              {'groups': grouplist['groupList'],  'nextid': grouplist['nextId'], 'firstset': firstset, 'count': groupcount})
+    else:
+        firstset = True
+        return render(request, 'helpdesk/grouplist.html',
+                      {'groups': grouplist['groupList'],  'nextid': grouplist['nextId'],'firstset': firstset, 'count': groupcount})
+
 
 def groupdetails(request):
     gw = gwInit()
-    allgroups = gw.getGroups()
-    count = len(allgroups)
     idoms = gw.iDomains()
-
     idomChoices = []
     for idom in idoms:
         choice = (idom, idom)
         idomChoices.append(choice)
     addressFormats = gw.addrFormats()
-
     if request.method == "POST":
-        #print request.POST
         form = GroupList(request.POST)
         id = request.POST['id']
-
-
         name = request.POST['name']
-
-
         groupdata = gw.getGroup(id)
         if 'url' in request.POST:
             url = request.POST['url']
         else:
             url = groupdata['@url']
-
-
         request.session['id'] = id
         request.session['name'] = name
-        if 'delete' in request.POST:
-
-            memberid = 'USER.' + request.POST['memberid']
-            type = 'd'
-            data = {
-                'id': id,
-                'memberid': memberid
-            }
-            update = gw.updateGroup(id, data, type)
-            if update == 0:
-                groupdata = gw.getGroup(id)
-                emailAddrs = gw.userAddresses(groupdata['@url'])
-                addressFormats = gw.addrFormats()
-                groupUrl = groupdata['@url']
-                members = gw.getGroupMembers(groupUrl)
-                if members != 0:
-                    for member in members:
-                        member['id'] = member['id'].split('.', 1)[1]
-                form = GroupDetails()
-                return render(request, 'helpdesk/groupdetails.html',
-                              {'form': form, 'group': groupdata, 'members': members, 'addressFormats': addressFormats,
-                               'emailAddrs': emailAddrs,'idomains': idomChoices})
-
-        elif 'general' in request.POST:
+        request.session['url'] = url
+        if 'general' in request.POST:
             description = request.POST['description']
             visibility = request.POST['visibility']
             replicationOverride = request.POST['replicationOverride']
@@ -394,12 +462,10 @@ def groupdetails(request):
                 'visibility' : visibility,
                 'replicationOverride': replicationOverride
             }
-
             type = 'u'
-
             update = gw.updateGroup(id, data, type)
-            if update == 0:
-
+            if update == int(200):
+                log(request, 'Modified group %s' % name)
                 groupdata = gw.getGroup(id)
                 groupUrl = groupdata['@url']
                 emailAddrs = gw.userAddresses(groupdata['@url'])
@@ -424,12 +490,10 @@ def groupdetails(request):
             data = {
                 'id': memberid,
                 'participation': participation
-
             }
             type = 'm'
-
             update = gw.updateGroup(id, data, type)
-            if update == 0:
+            if update == 200:
                 groupdata = gw.getGroup(id)
                 groupUrl  = groupdata['@url']
                 emailAddrs = gw.userAddresses(groupdata['@url'])
@@ -439,7 +503,6 @@ def groupdetails(request):
                 if members != 0:
                     for member in members:
                         member['stripid'] = member['id'].split('.', 1)[1]
-
                 form = GroupDetails()
                 return render(request, 'helpdesk/groupdetails.html',
                               {'form': form, 'group': groupdata, 'members': members, 'addressFormats': addressFormats,
@@ -466,80 +529,75 @@ def groupdetails(request):
                               {'form': form, 'group': groupdata, 'members': members,
                                'addressFormats': addressFormats,
                                'emailAddrs': emailAddrs, 'idomains': idomChoices})
-
         elif 'editgroup' in request.POST:
             form = GroupList(request.POST)
             id = request.POST['id']
             name = request.POST['name']
             request.session['id'] = id
             request.session['name'] = name
-
-
-
             groupdata = gw.getGroup(id)
             groupUrl = url
             idoms = gw.iDomains()
-
             idomChoices = []
             for idom in idoms:
                 choice = (idom, idom)
                 idomChoices.append(choice)
-
             addressFormats = gw.addrFormats()
             emailAddrs = gw.userAddresses(groupdata['@url'])
             members = gw.getGroupMembers(groupUrl)
-
-            if members != 0:
+            if members == 0:
+                form = GroupDetails()
+                return render(request, 'helpdesk/groupdetails.html', {'form': form, 'group': groupdata, 'members': members,
+                                        'addressFormats': addressFormats,
+                                        'emailAddrs': emailAddrs,'idomains': idomChoices} )
+            if members != None or members != 0:
                 for member in members:
                     member['stripid'] = member['id'].split('.',1)[1]
-
-            form = GroupDetails()
-            return render(request, 'helpdesk/groupdetails.html', {'form': form, 'group': groupdata, 'members': members,
-                                    'addressFormats': addressFormats,
-                                    'emailAddrs': emailAddrs,'idomains': idomChoices} )
-
+                form = GroupDetails()
+                return render(request, 'helpdesk/groupdetails.html', {'form': form, 'group': groupdata, 'members': members,
+                                        'addressFormats': addressFormats,
+                                        'emailAddrs': emailAddrs,'idomains': idomChoices} )
+            else:
+                form = GroupDetails()
+                return render(request, 'helpdesk/groupdetails.html', {'form': form, 'group': groupdata, 'members': members,
+                                        'addressFormats': addressFormats,
+                                        'emailAddrs': emailAddrs,'idomains': idomChoices} )
 
         elif 'deletemember' in request.POST:
-
             id = request.POST['id']
             name = request.POST['name']
             request.session['id'] = id
             request.session['name'] = name
             groupdata = gw.getGroup(id)
             delmember = gw.delFromGroup(groupdata['@url'], request.POST['memberid'])
-
+            if delmember == int(200):
+                log(request, 'Removed %s from group %s' % (request.POST['memberid'], name))
             idoms = gw.iDomains()
             idomChoices = []
             for idom in idoms:
                 choice = (idom, idom)
                 idomChoices.append(choice)
-
             addressFormats = gw.addrFormats()
             emailAddrs = gw.userAddresses(groupdata['@url'])
             members = gw.getGroupMembers(groupdata['@url'])
-
             if members != 0:
                 for member in members:
                     member['stripid'] = member['id'].split('.', 1)[1]
-
             form = GroupDetails()
             return render(request, 'helpdesk/groupdetails.html', {'form': form, 'group': groupdata, 'members': members,
                                                                   'addressFormats': addressFormats,
                                                                   'emailAddrs': emailAddrs, 'idomains': idomChoices})
 
-
-
-
-
         elif 'deletegroup' in request.POST:
             id = request.POST['id']
             name = request.POST['name']
             delgrp = gw.deleteGroup(id)
+            if delgrp == int(0):
+                log(request, 'Deleted group %s' % name)
             allgroups = gw.getGroups()
             count = len(allgroups)
             form = GroupList()
             return render(request, 'helpdesk/grouplist.html', {'form': form, 'groups': allgroups, 'count': count})
-
         return render(request, 'helpdesk/groupdetails.html', {'form': form})
     else:
         form = GroupDetails
@@ -758,7 +816,6 @@ def logout(request):
     request.session.modified = True
     return HttpResponseRedirect('/login/')
 
-
 def maintenance(request):
     if request.method == "POST":
         id = request.POST['id']
@@ -813,12 +870,9 @@ def maintenance(request):
             }
 
             gwcheck = gw.gwcheck('REBUILD', id, data)
-
             if gwcheck == 0:
                 log(request, "gwcheck %s task has been sent to the POA for %s" % ('Structural Rebuild', name))
                 messages.add_message(request, messages.SUCCESS, "A Maintenace task has been sent to the POA")
-
-
         elif 'resetok' in request.POST:
             data = {
               "files" : [ "USER" ],
@@ -848,7 +902,6 @@ def move(request):
         form = Move(request.POST)
         print form.errors
         if form.is_valid():
-
             cd = form.cleaned_data
             POST, DOMAIN, PONAME = cd['postoffice'].split('.')
             USER, DOM, PO, USERID = cd['id'].split('.')
@@ -877,12 +930,10 @@ def move(request):
     else:
         form = Move()
         polist = gw.getPolist()
-
         for postoffice in polist:
             dom = str(postoffice['url']).split('/')[3]
             po = str(postoffice['url']).split('/')[5]
             poid = 'POST_OFFICE.%s.%s' % (dom, po)
-
             postoffice['id'] = poid
         return render(request, 'helpdesk/move.html', {'form': form, 'polist': polist})
 
@@ -890,7 +941,6 @@ def nicknames(request):
     gw = gwInit()
     id = request.session['id']
     nicknamelist = gw.nicknames(id)
-
     if request.POST:
         if 'delete' in request.POST:
             url = request.POST['url']
@@ -906,7 +956,6 @@ def nicknames(request):
 
 def rename(request):
     if request.method == "POST":
-
         form = Rename(request.POST)
         print form.errors
         if form.is_valid():
@@ -917,12 +966,9 @@ def rename(request):
             cd = form.cleaned_data
             id = cd['id']
             newname = cd['newid']
-
             oldname = cd['name']
             popart = id.rsplit('.',1)[0]
-
             newid = '%s.%s' % (popart, newname)
-
             gw = gwInit()
             rename = gw.renameUser(id, newname)
             request.session['id'] = newid
@@ -953,12 +999,10 @@ def resources(request):
         form = Resources(request.POST)
         print form.errors
         url = request.POST['resourceurl']
-
         if 'delete' in request.POST:
             delresource = gw.delResource(url)
             resourcelist = gw.resources(id)
             return render(request, 'helpdesk/resources.html', {'resources': resourcelist})
-
         if 'add' in request.POST:
             pourl = request.POST['resourceurl']
             parts = pourl.split('/')
@@ -1197,9 +1241,11 @@ def userlist(request):
             nextId = request.POST['nextid']
             userlist = gw.pageUsers(nextId)
             for user in userlist['userList']:
+
                 ldap = checkLdap(user['postOfficeName'], polist)
                 if ldap == True:
                     user['ldap'] = True
+
             if int(userlist['nextId']) > 1:
                 firstset = False
                 return render(request, 'helpdesk/userlist.html',
