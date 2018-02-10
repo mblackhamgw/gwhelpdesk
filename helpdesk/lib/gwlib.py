@@ -30,10 +30,8 @@ class gw:
 
     def whoami(self):
         url = '%s/gwadmin-service/system/whoami' % self.baseUrl
-
         try:
             response = self.session.get(url, timeout=10)
-
         except:
             return 1
         if response.text:
@@ -73,12 +71,20 @@ class gw:
             url = '%s/gwadmin-service/list/group?count=8&nextID=%s' % (self.baseUrl, nextId)
         else:
             url = '%s/gwadmin-service/list/group?count=8' % (self.baseUrl)
-        nextId = self.getGroupList(url)
+
+        response = self.session.get(url)
+        if 'nextId' in response.text:
+            nextId =  json.loads(response.text)['resultInfo']['nextId']
+        grps = self.checkResponse(response)
+        for grp in grps:
+            grp['url'] = grp['@url']
+
         if nextId != 1:
             retvalue['nextId'] = nextId
         else:
             retvalue['nextId'] = 1
-        retvalue['groupList'] = self.groupList
+
+        retvalue['groupList'] = grps
         return retvalue
 
     def gwcheck(self, action, id, options):
@@ -113,7 +119,6 @@ class gw:
             }
 
         elif action == 'EXPIRE':
-
             data = {
                 'expireOptions': options,
                 "files": ["USER"],
@@ -133,7 +138,6 @@ class gw:
             data = options
 
         results = self.session.post(checkurl, data=json.dumps(data))
-
         if results.text:
             return results.text
         else:
@@ -141,7 +145,7 @@ class gw:
 
     def getGroups(self):
         glist = []
-        url = '%s/gwadmin-service/list/group' % self.baseUrl
+        url = '%s/gwadmin-service/list/group?count=8' % self.baseUrl
         try:
             response = self.session.get(url)
             g = self.checkResponse(response)
@@ -160,13 +164,9 @@ class gw:
         return groupdata
 
     def getGroupMembers(self, url):
-
-
         geturl = '%s%s/members' % (self.baseUrl, url)
-
         response = self.session.get(geturl)
         if response.text:
-
             j = json.loads(response.text)
             if j['resultInfo']['outOf'] == 0:
                 return 0
@@ -199,11 +199,26 @@ class gw:
         else:
             return 0
 
+    def addGroup(self,gwdata):
+        url = '%s%s/groups' % (self.baseUrl, gwdata['postOfficeName'])
+        data = {
+            'name': gwdata['name'],
+            'visibility': gwdata['visibility']
+        }
+        results = self.session.post(url, data=json.dumps(data))
+        return results.status_code
+
     def delFromGroup(self, url, userid):
         delurl = '%s%s/members/%s' % (self.baseUrl, url, userid)
         response = self.session.delete(delurl)
         return response.status_code
 
+    def addUserToGroup(self, grpdata):
+        print grpdata
+        url = '%s%s/members' % (self.baseUrl, grpdata['url'])
+        data = {'id': grpdata['id']}
+        add = self.session.post(url, data=json.dumps(data))
+        return add.status_code
 
     def addUserToGroups(self, groups, userid):
         user = self.getObject(userid)
@@ -220,8 +235,31 @@ class gw:
             total = info['userCount'] + info['externalUserCount']
             return total
 
+    def getGroupCount(self):
+        url = '%s/gwadmin-service/system/info' % self.baseUrl
+        response = self.session.get(url)
+        info = self.checkResponse(response)
+        if info:
+            total = info['groupCount'] + info['externalGroupCount']
+            return total
+
+    def getpic(self, url):
+        self.session.headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/octet-stream'
+        }
+
+        response = self.session.get(url)
+        print response
+        from StringIO import StringIO
+        image = response.open(StringIO())
+        self.session.headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+        return image
+
     def getUsers(self, url):
-        #self.session.auth = (self.gwAdmin, self.gwPass)
         response = self.session.get(url)
         if response.text:
             sj = json.loads(response.text)
@@ -264,9 +302,6 @@ class gw:
                         details['ldap'] = 'true'
                 gwusers.append(details)
         return gwusers
-
-
-
 
     def getObject(self, id):
         url = '%s/gwadmin-service/object/%s' % (self.baseUrl, id)
@@ -378,7 +413,6 @@ class gw:
             poList.append(podict)
         return poList
 
-
     def getDomlist(self):
         domList = []
         url = '%s/gwadmin-service/list/domain' % self.baseUrl
@@ -441,9 +475,7 @@ class gw:
                     data.append(grp['participation'])
                     data.append(grp['id'])
                     membership.append(data)
-
                 return membership
-
             elif 'resultInfo' in dict.keys():
                 return None
 
@@ -465,7 +497,6 @@ class gw:
     def renameUser(self, id, newid):
         user = self.getObject(id)
         pourl = '%s%s/rename' % (self.baseUrl, user['links'][1]['@href'])
-
         data = {'objectId': id,
                 'newObjectId': newid,
                 'createNickname':'false'
@@ -494,7 +525,6 @@ class gw:
                     lastaction = dict['object']['moveStatus']['lastAction']
                     return lastaction
 
-
     def resources(self, id):
         user = self.getObject(id)
         url = '%s%s/resources' % (self.baseUrl,user['@url'])
@@ -519,7 +549,6 @@ class gw:
 
     def delResource(self, url ):
         delurl = '%s%s' % (self.baseUrl, url)
-
         results = self.session.delete(delurl)
         return results.text
 
@@ -538,12 +567,10 @@ class gw:
         else:
             return 1
 
-
     def nicknames(self, id):
         user = self.getObject(id)
         url = '%s%s/nicknames' % (self.baseUrl, user['@url'])
         nicknamelist = []
-
         response = self.session.get(url)
         if response.text:
             dict = json.loads(response.text)
@@ -580,7 +607,6 @@ class gw:
             data[key] = value
         url = '%s/gwadmin-service/domains/%s/postoffices/%s/nicknames' % (self.baseUrl, data['domainName'], data['postOfficeName'] )
         results = self.session.post(url, data=json.dumps(data))
-
         if 'location' in results.headers:
             return 0
         else:
@@ -593,5 +619,3 @@ class gw:
             return 0
         else:
             return 1
-
-
