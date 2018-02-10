@@ -454,13 +454,12 @@ def groupdetails(request):
         request.session['name'] = name
         request.session['url'] = url
         if 'general' in request.POST:
+            print request.POST
             description = request.POST['description']
             visibility = request.POST['visibility']
-            replicationOverride = request.POST['replicationOverride']
             data = {
                 'description': description,
                 'visibility' : visibility,
-                'replicationOverride': replicationOverride
             }
             type = 'u'
             update = gw.updateGroup(id, data, type)
@@ -470,9 +469,12 @@ def groupdetails(request):
                 groupUrl = groupdata['@url']
                 emailAddrs = gw.userAddresses(groupdata['@url'])
                 members = gw.getGroupMembers(groupUrl)
-                for member in members:
-                    member['stripid'] = member['id'].split('.', 1)[1]
+                print 'membgers %s' % members
+
                 if members != 0:
+                    for member in members:
+                        member['stripid'] = member['id'].split('.', 1)[1]
+
                     for member in members:
                         member['id'] = member['id'].split('.', 1)[1]
                 form = GroupDetails()
