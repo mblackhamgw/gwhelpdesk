@@ -143,34 +143,6 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-xs-12 col-sm-6">
-											<div class="control-group">
-												<label class="control-label">Replication Override</label>
-												<div class="radio">
-													<label>
-														<input
-                                                            {% if group.replicationOverride == "EVERYWHERE" %}
-                                                                checked="checked"
-                                                            {% endif %}
-                                                            name="replicationOverride" type="radio" class="ace" value="EVERYWHERE"
-                                                        />
-
-														<span class="lbl"> Replicate regardless of visibility</span>
-													</label>
-												</div>
-
-												<div class="radio">
-													<label>
-														<input name="replicationOverride" type="radio" class="ace" value="ACCORDING_TO_VISIBILITY"
-                                                            {% if group.replicationOverride == "ACCORDING_TO_VISIBILITY" %}
-                                                                checked="checked"
-                                                            {% endif %}
-                                                        />
-														<span class="lbl"> Replicate according to visibility</span>
-													</label>
-												</div>
-                                            </div>
-                                    </div>
 
                                     <div class="col-lg-10 ">
                                         <label>Email Address: </label>
