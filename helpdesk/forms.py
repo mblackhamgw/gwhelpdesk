@@ -91,7 +91,8 @@ class AddGroup(forms.Form):
         pos = gw.getPolist()
         pochoices = []
         for po in pos:
-            choice = (po['name'], po['name'])
+            url = po['@url']
+            choice = (url, po['name'])
             pochoices.append(choice)
 
         name = forms.CharField(max_length=64)
