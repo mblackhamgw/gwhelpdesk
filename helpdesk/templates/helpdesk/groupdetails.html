@@ -277,6 +277,17 @@
 
                                             </tbody>
                                         </table>
+
+                                       {% if not group.ldapDn %}
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="entry">
+                                                    <button class="btn btn-primary btn-fill btn-wd" onclick="window.location.href='{% url "addgrpmember" %}';">Add Member</button>
+                                                </div>
+                                                </div>
+                                            <br>
+                                        </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <!-- end membership tab -->
@@ -487,6 +498,8 @@
                             </div>
 
                     </div><!-- end tabbable -->
+
+
 
 
 

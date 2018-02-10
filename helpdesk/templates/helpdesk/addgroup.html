@@ -1,0 +1,80 @@
+{% extends 'helpdesk/base.html' %}
+{% block content %}
+{% load staticfiles %}
+<div class="page-header">
+    <h1>Add Group </h1>
+</div><!-- /.page-header -->
+<div class="col-xs-8 ">
+    <div class="widget-box widget-color-blue">
+        <div class="widget-header">
+            <h5 class="widget-title bigger lighter">Add Group</h5>
+        </div>
+
+        <div class="widget-body">
+            <div class="widget-main">
+
+                 </h5>
+                <form name="addgroupform" method="post" action="" class="form-horizontal">
+                     {% csrf_token %}
+
+                <div class="row">
+
+                    <div class="row">
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Group Name</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="name" placeholder="Group Name"/>
+                    </div>
+                </div>
+
+
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Visibility</label>
+                    <div class="col-md-5">
+                        <select  class="form-control" name="visibility">
+
+                            <option value="SYSTEM">System</option>
+                            <option value="DOMAIN">Domain</option>
+                            <option value="POST_OFFICE">Post Office</option>
+                            <option value="NONE">None</option>
+
+                        </select>
+                    </div>
+                 </div>
+
+                 <div class="form-group">
+                    <label class="col-md-3 control-label">Post Office</label>
+                    <div class="col-md-5">
+                        <select  class="form-control" name="postOfficeName">
+                            {% for po in polist %}
+                                {% if po.external == True %}
+                                    <option value="{{ po.url }}">{{ po.name }} (External)</option>
+                                {% else %}
+                                    <option value="{{ po.url }}">{{ po.name }}</option>
+                                {% endif %}
+
+                            {% endfor %}
+                        </select>
+                    </div>
+                 </div>
+
+                <div class="card-footer">
+                    <div class="form-group">
+                        <label class="col-md-3"></label>
+                        <div class="col-md-9">
+                            <button type="submit" class="btn btn-fill btn-primary">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

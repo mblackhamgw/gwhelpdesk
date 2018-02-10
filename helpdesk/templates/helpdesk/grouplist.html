@@ -2,7 +2,7 @@
 {% load staticfiles %}
 {% block content %}
 
-<div class="page-header">
+<div class="page-header" xmlns="http://www.w3.org/1999/html">
     <h1>GroupWise Groups</h1>
 </div><!-- /.page-header -->
 
@@ -14,7 +14,7 @@
 
 <div class="widget-body">
     <div class="widget-main">
-       <div class="col-xs-12 ">
+       <div class="col-xs-12">
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -37,7 +37,7 @@
                                 <input type="hidden"  name="postOfficeName" value="{{ group.postOfficeName}}">
                                 <input  type="hidden" name="domainName" value="{{ group.domainName}}">
                                 <input  type="hidden" name="visibility" value="{{ group.visibility}}">
-                            <input  type="hidden" name="url" value="{{ group.url }}">
+                                <input  type="hidden" name="url" value="{{ group.url }}">
 
                             <tr>
                                 <td>
@@ -66,6 +66,58 @@
                     {% endfor %}
                  </tbody>
             </table>
+
+
+           <div class="col-lg=8">
+                   <div class="col-md-5">
+                      <form name="next" method="post" action="{% url 'grouplist' %}">
+                        {% csrf_token %}
+                        <input name="nextid" type="hidden"
+                            {% if nextid != 1 or nextid != 0 %}
+                                value="{{nextid}}"
+                            {% else %}
+                               value="0"
+                            {% endif %}
+                        />
+                            {% if nextid != 1 or nextid != 0 %}
+                                {% if firstset == False %}
+                                    <a href="javascript:window.history.back();"  class="btn btn-primary btn-fill btn-sm" )">Back</a>
+                                    <button class="btn btn-primary btn-fill btn-sm " type="submit" name="next">Next</button>
+                                {% endif %}
+                                {% if firstset == True %}
+                                    <a href=""  class="btn btn-primary btn-fill btn-sm" )">Back</a>
+                                    <button class="btn btn-primary btn-fill btn-sm" type="submit" name="next">Next</button>
+                                {% endif %}
+                            {% endif %}
+                        </form>
+                   </div>
+
+
+               <!--
+                      <div class="col-md-5">
+                          <form  method="post" action="{% url 'searchresults' %}">
+                            {% csrf_token %}
+                            <div class="input-group custom-search-form">
+                                  <input type="text" class="form-control" placeholder="Search for GW User" name="userid">
+                                    <span class="input-group-btn">
+                                    <button class="btn btn-primary btn-sm" type="submit">
+                                        <i class="fa fa-search"></i>&nbsp;&nbsp;Search
+                                    </button>
+                                </span>
+                            </div>
+                          </form>
+                      </div>
+
+                    -->
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="entry">
+                            <button class="btn btn-primary btn-fill btn-wd" onclick="window.location.href='{% url "addgroup" %}';">Add Group</button>
+                        </div>
+                        </div>
+                    <br>
+            </div>
        </div>
     </div>
 </div>
