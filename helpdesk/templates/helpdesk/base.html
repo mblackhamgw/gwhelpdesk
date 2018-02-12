@@ -49,7 +49,7 @@
 				<div class="navbar-header pull-left">
 					<img src="{% static 'img/helpdesk.jpg' %}" style="float:left;width:80px;height:90px;"/>
 					<a href="{% url 'index' %}" class="navbar-brand">
-						<small>GroupWise Helpdesk</small>
+						GroupWise Helpdesk
 					</a>
 				</div>
 
@@ -61,17 +61,17 @@
 								<div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
 									<button class="btn btn-info">
 										<i class="ace-icon fa fa-search bigger-200"></i>
-										<a href="{% url 'search' %}">Search</a>
+										<a href="{% url 'search' %}">User Search</a>
 									</button>
 									<button class="btn btn-info">
 										<i class="ace-icon fa fa-users bigger-200"></i>
-										<a href="{% url 'userlist' %}">All Users</a>
+										<a href="{% url 'userlist' %}">User List</a>
 									</button>
 
 									{% if request.session.role == "AD" or request.session.role == "HD" %}
 										<button class="btn btn-info">
 											<i class="ace-icon fa fa-user bigger-200"></i>
-											<a href="{% url 'grouplist' %}">Groups</a>
+											<a href="{% url 'grouplist' %}">Group List</a>
 										</button>
 									{% endif %}
 
@@ -192,6 +192,21 @@
 								<a href="{% url 'grouplist' %}">
 									<i class="menu-icon fa fa-caret-right"></i>
                                     All GroupWise Groups
+								</a>
+								<b class="arrow"></b>
+							</li>
+
+							<li class="">
+								<a href="{% url 'groupsearch' %}">
+									<i class="menu-icon fa fa-caret-right"></i>
+                                    GroupWise Group Search
+								</a>
+								<b class="arrow"></b>
+							</li>
+							<li class="">
+								<a href="{% url 'addgroup' %}">
+									<i class="menu-icon fa fa-caret-right"></i>
+                                    New Group
 								</a>
 								<b class="arrow"></b>
 							</li>

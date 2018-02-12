@@ -1,0 +1,97 @@
+{% extends 'helpdesk/base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+<div class="col-lg-12">
+    <div class="card">
+        <div class="header">
+            <h4>List of groups matching on search string:<b> {{ searchstring }} </b></h4>
+             <h5>The list contains the first 5 matches.  Please refine the search string if the desired group is not listed.</h5>
+
+                {% for message in messages %}
+                    {% if message.level == 30 %}
+                      <div class="col-lg-12">
+                            <div class="col-lg-8">
+                                <div class="alert alert-danger alert-dismissable">
+                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                    {{ message }}
+                                </div>
+                            </div>
+                      </div>
+                    {% endif %}
+                {% endfor %}
+
+            <br>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+
+                            <th>Group Name</th>
+                            <th>Post Office</th>
+                            <th>Domain</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                         {% for group in groups %}
+                        <form id="{{ group.name }}" method="POST" action="{% url 'groupdetails' %}" name="{{ group.id }}">
+                        {% csrf_token %}
+                            <input type="hidden" name="id" value="{{group.id}}"/>
+                            <input type="hidden" name="name" value="{{group.name}}"/>
+
+                            <tr>
+
+                                <td>
+                                    {% if group.ldapDn %}
+                                    <img src="{% static 'img/associatedgrp.png' %}" style="float:left;width:15px;height:15px;"/>
+                                    {% elif group.externalRecord %}
+                                    <img src="{% static 'img/external.png' %}" style="float:left;width:15px;height:15px;"/>
+                                    {% else %}
+                                    <img src="{% static 'img/grp.png' %}" style="float:left;width:15px;height:15px;"/>
+                                    {% endif %}
+                                    &nbsp&nbsp&nbsp{{ group.name }}{% if group.externalRecord %}
+                                       <font size="2">(External)</font>
+
+                                        {% endif %}
+                                </td>
+
+                                <td>
+                                    &nbsp&nbsp&nbsp{{ group.postOfficeName }}</td>
+
+                                </td>
+
+                                <td>{{ group.domainName }}</td>
+
+                                {% if request.session.role != "PW" %}
+                                    <td>
+                                        <button class="btn btn-primary btn-fill btn-xs" type="submit" name="editgroup">Edit</button>
+                                    </td>
+                                     {% if request.session.role != "HL" %}
+                                        <td>
+                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="delete">Delete</button>
+                                         </td>
+                                    {% endif %}
+                                {% endif %}
+
+                                <td></td>
+
+                                <td>
+
+
+                                </td>
+                            </tr>
+                        </form>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
