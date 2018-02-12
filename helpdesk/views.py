@@ -155,7 +155,7 @@ def addgrpmember(request):
             grpid = request.POST['grpid']
             grpname = request.POST['grpname']
             url = request.POST['url']
-            print url
+
             data = {
                 'id': userid,
                 'url': url,
@@ -454,7 +454,6 @@ def groupdetails(request):
         request.session['name'] = name
         request.session['url'] = url
         if 'general' in request.POST:
-            print request.POST
             description = request.POST['description']
             visibility = request.POST['visibility']
             data = {
@@ -469,7 +468,7 @@ def groupdetails(request):
                 groupUrl = groupdata['@url']
                 emailAddrs = gw.userAddresses(groupdata['@url'])
                 members = gw.getGroupMembers(groupUrl)
-                print 'membgers %s' % members
+
 
                 if members != 0:
                     for member in members:
@@ -604,6 +603,45 @@ def groupdetails(request):
     else:
         form = GroupDetails
         return render(request, 'helpdesk/groupdetails.html', {'form': form})
+
+def groupsearch(request):
+    request.session.header = 'GroupWise Group Search'
+    form = GroupSearch()
+    return render(request, 'helpdesk/groupsearch.html', {'form': form})
+
+def groupsearchresults(request):
+    gw = gwInit()
+    grouplist = []
+
+    if request.method == "POST":
+        form = GroupSearch(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            groupid = cd['groupid']
+            gw = gwInit()
+
+            if cd['groupid'] != '*':
+                grps = gw.groupSearch(groupid)
+
+                request.session['searchid'] = cd['groupid']
+                log(request, 'Perform search on %s' % request.session['searchid'])
+                if int(len(grps)) == int(0):
+                    messages.add_message(request, messages.WARNING,
+                                         "No groups matching: %s  found.  Try searching again." % cd['groupid'])
+                else:
+                    return render(request, 'helpdesk/groupsearchresults.html',
+                              {'groups': grps, 'searchstring': groupid})
+
+
+
+
+
+
+        else:
+            form = GroupSearch()
+        return render(request, 'helpdesk/groupsearch.html', {'form': form})
+
+
 
 def groupupdatedata(formdata, uid, allowed):
     addressFormats = ['HOST', 'USER', 'FIRST_LAST', 'LAST_FIRST', 'FLAST']
