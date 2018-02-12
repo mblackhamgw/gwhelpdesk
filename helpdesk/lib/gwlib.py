@@ -214,7 +214,6 @@ class gw:
         return response.status_code
 
     def addUserToGroup(self, grpdata):
-        print grpdata
         url = '%s%s/members' % (self.baseUrl, grpdata['url'])
         data = {'id': grpdata['id']}
         add = self.session.post(url, data=json.dumps(data))
@@ -303,6 +302,32 @@ class gw:
                 gwusers.append(details)
         return gwusers
 
+    def groupSearch(self, groupid):
+        url = '%s/gwadmin-service/system/search?text=%s' % (self.baseUrl, groupid)
+        response = self.session.get(url)
+        gwgrps = []
+        if response.text:
+            dict = json.loads(response.text)
+            if dict['resultInfo']['outOf'] == 0:
+                return gwgrps
+            elif 'object' in dict.keys():
+                objects = dict['object']
+
+            else:
+                return gwgrps
+
+        for obj in objects:
+            userUrl = "%s%s" % (self.baseUrl, obj['@url'])
+            resp = self.session.get(userUrl)
+            group = self.checkResponse(resp)
+            if 'GROUP' in group['id']:
+                details = self.getObject(group['id'])
+                details['pendingOp'] = 'false'
+                if 'pendingOp' in group.keys():
+                    details['pendingOp'] = 'true'
+                gwgrps.append(details)
+        return gwgrps
+
     def getObject(self, id):
         url = '%s/gwadmin-service/object/%s' % (self.baseUrl, id)
         response = self.session.get(url, timeout=5)
@@ -339,6 +364,7 @@ class gw:
         return formats
 
     def userAddresses(self, userurl):
+
         url = "%s%s/emailaddresses" % (self.baseUrl, userurl)
         response = self.session.get(url, timeout=5)
         emailAddrs = self.checkResponse(response)
