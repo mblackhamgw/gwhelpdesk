@@ -1,0 +1,46 @@
+{% extends 'helpdesk/base.html' %}
+{% block content %}
+<div class="page-header">
+    <h1>Group Search</h1>
+    </div><!-- /.page-header -->
+        <div class="col-xs-8 ">
+            <div class="widget-box widget-color-blue">
+                <div class="widget-header">
+                    <h5 class="widget-title bigger lighter">GroupWise Group Search</h5>
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main">
+                    <form  method="post" action="{% url 'groupsearchresults' %}">
+                        {% csrf_token %}
+                         <div class="col-md-8">
+                            <div class="input-group custom-search-form">
+                                  <input type="text" class="form-control" placeholder="GroupWise Group Name..." name="groupname">
+                                    <span class="input-group-btn ">
+                                    <button class="btn btn-primary btn-sm" type="submit">
+                                        <i class="fa fa-search"></i>
+                                        &nbsp;&nbsp;Search
+                                    </button>
+                                </span>
+                            </div>
+                         </div>
+                        <div class="clearfix"></div>
+                    </form>
+                    </p>
+
+                    <div class="col-md-12">
+                        {% for message in messages %}
+                            {% if message.level == 30 %}
+                                <div class="alert alert-danger alert-dismissable">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                            {{ message }}
+                                    </div>
+
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
