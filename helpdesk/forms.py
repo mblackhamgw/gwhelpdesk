@@ -85,6 +85,9 @@ class Groups(forms.Form):
     except:
         pass
 
+class GroupSearch(forms.Form):
+    groupname = forms.CharField(max_length=128)
+
 class AddGroup(forms.Form):
     try:
         gw = gwInit()

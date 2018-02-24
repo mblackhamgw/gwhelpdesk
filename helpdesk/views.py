@@ -612,35 +612,27 @@ def groupsearch(request):
 def groupsearchresults(request):
     gw = gwInit()
     grouplist = []
-
     if request.method == "POST":
         form = GroupSearch(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            groupid = cd['groupid']
+            groupname = cd['groupname']
             gw = gwInit()
 
-            if cd['groupid'] != '*':
-                grps = gw.groupSearch(groupid)
+            if cd['groupname'] != '*':
+                grps = gw.groupSearch(groupname)
 
-                request.session['searchid'] = cd['groupid']
-                log(request, 'Perform search on %s' % request.session['searchid'])
+                request.session['searchid'] = cd['groupname']
+                log(request, 'Perform group search on %s' % request.session['searchid'])
                 if int(len(grps)) == int(0):
                     messages.add_message(request, messages.WARNING,
-                                         "No groups matching: %s  found.  Try searching again." % cd['groupid'])
+                                         "No groups matching: %s  found.  Try searching again." % cd['groupname'])
                 else:
                     return render(request, 'helpdesk/groupsearchresults.html',
-                              {'groups': grps, 'searchstring': groupid})
-
-
-
-
-
-
+                              {'groups': grps, 'searchstring': groupname})
         else:
             form = GroupSearch()
         return render(request, 'helpdesk/groupsearch.html', {'form': form})
-
 
 
 def groupupdatedata(formdata, uid, allowed):

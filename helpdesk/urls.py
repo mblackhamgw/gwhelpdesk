@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^addgroup/$', views.addgroup, name='addgroup'),
     url(r'^groupdetails/$', views.groupdetails, name='groupdetails'),
     url(r'^groupsearch/$', views.groupsearch, name='groupsearch'),
+    url(r'^groupsearchresults/$', views.groupsearchresults, name='groupsearchresults'),
     url(r'^grouplist/$', views.grouplist, name='grouplist'),
     url(r'^addgrpmember/$', views.addgrpmember, name='addgrpmember'),
     url(r'^move/$', views.move, name='move'),
