@@ -59,34 +59,40 @@
 						<li>
 							<div class="sidebar-shortcuts" id="sidebar-shortcuts">
 								<div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
-									<button class="btn btn-info">
+									<button class="btn btn-sm btn-info">
 										<i class="ace-icon fa fa-search bigger-200"></i>
 										<a href="{% url 'search' %}">User Search</a>
 									</button>
-									<button class="btn btn-info">
+
+									<button class="btn btn-sm btn-info">
 										<i class="ace-icon fa fa-users bigger-200"></i>
 										<a href="{% url 'userlist' %}">User List</a>
 									</button>
 
+									<button class="btn btn-sm btn-info">
+										<i class="ace-icon fa fa-search bigger-200"></i>
+										<a href="{% url 'groupsearch' %}">Group Search</a>
+									</button>
+
 									{% if request.session.role == "AD" or request.session.role == "HD" %}
-										<button class="btn btn-info">
+										<button class="btn btn-sm btn-info">
 											<i class="ace-icon fa fa-user bigger-200"></i>
 											<a href="{% url 'grouplist' %}">Group List</a>
 										</button>
 									{% endif %}
 
-
 									{% if request.session.role == "AD" %}
-										<button class="btn btn-info">
+										<button class="btn btn-sm btn-info">
 											<i class="ace-icon fa fa-user bigger-200"></i>
-											<a href="{% url 'admins' %}">Administrators</a>
+											<a href="{% url 'admins' %}">Admins</a>
 										</button>
 									{% endif %}
 
-									<button class="btn btn-info">
+									<button class="btn btn-sm btn-info">
 										<i class="ace-icon fa fa-newspaper-o bigger-200"></i>
 										<a href="{% url 'viewlog' %}">View Log</a>
 									</button>
+
 								</div>
 							</div>
 						</li>
