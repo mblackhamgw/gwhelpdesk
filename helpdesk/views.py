@@ -1309,12 +1309,20 @@ def userlist(request):
             ldap = checkLdap(user['postOfficeName'], polist)
             if ldap == True:
                 user['ldap'] = True
-        if int(userlist['nextId']) > 1:
-            firstset = True
-            return render(request, 'helpdesk/userlist.html',
-                          {'users': userlist['userList'], 'nextid': userlist['nextId'], 'firstset': firstset, 'usercount': usercount})
+
+        if 'nextId' not in userlist:
+            if int(userlist['nextId']) > 1:
+                firstset = True
+                return render(request, 'helpdesk/userlist.html',
+                              {'users': userlist['userList'], 'nextid': userlist['nextId'],
+                               'firstset': firstset, 'usercount': usercount})
+            else:
+                return render(request, 'helpdesk/userlist.html', {'users': userlist['userList'],
+                                                                  'firstset': firstset, 'usercount': usercount})
+
         else:
-            return render(request, 'helpdesk/userlist.html', {'users': userlist['userList'], 'firstset': firstset, 'usercount': usercount})
+            return render(request, 'helpdesk/userlist.html', {'users': userlist['userList'],
+                                            'firstset': firstset, 'usercount': usercount})
 
 def viewlog(request):
     request.session.header = 'Log File'
