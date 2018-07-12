@@ -19,7 +19,7 @@ Requirements:
   
   •	A valid internet connection, required to download applcation from github.
   
-  •	A GroupWise 2014 system.  Only tested against GroupWise 2014 SP2 and GroupWise 18.0.1, no testing on prior versions.
+  •	A GroupWise 2014 or later system.  Only tested against GroupWise 2014 SP2 and GroupWise 18.0.1, no testing on prior versions.
 
 You can get by with a text only install for the OS, but you can do the whole GUI thing if you want. After you install, copy the gwhelpdesk_install.py script to the server, then run "python gwhelpdesk_install.py". This will install a few needed rpm's, python modules and download gwhelpdesk from github.com
 
