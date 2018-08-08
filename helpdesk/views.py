@@ -191,7 +191,14 @@ def addgrpmember(request):
 
     else:
         userlist = gw.pageUsers(0)
-        firstset = False
+        print userlist['nextId']
+        if userlist['nextId'] == None:
+            firstset = False
+            return render(request, 'helpdesk/addgrpmember.html',
+                          {'users': userlist['userList'], 'nextid': userlist['nextId'], 'firstset': firstset,
+                           'usercount': usercount})
+
+
         if int(userlist['nextId']) > 1:
             firstset = True
             return render(request, 'helpdesk/addgrpmember.html',
