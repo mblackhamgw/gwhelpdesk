@@ -72,7 +72,7 @@ def admins(request):
     admins = Admin.objects.all()
     if request.method == "POST":
         form = AdminForm(request.POST)
-        print form.errors
+        #print form.errors
         if form.is_valid():
             cd = form.cleaned_data
             user = Admin.objects.get(username=cd['username'])
@@ -123,12 +123,19 @@ def addgroup(request):
 
         return render(request, 'helpdesk/addgroup.html', {'form': form, 'polist': polist})
     else:
-        allgroups = gw.getGroups()
-        for group in allgroups:
-            group['url'] = group['@url']
-        count = len(allgroups)
-        form = AddGroup()
-        return render(request, 'helpdesk/addgroup.html', {'form': form, 'polist': polist })
+        groupnumber = gw.objectCount('group')
+        if groupnumber != 0:
+            allgroups = gw.getGroups()
+            for group in allgroups:
+                group['url'] = group['@url']
+            count = len(allgroups)
+            form = AddGroup()
+            return render(request, 'helpdesk/addgroup.html', {'form': form, 'polist': polist })
+
+        else:
+            form = AddGroup()
+            return render(request, 'helpdesk/addgroup.html', {'form': form, 'polist': polist})
+
 
 def addgrpmember(request):
     gw = gwInit()
@@ -408,30 +415,37 @@ def dissociate(request):
 
 def grouplist(request):
     gw = gwInit()
-    grouplist = gw.pageGroups(0)
-    polist = gw.getPolist()
-    groupcount = gw.getGroupCount()
-    if request.method == "POST":
-        if 'next' in request.POST:
-            nextId = request.POST['nextid']
-            grouplist = gw.pageGroups(nextId)
-            for grp in grouplist['groupList']:
-                ldap = checkLdap(grp['postOfficeName'], polist)
-                if ldap == True:
-                    grp['ldap'] = True
-            if int(grouplist['nextId']) > 1:
-                firstset = False
-                return render(request, 'helpdesk/grouplist.html',
-                              {'groups': grouplist['groupList'], 'nextid': grouplist['nextId'], 'firstset': firstset, 'count': groupcount})
-            else:
-                firstset = True
-                return render(request, 'helpdesk/grouplist.html',
-                              {'groups': grouplist['groupList'],  'nextid': grouplist['nextId'], 'firstset': firstset, 'count': groupcount})
-    else:
-        firstset = True
-        return render(request, 'helpdesk/grouplist.html',
-                      {'groups': grouplist['groupList'],  'nextid': grouplist['nextId'],'firstset': firstset, 'count': groupcount})
+    grpcount = gw.objectCount('group')
+    if grpcount != 0:
+        grouplist = gw.pageGroups(0)
+        polist = gw.getPolist()
+        groupcount = gw.getGroupCount()
+        if request.method == "POST":
+            if 'next' in request.POST:
+                nextId = request.POST['nextid']
 
+                grouplist = gw.pageGroups(nextId)
+                for grp in grouplist['groupList']:
+                    ldap = checkLdap(grp['postOfficeName'], polist)
+                    if ldap == True:
+                        grp['ldap'] = True
+                if int(grouplist['nextId']) > 1:
+                    firstset = False
+                    return render(request, 'helpdesk/grouplist.html',
+                                  {'groups': grouplist['groupList'], 'nextid': grouplist['nextId'], 'firstset': firstset, 'count': groupcount})
+                else:
+                    firstset = True
+                    return render(request, 'helpdesk/grouplist.html',
+                                  {'groups': grouplist['groupList'],  'nextid': grouplist['nextId'], 'firstset': firstset, 'count': groupcount})
+        else:
+            firstset = True
+            return render(request, 'helpdesk/grouplist.html',
+                          {'groups': grouplist['groupList'],  'nextid': grouplist['nextId'],'firstset': firstset, 'count': groupcount})
+
+    else:
+        messages.add_message(request, messages.WARNING,
+                             "No groups GroupWise groups defined")
+        return render(request, 'helpdesk/grouplist.html')
 
 def groupdetails(request):
     gw = gwInit()
@@ -989,7 +1003,7 @@ def nicknames(request):
 def rename(request):
     if request.method == "POST":
         form = Rename(request.POST)
-        print form.errors
+        #print form.errors
         if form.is_valid():
             if 'id' in request.session.keys():
                 del request.session['id']
@@ -1029,7 +1043,7 @@ def resources(request):
     id = request.session['id']
     if request.POST:
         form = Resources(request.POST)
-        print form.errors
+        #print form.errors
         url = request.POST['resourceurl']
         if 'delete' in request.POST:
             delresource = gw.delResource(url)
@@ -1169,10 +1183,6 @@ def updatedata(formdata, uid, allowed):
     changedData['internetDomainName'] = internetDomainName
 
     return changedData
-
-
-
-
 
 
 def userdata(request):
