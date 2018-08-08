@@ -40,6 +40,22 @@ class gw:
         else:
             return response
 
+    def objectCount(self, gwtype):
+        url = '%s/gwadmin-service/list/%s' % (self.baseUrl, gwtype)
+        response = self.session.get(url)
+        if response.text:
+            dict = json.loads(response.text)
+            if 'resultInfo' in dict.keys():
+                if dict['resultInfo']['outOf'] == 0:
+                    return 0
+                else:
+                    return dict['resultInfo']['outOf']
+
+
+
+
+
+
     def pageUsers(self, nextId):
         retvalue = {}
         self.userList = []
@@ -67,7 +83,7 @@ class gw:
     def pageGroups(self, nextId):
         retvalue = {}
         self.groupList = []
-        if nextId > 1:
+        if int(nextId) > 1:
             url = '%s/gwadmin-service/list/group?count=8&nextID=%s' % (self.baseUrl, nextId)
         else:
             url = '%s/gwadmin-service/list/group?count=8' % (self.baseUrl)
