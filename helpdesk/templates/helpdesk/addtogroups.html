@@ -44,11 +44,29 @@
 				<form name="grp" action="" method="post">
 					{% csrf_token %}
                     <tr>
-                        <td class="col-xs-4">{{ grp.name }}</td>
+
+                        <td class="col-xs-4">
+                            {% if grp.ldapDn %}
+                                       <img src="{% static 'img/associatedgrp.png' %}" style="float:left;width:15px;height:15px;"/>
+                                    {% else %}
+                                        <img src="{% static 'img/grp.png' %}" style="float:left;width:15px;height:15px;"/>
+
+
+
+                            {% endif %}
+                            &nbsp{{ grp.name }}
+                        </td>
                         <td class="col-xs-3">{{ grp.postOfficeName}}</td>
                         <td class="col-xs-3">{{ grp.domainName}}</td>
-                        <td class="col-xs-2"><button class="btn btn-primary btn-fill btn-sm " type="submit" name="add">Select</button></td>
 
+                        {% if grp.ldapDn %}
+                        <td class="col-xs-2">
+
+                        </td>
+                        {% else %}
+
+                            <td class="col-xs-2"><button class="btn btn-primary btn-fill btn-sm " type="submit" name="add">Select</button></td>
+                        {% endif %}
                     </tr>
                     <input type="hidden" name="url" value="{{ grp.url }}"/>
 				</form>
