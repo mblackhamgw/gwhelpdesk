@@ -51,11 +51,6 @@ class gw:
                 else:
                     return dict['resultInfo']['outOf']
 
-
-
-
-
-
     def pageUsers(self, nextId):
         retvalue = {}
         self.userList = []
@@ -166,8 +161,16 @@ class gw:
             response = self.session.get(url)
             g = self.checkResponse(response)
             for grp in g:
+                #print grp
                 data = [grp['name'], grp['id'], grp['domainName'], grp['postOfficeName'], grp['visibility'], grp['@url']]
                 grp['url'] = grp['@url']
+
+                if 'ldapDn' in grp.keys():
+                    print "associtate"
+                    dn = grp['ldapDn']
+                    #grp['ldapDn']
+                    grp['ldapDn'] = dn
+                    print data
                 glist.append(grp)
             #print glist
             return glist
@@ -182,6 +185,7 @@ class gw:
             g = self.checkResponse(response)
             for grp in g:
                 data = [grp['name'], grp['id'], grp['domainName'], grp['postOfficeName'], grp['visibility'], grp['@url']]
+
                 grp['url'] = grp['@url']
                 glist.append(grp)
             #print glist
@@ -344,7 +348,6 @@ class gw:
                 return gwgrps
             elif 'object' in dict.keys():
                 objects = dict['object']
-
             else:
                 return gwgrps
 
@@ -537,13 +540,15 @@ class gw:
             elif 'resultInfo' in dict.keys():
                 return None
 
-    def updateGroupMembership(self, userid, groupid, particpation ):
+    def updateGroupMembership(self, name, userid, groupid, particpation ):
         user = self.getObject(userid)
         url = '%s%s/groupmemberships' %(self.baseUrl, user['@url'])
-        data = {'update':{
-                    'id':groupid,
-                    'participation': particpation
-                    }
+        data = {
+            'update':[{
+                'id':groupid,
+                'participation': particpation,
+                'name': name,
+                    }]
                 }
         results = self.session.put(url,data=json.dumps(data))
 
