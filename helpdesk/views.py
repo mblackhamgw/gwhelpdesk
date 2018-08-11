@@ -191,7 +191,7 @@ def addgrpmember(request):
 
     else:
         userlist = gw.pageUsers(0)
-        print userlist['nextId']
+        #print userlist['nextId']
         if userlist['nextId'] == None:
             firstset = False
             return render(request, 'helpdesk/addgrpmember.html',
@@ -265,17 +265,82 @@ def addresource(request):
     form = Addresource()
     return render(request, 'helpdesk/addresource.html', {'form': form, 'polist': polist})
 
+def gtable(request):
+    gw = gwInit()
+    groups = gw.getAllGroups()
+    if request.POST:
+        #print request.POST
+        grpurl = request.POST['url']
+        userid = request.session['id']
+        print grpurl
+        print userid
+        data = {
+            'id': userid,
+            'url': grpurl,
+        }
+        addtogrp = gw.addUserToGroup(data)
+        if addtogrp == 201:
+            return HttpResponseRedirect(reverse('grouplist'))
+        else:
+            members = gw.getGroupMembers(url)
+            form = GroupDetails()
+            groupdata = gw.getGroup(id)
+            emailAddrs = gw.userAddresses(url)
+            idoms = gw.iDomains()
+            idomChoices = []
+            for idom in idoms:
+                choice = (idom, idom)
+                idomChoices.append(choice)
+            addressFormats = gw.addrFormats()
+            return render(request, 'helpdesk/groupdetails.html',
+                          {'form': form, 'group': groupdata, 'members': members,
+                           'addressFormats': addressFormats,
+                           'emailAddrs': emailAddrs, 'idomains': idomChoices})
+
+    else:
+        return render(request, 'helpdesk/gtable.html', {'groups':groups})
+
 def addtogroups(request):
     gw = gwInit()
-    if request.method == "POST":
-        form = Groups(request.POST)
-        return render(request, 'helpdesk/groups.html',
-                     {'form': form})
+    groups = gw.getAllGroups()
+    if len(groups) == 0:
+
+        messages.add_message(request, messages.WARNING,
+                             "No groups GroupWise groups defined")
+        return render(request, 'helpdesk/addtogroups.html')
+    if request.POST:
+        # print request.POST
+        grpurl = request.POST['url']
+        userid = request.session['id']
+        print grpurl
+        print userid
+        data = {
+            'id': userid,
+            'url': grpurl,
+        }
+        addtogrp = gw.addUserToGroup(data)
+        if addtogrp == 201:
+            return HttpResponseRedirect(reverse('grouplist'))
+        else:
+            members = gw.getGroupMembers(url)
+            form = GroupDetails()
+            groupdata = gw.getGroup(id)
+            emailAddrs = gw.userAddresses(url)
+            idoms = gw.iDomains()
+            idomChoices = []
+            for idom in idoms:
+                choice = (idom, idom)
+                idomChoices.append(choice)
+            addressFormats = gw.addrFormats()
+            return render(request, 'helpdesk/groupdetails.html',
+                          {'form': form, 'group': groupdata, 'members': members,
+                           'addressFormats': addressFormats,
+                           'emailAddrs': emailAddrs, 'idomains': idomChoices})
+
     else:
-        form = Groups()
-        groupList = gw.getGroups()
-        return render(request, 'helpdesk/addtogroups.html',
-                      {'form': form, 'groups': groupList})
+        return render(request, 'helpdesk/addtogroups.html', {'groups': groups})
+
+
 
 def adduser(request):
     request.session.header = 'New GroupWise User'
