@@ -159,6 +159,21 @@ class gw:
         else:
             return 0
 
+    def getAllGroups(self):
+        glist = []
+        url = '%s/gwadmin-service/list/group' % self.baseUrl
+        try:
+            response = self.session.get(url)
+            g = self.checkResponse(response)
+            for grp in g:
+                data = [grp['name'], grp['id'], grp['domainName'], grp['postOfficeName'], grp['visibility'], grp['@url']]
+                grp['url'] = grp['@url']
+                glist.append(grp)
+            #print glist
+            return glist
+        except:
+            pass
+
     def getGroups(self):
         glist = []
         url = '%s/gwadmin-service/list/group?count=8' % self.baseUrl
@@ -169,6 +184,7 @@ class gw:
                 data = [grp['name'], grp['id'], grp['domainName'], grp['postOfficeName'], grp['visibility'], grp['@url']]
                 grp['url'] = grp['@url']
                 glist.append(grp)
+            #print glist
             return glist
         except:
             pass
