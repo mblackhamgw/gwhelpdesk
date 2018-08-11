@@ -161,19 +161,16 @@ class gw:
             response = self.session.get(url)
             g = self.checkResponse(response)
             for grp in g:
-                #print grp
                 data = [grp['name'], grp['id'], grp['domainName'], grp['postOfficeName'], grp['visibility'], grp['@url']]
                 grp['url'] = grp['@url']
 
                 if 'ldapDn' in grp.keys():
-                    print "associtate"
                     dn = grp['ldapDn']
-                    #grp['ldapDn']
                     grp['ldapDn'] = dn
-                    print data
+
                 glist.append(grp)
-            #print glist
             return glist
+
         except:
             pass
 
@@ -188,7 +185,6 @@ class gw:
 
                 grp['url'] = grp['@url']
                 glist.append(grp)
-            #print glist
             return glist
         except:
             pass
@@ -285,7 +281,7 @@ class gw:
         }
 
         response = self.session.get(url)
-        print response
+        #print response
         from StringIO import StringIO
         image = response.open(StringIO())
         self.session.headers = {
