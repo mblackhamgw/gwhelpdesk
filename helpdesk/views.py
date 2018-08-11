@@ -265,44 +265,12 @@ def addresource(request):
     form = Addresource()
     return render(request, 'helpdesk/addresource.html', {'form': form, 'polist': polist})
 
-def gtable(request):
-    gw = gwInit()
-    groups = gw.getAllGroups()
-    if request.POST:
-        #print request.POST
-        grpurl = request.POST['url']
-        userid = request.session['id']
-        print grpurl
-        print userid
-        data = {
-            'id': userid,
-            'url': grpurl,
-        }
-        addtogrp = gw.addUserToGroup(data)
-        if addtogrp == 201:
-            return HttpResponseRedirect(reverse('grouplist'))
-        else:
-            members = gw.getGroupMembers(url)
-            form = GroupDetails()
-            groupdata = gw.getGroup(id)
-            emailAddrs = gw.userAddresses(url)
-            idoms = gw.iDomains()
-            idomChoices = []
-            for idom in idoms:
-                choice = (idom, idom)
-                idomChoices.append(choice)
-            addressFormats = gw.addrFormats()
-            return render(request, 'helpdesk/groupdetails.html',
-                          {'form': form, 'group': groupdata, 'members': members,
-                           'addressFormats': addressFormats,
-                           'emailAddrs': emailAddrs, 'idomains': idomChoices})
-
-    else:
-        return render(request, 'helpdesk/gtable.html', {'groups':groups})
 
 def addtogroups(request):
     gw = gwInit()
     groups = gw.getAllGroups()
+#    print groups
+
     if len(groups) == 0:
 
         messages.add_message(request, messages.WARNING,
@@ -312,8 +280,7 @@ def addtogroups(request):
         # print request.POST
         grpurl = request.POST['url']
         userid = request.session['id']
-        print grpurl
-        print userid
+
         data = {
             'id': userid,
             'url': grpurl,
@@ -322,10 +289,10 @@ def addtogroups(request):
         if addtogrp == 201:
             return HttpResponseRedirect(reverse('grouplist'))
         else:
-            members = gw.getGroupMembers(url)
+            members = gw.getGroupMembers(grpurl)
             form = GroupDetails()
             groupdata = gw.getGroup(id)
-            emailAddrs = gw.userAddresses(url)
+            emailAddrs = gw.userAddresses(grpurl)
             idoms = gw.iDomains()
             idomChoices = []
             for idom in idoms:
@@ -785,11 +752,16 @@ def groups(request):
         if form.is_valid():
             cd = form.cleaned_data
             userid = request.session['id']
+            name = request.session['name']
+            print name
+            print userid
             grpid = cd['grpid']
             groupname = cd['group']
             participation = cd['participation']
             if 'edit' in request.POST.keys():
-                x = gw.updateGroupMembership(userid, grpid, participation)
+                print request.POST
+                x = gw.updateGroupMembership(name, userid, grpid, participation)
+                print x
                 log(request, 'Modified Group Participation for user: %s in group: %s' % (request.session['name'], groupname))
                 groupList = gw.userGroupMembership(gwid)
                 return render(request, 'helpdesk/groups.html', {'form': form, 'groupList': groupList})

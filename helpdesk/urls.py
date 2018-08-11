@@ -41,4 +41,5 @@ urlpatterns = [
     url(r'^addresource/$', views.addresource, name='addresource'),
 
 
+
 ]
