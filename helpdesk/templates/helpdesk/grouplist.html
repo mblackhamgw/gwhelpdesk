@@ -8,7 +8,7 @@
 
 <div class="widget-box widget-color-blue">
     <div class="widget-header">
-        <h5 class="widget-title bigger lighter">GroupWise Groups - Total Group Count {{ count }} </h5>
+        <h5 class="widget-title bigger lighter">GroupWise Groups - Total Group Count {{ count }} {{adduser}} </h5>
     </div>
 </div>
 
@@ -53,6 +53,13 @@
                                 <td>{{ group.visibility}}</td>
 
                                 {% if request.session.role == "AD" or request.session.role != "HL" %}
+
+                                    {% if adduser.add == True%}
+
+                                        <td>
+                                            <button class="btn btn-primary btn-fill btn-xs" type="submit" name="group">Select</button>
+                                        </td>
+                                    {% else %}
                                         <td>
                                             <button class="btn btn-primary btn-fill btn-xs" type="submit" name="editgroup">Edit</button>
                                          </td>
@@ -60,6 +67,7 @@
                                             <button class="btn btn-primary btn-fill btn-xs" type="submit" name="deletegroup">Delete</button>
                                          </td>
                                         <td>
+                                  {% endif %}
                                 {% endif %}
                             </tr>
                         </form>
