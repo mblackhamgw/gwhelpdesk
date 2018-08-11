@@ -753,15 +753,11 @@ def groups(request):
             cd = form.cleaned_data
             userid = request.session['id']
             name = request.session['name']
-            print name
-            print userid
             grpid = cd['grpid']
             groupname = cd['group']
             participation = cd['participation']
             if 'edit' in request.POST.keys():
-                print request.POST
                 x = gw.updateGroupMembership(name, userid, grpid, participation)
-                print x
                 log(request, 'Modified Group Participation for user: %s in group: %s' % (request.session['name'], groupname))
                 groupList = gw.userGroupMembership(gwid)
                 return render(request, 'helpdesk/groups.html', {'form': form, 'groupList': groupList})
