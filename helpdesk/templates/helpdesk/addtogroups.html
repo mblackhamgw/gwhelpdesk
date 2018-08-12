@@ -22,6 +22,11 @@
 		}
 	</style>
 
+
+<div class="page-header">
+    <h1>Add {{ request.session.name }} To a Group</h1>
+</div>
+
 <div class="container">
   <div class="row">
       <div class="panel panel-primary">
@@ -29,6 +34,7 @@
           <h4>
             Group list - Scroll down to see all groups.  Press select to add  {{ request.session.name }} to the desired group
           </h4>
+            <h5>If there is not a Select button,  the Group is associated to a directory</h5>
         </div>
         <table class="table table-fixed">
           <thead>
