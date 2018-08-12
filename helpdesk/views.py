@@ -169,6 +169,7 @@ def addgrpmember(request):
             }
             addtogrp = gw.addUserToGroup(data)
             if addtogrp == 201:
+                log(request, 'Added %s to Group %s' % (username, grpname))
                 return HttpResponseRedirect(reverse('grouplist'))
             else:
                 members = gw.getGroupMembers(url)
