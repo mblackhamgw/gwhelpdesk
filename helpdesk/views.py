@@ -278,7 +278,7 @@ def addtogroups(request):
                              "No groups GroupWise groups defined")
         return render(request, 'helpdesk/addtogroups.html')
     if request.POST:
-        print request.POST
+
         grpurl = request.POST['url']
         userid = request.session['id']
         grpname = request.POST['grpname']
@@ -1322,7 +1322,7 @@ def userlist(request):
     polist = gw.getPolist()
     usercount = gw.getUserCount()
     if request.method == "POST":
-        print request.POST
+
         if 'next' in request.POST:
             nextId = request.POST['nextid']
             userlist = gw.pageUsers(nextId)
