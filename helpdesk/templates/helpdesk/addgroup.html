@@ -2,7 +2,7 @@
 {% block content %}
 {% load staticfiles %}
 <div class="page-header">
-    <h1>Add Group </h1>
+    <h1>Add Group {{ group }}</h1>
 </div><!-- /.page-header -->
 <div class="col-xs-8 ">
     <div class="widget-box widget-color-blue">
@@ -46,7 +46,7 @@
                  <div class="form-group">
                     <label class="col-md-3 control-label">Post Office</label>
                     <div class="col-md-5">
-                        <select  class="form-control" name="postOfficeName">
+                        <select  class="form-control" name="pourl">
                             {% for po in polist %}
                                 {% if po.external == True %}
                                     <option value="{{ po.url }}">{{ po.name }} (External)</option>
@@ -56,6 +56,8 @@
 
                             {% endfor %}
                         </select>
+
+
                     </div>
                  </div>
 

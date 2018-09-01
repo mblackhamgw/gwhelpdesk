@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="page-header">
-    <h1>Settings for {{ group.name }}</h1>
+    <h1>Settings for group: {{ group.name}}</h1>
 
 </div><!-- /.page-header -->
 
@@ -19,19 +19,6 @@
         </h6>
     </div>
 
-    <!--
-        {% if group.moveStatus %}
-            <h6>
-              <div class="col-md-6">
-                    {% ifequal group.moveStatus.action "UDB_MOVE_group_FINISHED" %}
-                        &nbsp
-                    {% else %}
-                        A previous group move operation has not yet completed.
-                    {% endifequal %}
-              </div>
-            </h6>
-        {% endif %}
-        -->
 </div>
 <div class="widget-body">
     <div class="widget-main">
@@ -41,15 +28,9 @@
             Changing memebership is not allowed.
             </b></p>
             {% endif %}
-
-
             <div class="row">
                 <div class="col-sm-10">
-
                     <br>
-
-
-
                     <div class="tabbable">
                         <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="tab1">
                             <li >
@@ -62,8 +43,6 @@
                                 <a data-toggle="tab" href="#inet">Internet Addressing</a>
                             </li>
                         </ul>
-
-
                             <div class="tab-content">
                                 <div id="general" class="tab-pane">
 
@@ -72,8 +51,6 @@
                                         {% csrf_token %}
                                             <input type="hidden" name="id" value="{{ group.id }}">
                                             <input type="hidden" name="name" value="{{ group.name }}">
-
-
                                         <div class="form-group">
                                             <label>Description</label>
                                             <textarea class="form-control" rows="2" name="description"
@@ -98,7 +75,6 @@
                                         </div>
                                     </div>
 
-
                                     <div class="col-lg-10 ">
                                         <label>Email Address: </label>
                                         {{ group.preferredEmailAddress }}
@@ -112,17 +88,11 @@
                                     </div>
                                     </div>
                                     </form>
-
                                 </div>
                                 <!-- end general tab -->
 
-
                                 <div id="membership" class="tab-pane in active">
                                     <div class="col-xs-12 ">
-
-
-
-
                                         <table class="table table-hover">
                                             <thead>
                                                 <tr>
@@ -191,17 +161,11 @@
                                                             <button class="btn btn-primary btn-fill btn-xs" type="submit" name="deletemember">Remove</button>
                                                             {% endif %}
                                                         </td>
-
-
-
                                                     </tr>
-                                                    </form>
 
 
                                                 {% endfor %}
                                             {% endif %}
-
-
                                             </tbody>
                                         </table>
 
@@ -220,19 +184,14 @@
                                 <!-- end membership tab -->
 
                                 <div id="inet" class="tab-pane">
-
-                                    <div id="inet" class="tab-pane">
                                     <h4>Internet Addressing</h4>
-
                                     <div class="col-lg-12">
                                         <div class="col-lg-6">
                                             <label>Allowed Addressing Formats</label>
-
                                             <form class="form-horizontal" id="inetaddressing" name="inetaddressing" action="{% url 'groupdetails' %}" method="post">
                                                 {% csrf_token %}
                                               <input type="hidden" name="id" value="{{ group.id }}">
                                               <input type="hidden" name="name" value="{{ group.name }}">
-
                                                 <div class="form-group">
                                                 <div id="showAllowedOverride">
                                                      <div class="checkbox">

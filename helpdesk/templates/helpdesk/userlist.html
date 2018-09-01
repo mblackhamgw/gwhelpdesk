@@ -35,9 +35,11 @@
                 </thead>
                  <tbody>
                     {% for user in users %}
-
-
-                        <form name="userform" id="userform" class="userform" method="post" action="{% url 'userdata' %}">
+                       {% if user.externalRecord %}
+                            <form name="userform" id="userform" class="userform" method="post" action="{% url 'extuserdata' %}">
+                        {% else %}
+                            <form name="userform" id="userform" class="userform" method="post" action="{% url 'userdata' %}">
+                        {% endif %}
                             <span>{% csrf_token %}</span>
                             <input type="hidden" name="id" value="{{ user.id}}">
                             <input type="hidden" name="name" value="{{ user.name}}">
@@ -137,6 +139,7 @@
                         </form>
                    </div>
 
+                  {% if request.session.role != 'AB' %}
                       <div class="col-md-5">
                           <form  method="post" action="{% url 'searchresults' %}">
                             {% csrf_token %}
@@ -150,6 +153,7 @@
                             </div>
                           </form>
                       </div>
+                  {% endif %}
                 </div>
       </div>
     </div>

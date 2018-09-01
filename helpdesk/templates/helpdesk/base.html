@@ -60,86 +60,85 @@
 				<div class="navbar-header pull-left">
 					<img src="{% static 'img/helpdesk.jpg' %}" style="float:left;width:80px;height:90px;"/>
 					<a href="{% url 'index' %}" class="navbar-brand">
-						GroupWise Helpdesk
 					</a>
 				</div>
 
 				{% if request.session.role %}
 				<div class="navbar-buttons navbar-header pull-right" role="navigation">
 					<ul class="nav ace-nav">
+					{% if request.session.role == "AD" or request.session.role == "HD" or request.session.role == "AB"%}
+
 						<li>
 							<div class="sidebar-shortcuts" id="sidebar-shortcuts">
 								<div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
-									<button class="btn btn-sm btn-info">
-										<i class="ace-icon fa fa-search bigger-200"></i>
-										<a href="{% url 'search' %}">User Search</a>
-									</button>
 
-									<button class="btn btn-sm btn-info">
-										<i class="ace-icon fa fa-users bigger-200"></i>
-										<a href="{% url 'userlist' %}">User List</a>
-									</button>
 
+									{% if request.session.role == "AD" or request.session.role == "HD" %}
+										<button class="btn btn-sm btn-info">
+											<i class="ace-icon fa fa-search bigger-200"></i>
+											<a href="{% url 'search' %}">User Search</a>
+										</button>
+
+										<button class="btn btn-sm btn-info">
+											<i class="ace-icon fa fa-users bigger-200"></i>
+											<a href="{% url 'userlist' %}">User List</a>
+										</button>
+
+									{% endif %}
+					{% endif %}
 									<button class="btn btn-sm btn-info">
 										<i class="ace-icon fa fa-search bigger-200"></i>
 										<a href="{% url 'groupsearch' %}">Group Search</a>
 									</button>
 
-									{% if request.session.role == "AD" or request.session.role == "HD" %}
-										<button class="btn btn-sm btn-info">
-											<i class="ace-icon fa fa-user bigger-200"></i>
-											<a href="{% url 'grouplist' %}">Group List</a>
-										</button>
-									{% endif %}
+					{% if request.session.role == "AD" or request.session.role == "HD" or request.session.role == "AB"%}
+						<button class="btn btn-sm btn-info">
+							<i class="ace-icon fa fa-user bigger-200"></i>
+							<a href="{% url 'grouplist' %}">Group List</a>
+						</button>
 
-									{% if request.session.role == "AD" %}
-										<button class="btn btn-sm btn-info">
-											<i class="ace-icon fa fa-user bigger-200"></i>
-											<a href="{% url 'admins' %}">Admins</a>
-										</button>
-									{% endif %}
 
-									<button class="btn btn-sm btn-info">
-										<i class="ace-icon fa fa-newspaper-o bigger-200"></i>
-										<a href="{% url 'viewlog' %}">View Log</a>
-									</button>
+						<button class="btn btn-sm btn-info">
+							<i class="ace-icon fa fa-newspaper-o bigger-200"></i>
+							<a href="{% url 'viewlog' %}">View Log</a>
+						</button>
 
-								</div>
-							</div>
-						</li>
 
-						<li class=" dark-blue dropdown-modal">
-							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
-								<span class="user-info">
-									<small>Hi!
-										{% if request.session.givenName %}
-											{{ request.session.givenName }}
-										{% else %}
-											{{ request.session.adminname }}
-										{% endif %}
-										</small>
+				</div>
 
-								</span>
-								<i class="ace-icon fa fa-caret-down"></i>
+				</li>
+
+				<li class=" dark-blue dropdown-modal">
+					<a data-toggle="dropdown" href="#" class="dropdown-toggle">
+						<span class="user-info">
+							<small>Hi!
+								{% if request.session.givenName %}
+									{{ request.session.givenName }}
+								{% else %}
+									{{ request.session.adminname }}
+								{% endif %}
+							</small>
+
+						</span>
+						<i class="ace-icon fa fa-caret-down"></i>
+					</a>
+					<ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+						<li>
+							<a href="{% url 'changeadminpassword' %}">
+								<i class="ace-icon fa fa-cog"></i>
+								Change Password
 							</a>
-							<ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
-								<li>
-									<a href="{% url 'changeadminpassword' %}">
-										<i class="ace-icon fa fa-cog"></i>
-										Change Password
-									</a>
-								</li>
-								<li class="divider"></li>
-								<li>
-									<a href="{% url 'logout' %}">
-										<i class="ace-icon fa fa-power-off"></i>
-										Logout
-									</a>
-								</li>
-							</ul>
+						</li>
+						<li class="divider"></li>
+						<li>
+							<a href="{% url 'logout' %}">
+								<i class="ace-icon fa fa-power-off"></i>
+									Logout
+							</a>
+							{% endif %}
+							{% endif %}
 						</li>
 
-						{% endif %}
 					</ul>
 				</div>
 			</div><!-- /.navbar-container -->
@@ -153,15 +152,9 @@
 					try{ace.settings.loadState('sidebar')}catch(e){}
 				</script>
 
-
-
-
-
-
                 <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
 					<i id="sidebar-toggle-icon" class="ace-icon fa fa-angle-double-left ace-save-state" data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
 				</div>
-
 
 				<ul class="nav nav-list">
 					<li class="">
@@ -173,37 +166,74 @@
 					</li>
 					{% if request.session.role %}
 
-					<li class="hover">
-						<a href="#" class="dropdown-toggle">
-							<i class="menu-icon fa fa-users"></i>
-							<span class="menu-text"> GroupWise</span>
-							<b class="arrow fa fa-angle-down"></b>
-						</a>
-						<b class="arrow"></b>
-						<ul class="submenu">
-							<li class="">
-								<a href="{% url 'userlist' %}">
-									<i class="menu-icon fa fa-caret-right"></i>
-                                    &nbsp&nbsp&nbsp All GroupWise Users
-								</a>
-								<b class="arrow"></b>
-							</li>
-							<li class="">
-								<a href="{% url 'search' %}">
-									<i class="menu-icon fa fa-caret-right"></i>
-									&nbsp&nbsp&nbsp GroupWise User Search
-								</a>
-								<b class="arrow"></b>
-							</li>
-							{% if request.session.role == "AD" or request.session.role == "HD" %}
-							<li class="">
-								<a href="{% url 'adduser' %}">
-									<i class="menu-icon fa fa-caret-right"></i>
-									&nbsp&nbsp&nbsp New User
-								</a>
-								<b class="arrow"></b>
-							</li>
-							<hr>
+						<li class="hover">
+							<a href="#" class="dropdown-toggle">
+								<i class="menu-icon fa fa-users"></i>
+								<span class="menu-text"> GroupWise</span>
+								<b class="arrow fa fa-angle-down"></b>
+							</a>
+							<b class="arrow"></b>
+
+
+							<ul class="submenu">
+
+								{% if request.session.role == "AD" or request.session.role == "HD" %}
+
+								<li class="">
+									<a href="{% url 'userlist' %}">
+										<i class="menu-icon fa fa-caret-right"></i>
+										&nbsp&nbsp&nbsp All GroupWise Users
+									</a>
+									<b class="arrow"></b>
+								</li>
+
+								<li class="">
+									<a href="{% url 'search' %}">
+										<i class="menu-icon fa fa-caret-right"></i>
+										&nbsp&nbsp&nbsp GroupWise User Search
+									</a>
+									<b class="arrow"></b>
+								</li>
+								{% endif %}
+
+								{% if request.session.role == "AB" %}
+								<li class="">
+										<a href="{% url 'extuserlist' %}">
+											<i class="menu-icon fa fa-caret-right"></i>
+										&nbsp&nbsp&nbsp All External Users
+
+										</a>
+									</li>
+								<li class="">
+										<a href="{% url 'addextuser' %}">
+											<i class="menu-icon fa fa-caret-right"></i>
+										&nbsp&nbsp&nbsp New External User
+
+										</a>
+									</li>
+								{% endif %}
+
+
+
+
+								{% if request.session.role == "AD" or request.session.role == "HD" %}
+								<li class="">
+										<a href="{% url 'adduser' %}">
+											<i class="menu-icon fa fa-caret-right"></i>
+										&nbsp&nbsp&nbsp New User
+
+										</a>
+									</li>
+								{% endif %
+							{% endif %}
+
+									<b class="arrow"></b>
+									</li>
+
+								<hr>
+
+
+							{% if request.session.role == "AD" or request.session.role == "HD" or request.session.role == "AB"  %}
 
 							<li class="">
 								<a href="{% url 'grouplist' %}">
@@ -229,52 +259,55 @@
 								<b class="arrow"></b>
 							</li>
 							{% endif %}
-							{% endif %}
+						{% endif %}
+
 
 
 						</ul>
 					</li>
 
 					{% if request.session.role == "AD" %}
-					<li class="hover">
-						<a href="#" class="dropdown-toggle">
-							<i class="menu-icon fa fa-pencil-square-o"></i>
-							<span class="menu-text"> Adminstration</span>
-							<b class="arrow fa fa-angle-down"></b>
-						</a>
-						<b class="arrow"></b>
-						<ul class="submenu">
-							<li class="">
-								<a href="{% url 'gwconfig' %}">
-									<i class="menu-icon fa fa-caret-right"></i>
-                                    &nbsp&nbsp&nbsp GroupWise Settings
-								</a>
-								<b class="arrow"></b>
-							</li>
-							<li class="">
-								<a href="{% url 'admins' %}">
-									<i class="menu-icon fa fa-caret-right"></i>
-									&nbsp&nbsp&nbsp Administrators
-								</a>
-								<b class="arrow"></b>
-							</li>
-							<li class="">
-								<a href="{% url 'addadmin' %}">
-									<i class="menu-icon fa fa-caret-right"></i>
-									&nbsp&nbsp&nbsp Add Administrator
-								</a>
-								<b class="arrow"></b>
-							</li>
-							<li class="">
-								<a href="{% url 'viewlog' %}">
-									<i class="menu-icon fa fa-caret-right"></i>
-									&nbsp&nbsp&nbsp View Log File
-								</a>
-								<b class="arrow"></b>
-							</li>
-							{% endif %}
+						<li class="hover">
+							<a href="#" class="dropdown-toggle">
+								<i class="menu-icon fa fa-pencil-square-o"></i>
+								<span class="menu-text"> Adminstration</span>
+								<b class="arrow fa fa-angle-down"></b>
+							</a>
+							<b class="arrow"></b>
+							<ul class="submenu">
+								<li class="">
+									<a href="{% url 'gwconfig' %}">
+										<i class="menu-icon fa fa-caret-right"></i>
+										&nbsp&nbsp&nbsp GroupWise Settings
+									</a>
+									<b class="arrow"></b>
+								</li>
+								<li class="">
+									<a href="{% url 'admins' %}">
+										<i class="menu-icon fa fa-caret-right"></i>
+										&nbsp&nbsp&nbsp Administrators
+									</a>
+									<b class="arrow"></b>
+								</li>
+								<li class="">
+									<a href="{% url 'addadmin' %}">
+										<i class="menu-icon fa fa-caret-right"></i>
+										&nbsp&nbsp&nbsp Add Administrator
+									</a>
+									<b class="arrow"></b>
+								</li>
+								<li class="">
+									<a href="{% url 'viewlog' %}">
+										<i class="menu-icon fa fa-caret-right"></i>
+										&nbsp&nbsp&nbsp View Log File
+									</a>
+									<b class="arrow"></b>
+								</li>
+								{% endif %}
 						</ul>
 				</ul><!-- /.nav-list -->
+
+
 			</div>
 
 			<div class="main-content">
