@@ -2,7 +2,7 @@ import requests, json, time
 from requests import ConnectionError
 requests.packages.urllib3.disable_warnings()
 from gwhelp import settings
-
+from pprint import pprint
 class gw:
     def __init__(self, gwHost, gwPort, gwAdmin, gwPass):
 
@@ -200,6 +200,7 @@ class gw:
         response = self.session.get(geturl)
         if response.text:
             j = json.loads(response.text)
+            print j
             if j['resultInfo']['outOf'] == 0:
                 return 0
             else:
@@ -215,6 +216,7 @@ class gw:
 
     def updateGroup(self, id, data, type):
         grp = self.getObject(id)
+
         if type == 'u':
             grpurl = '%s%s' % (self.baseUrl, grp['@url'])
             update = self.session.put(grpurl, data=json.dumps(data))
@@ -231,14 +233,20 @@ class gw:
         else:
             return 0
 
-    def addGroup(self,gwdata):
-        url = '%s%s/groups' % (self.baseUrl, gwdata['postOfficeName'])
+    def addGroup(self,gwdata, pourl):
+        url = '%s%s/groups' % (self.baseUrl, pourl )
         data = {
             'name': gwdata['name'],
             'visibility': gwdata['visibility']
         }
         results = self.session.post(url, data=json.dumps(data))
-        return results.status_code
+
+
+
+        if results.headers:
+            return results.headers
+        else:
+            return results.status_code
 
     def delFromGroup(self, url, userid):
         delurl = '%s%s/members/%s' % (self.baseUrl, url, userid)
@@ -248,8 +256,16 @@ class gw:
     def addUserToGroup(self, grpdata):
         url = '%s%s/members' % (self.baseUrl, grpdata['url'])
         data = {'id': grpdata['id']}
-        add = self.session.post(url, data=json.dumps(data))
-        return add.status_code
+        response = self.session.post(url, data=json.dumps(data))
+        if response.text:
+            results = self.checkResponse(response)
+            if 'object' in results:
+                #print results
+                print response.headers
+                return response.headers
+
+
+
 
     def addUserToGroups(self, groups, userid):
         user = self.getObject(userid)
@@ -399,8 +415,11 @@ class gw:
         url = "%s%s/emailaddresses" % (self.baseUrl, userurl)
         response = self.session.get(url, timeout=5)
         emailAddrs = self.checkResponse(response)
-        addresses = "\n".join(emailAddrs['allowed'])
-        return addresses
+        try:
+            addresses = "\n".join(emailAddrs['allowed'])
+            return addresses
+        except:
+            return emailAddrs
 
     def updateUser(self, id, data):
         obj = self.getObject(id)
@@ -470,6 +489,46 @@ class gw:
             poList.append(podict)
         return poList
 
+    def getExtPolist(self):
+        poList = []
+        url = '%s/gwadmin-service/list/post_office?externalRecord=true' % self.baseUrl
+        response = self.session.get(url, timeout=5)
+        print response.text
+        objects = self.checkResponse(response)
+        for object in objects:
+            podict = {}
+            podict['name'] = object['name']
+            podict['url'] = object['@url']
+            podict['id'] = object['id']
+
+            if 'externalRecord' in object.keys():
+                podict['external'] = True
+            else:
+                podict['external'] = False
+            poList.append(podict)
+        return poList
+
+    def getPolist(self):
+        poList = []
+        url = '%s/gwadmin-service/list/post_office' % self.baseUrl
+        response = self.session.get(url, timeout=5)
+        objects = self.checkResponse(response)
+        for object in objects:
+            podict = {}
+            podict['name'] = object['name']
+            podict['url'] = object['@url']
+            podict['id'] = object['id']
+            if 'LDAP' in object['securitySettings']:
+                podict['ldap'] = True
+            else:
+                podict['ldap'] = False
+            if 'externalRecord' in object.keys():
+                podict['external'] = True
+            else:
+                podict['external'] = False
+            poList.append(podict)
+        return poList
+
     def getDomlist(self):
         domList = []
         url = '%s/gwadmin-service/list/domain' % self.baseUrl
@@ -492,10 +551,31 @@ class gw:
         name = data['name']
         response = self.session.post(url, data=json.dumps(data), timeout=5)
         if response.text:
-            return json.loads(response.text)
+            print json.loads(response.text)
+            #return json.loads(response.text)
+            return requests.headers
         else:
             return response.headers
 
+    def addExtUser(self, pourl, data):
+        url = '%s%s/users' % (self.baseUrl, pourl)
+        name = data['name']
+        response = self.session.post(url, data=json.dumps(data), timeout=5)
+        if response.text:
+            print json.loads(response.text)
+            #return json.loads(response.text)
+            return requests.headers
+        else:
+            return response.headers
+
+    def getExtUsers(self):
+        url = '%s/gwadmin-service/list/user?externalRecord=true' % self.baseUrl
+        #print url
+        response = self.session.get(url)
+        #print response.text
+        users = self.checkResponse(response)
+        print users
+        return users
     def dissociate(self, id):
         user = self.getObject(id)
         userurl = user['@url']
