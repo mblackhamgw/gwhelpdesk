@@ -19,6 +19,29 @@ def gwInit():
         return 1
 
 
+class AddExtUser(forms.Form):
+    try:
+        gw = gwInit()
+        pos = gw.getPolist()
+        pochoices = []
+        for po  in pos:
+            if 'externalRecord' in po.keys():
+
+                choice = (po['name'],po['name'])
+            pochoices.append(choice)
+
+        name = forms.CharField(max_length=64)
+        postOfficeName = forms.ChoiceField(choices=pochoices,required=True)
+        givenName = forms.CharField(max_length=64, required=False)
+        surname = forms.CharField(max_length=64, required=False)
+        prefemail = forms.CharField(max_length=128)
+
+        def clean(self):
+            data = self.cleaned_data
+
+    except:
+        print 'Init failed'
+
 class AddUser(forms.Form):
     try:
         gw = gwInit()
@@ -213,6 +236,60 @@ class UserDetails(forms.Form):
     preferredEmailId = forms.CharField(max_length=128, required=False)
     internetDomainNameOverride = forms.BooleanField(required=False)
     iDomainValue = forms.ChoiceField(choices=idomChoices, required=False)
+    iDomainExclusive = forms.BooleanField(required=False)
+
+class ExtUserDetails(forms.Form):
+    gw = gwInit()
+
+    visChoices = [
+        ('SYSTEM', 'System'),
+        ('DOMAIN', 'Domain'),
+        ('POST_OFFICE', 'Post Office'),
+        ('NONE', 'None')
+    ]
+
+    addrFormats = [
+        ('HOST', 'Username.PostOffice@InternetDomain'),
+        ('USER', ' Username@InternetDomain'),
+        ('FIRST_LAST', 'First.Last@InternetDomain'),
+        ('LAST_FIRST', 'Last.First@InternetDomain'),
+        ('FLAST', 'FirstInitialLastName@InternetDomain')
+    ]
+
+    name = forms.CharField(max_length=64)
+    givenName = forms.CharField(max_length=64, required=False)
+    surname = forms.CharField(max_length=64, required=False)
+    middleInitial = forms.CharField(max_length=12, required=False)
+    suffix = forms.CharField(max_length=64, required=False)
+    title = forms.CharField(max_length=64, required=False)
+    company = forms.CharField(max_length=61, required=False)
+    department = forms.CharField(max_length=64, required=False)
+    fileId = forms.CharField(max_length=3, required=False)
+    description = forms.CharField(max_length=256, required=False)
+    telephoneNumber = forms.CharField(max_length=24, required=False)
+    mobilePhoneNumber = forms.CharField(max_length=24, required=False)
+    homePhoneNumber = forms.CharField(max_length=24, required=False)
+    otherPhoneNumber = forms.CharField(max_length=24, required=False)
+    faxNumber = forms.CharField(max_length=24, required=False)
+    pagerNumber = forms.CharField(max_length=24, required=False)
+    streetAddress = forms.CharField(max_length=128, required=False)
+    postOfficeBox = forms.CharField(max_length=24, required=False)
+    city = forms.CharField(max_length=64, required=False)
+    stateProvince = forms.CharField(max_length=64, required=False)
+    postalZipCode = forms.CharField(max_length=16, required=False)
+    visibility = forms.ChoiceField(choices=visChoices)
+    location = forms.CharField(max_length=64, required=False)
+    allowedOverride = forms.BooleanField(required=False)
+    HOST = forms.BooleanField(required=False)
+    USER = forms.BooleanField(required=False)
+    FIRST_LAST = forms.BooleanField(required=False)
+    LAST_FIRST = forms.BooleanField(required=False)
+    FLAST = forms.BooleanField(required=False)
+    preferredAddressFormatValue = forms.ChoiceField(choices=addrFormats, required=False)
+    preferredAddressFormatInherited = forms.BooleanField(required=False)
+    preferredEmailId = forms.CharField(max_length=128, required=False)
+    internetDomainNameOverride = forms.BooleanField(required=False)
+    iDomainValue = forms.CharField(max_length=128, required=False)
     iDomainExclusive = forms.BooleanField(required=False)
 
 

@@ -10,6 +10,7 @@ from django.conf import settings
 import logging, os
 import logging.config
 from lib import gwlib
+from pprint import pprint
 
 from logging.handlers import RotatingFileHandler
 logging.getLogger("requests").setLevel(logging.WARNING)
@@ -104,37 +105,27 @@ def addgroup(request):
     polist = gw.getPolist()
     if request.method == "POST":
         form = AddGroup(request.POST)
-        name = request.POST['name']
-        postOfficeName = request.POST['postOfficeName']
-        visibility = request.POST['visibility']
-        data = {
-            'name': name,
-            'postOfficeName' : postOfficeName,
-            'visibility': visibility
-        }
-        addgrp = gw.addGroup(data)
-        if addgrp == 201:
-            allgroups = gw.getGroups()
-            for group in allgroups:
-                group['url'] = group['@url']
-            count = len(allgroups)
-            form = GroupList()
-            return render(request, 'helpdesk/grouplist.html', {'form': form, 'groups': allgroups, 'count': count})
+        if form.is_valid():
+            name = request.POST['name']
+            pourl = request.POST['pourl']
+            visibility = request.POST['visibility']
+            data = {
+                'name': name,
+                #
+                'visibility': visibility
+            }
 
-        return render(request, 'helpdesk/addgroup.html', {'form': form, 'polist': polist})
-    else:
-        groupnumber = gw.objectCount('group')
-        if groupnumber != 0:
-            allgroups = gw.getGroups()
-            for group in allgroups:
-                group['url'] = group['@url']
-            count = len(allgroups)
-            form = AddGroup()
-            return render(request, 'helpdesk/addgroup.html', {'form': form, 'polist': polist })
-
+            addgrp = gw.addGroup(data, pourl)
+            return render(request, 'helpdesk/groupdetails.html', {'form': form}, {'group'': grpdata'})
         else:
             form = AddGroup()
-            return render(request, 'helpdesk/addgroup.html', {'form': form, 'polist': polist})
+            return render(request, 'helpdesk/groupdetails.html', {'form': form})
+    else:
+        form = AddGroup
+        return render(request, 'helpdesk/addgroup.html', {'form': form, 'polist': polist})
+
+
+
 
 
 def addgrpmember(request):
@@ -170,7 +161,7 @@ def addgrpmember(request):
             addtogrp = gw.addUserToGroup(data)
             if addtogrp == 201:
                 log(request, 'Added %s to Group %s' % (username, grpname))
-                return HttpResponseRedirect(reverse('grouplist'))
+                return HttpResponseRedirect(reverse('groupdetails'))
             else:
                 members = gw.getGroupMembers(url)
                 form = GroupDetails()
@@ -310,6 +301,63 @@ def addtogroups(request):
     else:
         return render(request, 'helpdesk/addtogroups.html', {'groups': groups})
 
+def extuserlist(request):
+    gw = gwInit()
+    userlist = gw.getExtUsers()
+    usercount = len(userlist)
+    return render(request, 'helpdesk/userlist.html', {'users': userlist, 'usercount': usercount})
+
+def addextuser(request):
+    gw = gwInit()
+    polist = gw.getExtPolist()
+    if request.method == "POST":
+        form = AddExtUser(request.POST)
+        print request.POST
+        if form.is_valid():
+            #
+            #print cd
+            po = request.POST['postOfficeName']
+            for postoffice in polist:
+                if po == postoffice['name']:
+                    pourl = postoffice['url']
+                    externalpo = postoffice['external']
+            name = request.POST['name']
+            givenName = request.POST['givenName']
+            surname = request.POST['surname']
+            postdata = {}
+            postdata['name'] = name
+            postdata['givenName'] = givenName
+            postdata['surname'] = surname
+
+            retvalues = gw.addUser(pourl, postdata)
+
+            if 'error' in retvalues.keys():
+                messages.add_message(request, messages.ERROR,retvalues['statusMsg'])
+            else:
+                if 'location' in retvalues:
+                    log(request, 'GroupWise User %s added to %s' % (name, po))
+                    userData = gw.getObjectByUrl(retvalues['location'])
+                    request.session['id'] = userData['id']
+                    addressFormats = gw.addrFormats()
+                    emailAddrs = gw.userAddresses(userData['@url'])
+                    ldap = gw.checkPoLdap(userData['postOfficeName'])
+                    if (ldap == 1) and 'ldapDn' in userData.keys():
+                        userData['ldap'] = 'true'
+                    else:
+                        userData['ldap'] = 'false'
+                    form = UserDetails()
+                    return render(request, 'helpdesk/userdata.html',
+                                  {'form': form, 'user': userData, 'addressFormats': addressFormats,
+                                   'emailAddrs': emailAddrs})
+
+
+
+    #print polist
+        return render(request, 'helpdesk/addextuser.html', {'form': form, 'polist': polist})
+
+    else:
+        form = AddExtUser()
+        return render(request, 'helpdesk/addextuser.html', {'form': form, 'polist': polist})
 
 
 def adduser(request):
@@ -320,13 +368,19 @@ def adduser(request):
         form = AddUser(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            pwd = cd['password']
-            pwd2 = cd['password2']
+            if 'password' in cd:
+                print cd['password']
+                pwd = cd['password']
+                pwd2 = cd['password2']
+            else:
+                pwd = None
+                pwd2 = None
             po = cd['postOfficeName']
             for postoffice in polist:
                 if po == postoffice['name']:
                     pourl = postoffice['url']
                     externalpo = postoffice['external']
+                    print externalpo
             name = cd['name']
             givenName = cd['givenName']
             surname = cd ['surname']
@@ -509,6 +563,7 @@ def groupdetails(request):
         request.session['id'] = id
         request.session['name'] = name
         request.session['url'] = url
+        groupdata['url'] = url
         if 'general' in request.POST:
             description = request.POST['description']
             visibility = request.POST['visibility']
@@ -627,6 +682,7 @@ def groupdetails(request):
             request.session['name'] = name
             groupdata = gw.getGroup(id)
             delmember = gw.delFromGroup(groupdata['@url'], request.POST['memberid'])
+            print delmember
             if delmember == int(200):
                 log(request, 'Removed %s from group %s' % (request.POST['memberid'], name))
             idoms = gw.iDomains()
@@ -1024,6 +1080,7 @@ def move(request):
             po = str(postoffice['url']).split('/')[5]
             poid = 'POST_OFFICE.%s.%s' % (dom, po)
             postoffice['id'] = poid
+
         return render(request, 'helpdesk/move.html', {'form': form, 'polist': polist})
 
 def nicknames(request):
@@ -1145,6 +1202,9 @@ def searchresults(request):
 
 def updatedata(formdata, uid, allowed):
 
+    print formdata
+
+
     addressFormats = ['HOST','USER','FIRST_LAST','LAST_FIRST','FLAST']
     gwkeys= [
 
@@ -1178,7 +1238,11 @@ def updatedata(formdata, uid, allowed):
     userAllowedValues = user['allowedAddressFormats']['value']
     changedData = {}
     for key in gwkeys:
-        changedData[key] = formdata[key]
+        if key in formdata.keys():
+            changedData[key] = formdata[key]
+        else:
+            break
+
     allowedAddressFormats = {}
     internetDomainName = {}
     preferredAddressFormat = {}
@@ -1210,6 +1274,8 @@ def updatedata(formdata, uid, allowed):
         changedData['preferredEmailId'] = ""
         if 'preferredAddressFormat' in user.keys():
             preferredAddressFormat['value'] = user['preferredAddressFormat']['value']
+        else:
+            preferredAddressFormat['value'] = 'FIRST'
 
     allowedAddressFormats['value'] = values
     changedData['preferredAddressFormat'] = preferredAddressFormat
@@ -1248,6 +1314,7 @@ def userdata(request):
                 request.session['id'] = cd['id']
                 request.session['name'] = cd['name']
                 userData = gw.getObject(gwid)
+                #print userData
                 request.session['poname'] = userData['postOfficeName']
                 emailAddrs = gw.userAddresses(userData['@url'])
                 ldap = gw.checkPoLdap(userData['postOfficeName'])
@@ -1315,6 +1382,73 @@ def userdata(request):
         form = u
     return render(request, 'helpdesk/userdata.html')
 
+def extuserdata(request):
+    gw = gwInit()
+    idoms = gw.iDomains()
+    idomChoices = []
+    for idom in idoms:
+        choice = (idom, idom)
+        idomChoices.append(choice)
+    groups = gw.getGroups()
+    addressFormats = gw.addrFormats()
+    if request.method == "POST":
+        if 'edit' in request.POST:
+            if 'id' in request.session.keys():
+                del request.session['id']
+            form = SearchResults(request.POST)
+            if form.is_valid():
+                cd = form.cleaned_data
+                gwid = cd['id']
+                request.session['id'] = cd['id']
+                request.session['name'] = cd['name']
+                userData = gw.getObject(gwid)
+                #print userData
+                request.session['poname'] = userData['postOfficeName']
+                emailAddrs = gw.userAddresses(userData['@url'])
+                userData['ldap'] = 'false'
+                form = ExtUserDetails()
+                return render(request, 'helpdesk/extuserdata.html',
+                              {'form': form, 'user': userData, 'addressFormats': addressFormats,
+                               'emailAddrs': emailAddrs, 'idomains': idomChoices})
+
+        elif 'delete' in request.POST:
+            request.session.header = "GroupWise User deleted"
+            form = SearchResults(request.POST)
+            if form.is_valid():
+                cd = form.cleaned_data
+                id = cd['id']
+                request.session['id'] = id
+                deluser = gw.delUser(id)
+                if deluser != 0:
+                    messages.add_message(request, messages.WARNING, "Delete Pending for %s" % id)
+                else:
+                    messages.add_message(request, messages.INFO, "User: %s deleted" % id)
+                parts = id.split('.')
+                log(request, 'GroupWise User %s deleted '% parts[3])
+                return render(request, 'helpdesk/deluser.html')
+
+
+        elif 'update' in request.POST:
+
+            uid = request.session['id']
+            form = ExtUserDetails(request.POST)
+            if form.is_valid():
+                userstuff = form.cleaned_data
+                allowed = gw.userFormats(uid)
+                from pprint import pprint
+                #pprint(userstuff)
+                userDict = updatedata(userstuff, uid, allowed)
+                log(request, 'Updated GroupWise settings for user: %s' % request.POST['name'])
+                newData = gw.updateUser(uid, userDict)
+                emailAddrs = gw.userAddresses(newData['@url'])
+                newData['ldap'] = 'false'
+                form = ExtUserDetails()
+                return render(request, 'helpdesk/extuserdata.html',
+                              {'form': form, 'user': newData, 'addressFormats': addressFormats,})
+        else:
+            form = u
+        return render(request, 'helpdesk/extuserdata.html')
+
 def userlist(request):
     request.session.header = 'GroupWise Users'
     gw = gwInit()
@@ -1353,9 +1487,11 @@ def userlist(request):
             else:
                 userData['ldap'] = 'false'
             form = UserDetails()
+
+
             return render(request, 'helpdesk/userdata.html',
-                          {'form': form, 'user': userData, 'addressFormats': addressFormats,
-                           'emailAddrs': emailAddrs})
+                              {'form': form, 'user': userData, 'addressFormats': addressFormats,
+                               'emailAddrs': emailAddrs})
     else:
         userlist = gw.pageUsers(0)
 

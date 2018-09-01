@@ -16,13 +16,15 @@ class GWSettings(models.Model):
 class Admin(models.Model):
     REQUIRED_FIELDS = ('username','role')
     ADMIN = 'AD'
-    HELPDESK = "HD"
-    HELPDESKLITE = "HL"
-    PASSWORD = "PW"
+    HELPDESK = 'HD'
+    HELPDESKLITE = 'HL'
+    PASSWORD = 'PW'
+    ADDRBOOK = 'AB'
     roleChoices = (
         (ADMIN, 'Administrator'),
         (HELPDESK, 'Helpdesk'),
         (HELPDESKLITE, 'Helpdesk Lite'),
+        (ADDRBOOK, 'Address Book'),
         (PASSWORD, 'Password'),
     )
     #USERNAME_FIELD = models.CharField(max_length=64)
