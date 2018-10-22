@@ -148,20 +148,47 @@ def addgrpmember(request):
                               {'users': userlist['userList'], 'firstset': firstset, 'usercount': usercount})
 
         elif 'add' in request.POST:
+            print "got to add"
             userid = request.POST['id']
             username = request.POST['name']
             grpid = request.POST['grpid']
             grpname = request.POST['grpname']
-            url = request.POST['url']
 
+
+            group = gw.getObject(grpid)
+            print '------'
+            print 'views 160 '
+            pprint(group)
+            #print userid
+            #print username
+            #print grpid
+            #print grpname
+            url = group['@url']
             data = {
                 'id': userid,
                 'url': url,
             }
             addtogrp = gw.addUserToGroup(data)
+
+            print '++++++++'
+
+            print 'veiw 179 %s' % addtogrp
             if addtogrp == 201:
                 log(request, 'Added %s to Group %s' % (username, grpname))
-                return HttpResponseRedirect(reverse('groupdetails'))
+                members = gw.getGroupMembers(url)
+                form = GroupDetails()
+                groupdata = gw.getGroup(id)
+                emailAddrs = gw.userAddresses(url)
+                idoms = gw.iDomains()
+                idomChoices = []
+                for idom in idoms:
+                    choice = (idom, idom)
+                    idomChoices.append(choice)
+                addressFormats = gw.addrFormats()
+                return render(request, 'helpdesk/groupdetails.html',
+                              {'form': form, 'group': groupdata, 'members': members,
+                               'addressFormats': addressFormats,
+                               'emailAddrs': emailAddrs, 'idomains': idomChoices})
             else:
                 members = gw.getGroupMembers(url)
                 form = GroupDetails()
@@ -552,6 +579,8 @@ def groupdetails(request):
         idomChoices.append(choice)
     addressFormats = gw.addrFormats()
     if request.method == "POST":
+
+        #pprint(request.POST)
         form = GroupList(request.POST)
         id = request.POST['id']
         name = request.POST['name']
@@ -674,6 +703,48 @@ def groupdetails(request):
                 return render(request, 'helpdesk/groupdetails.html', {'form': form, 'group': groupdata, 'members': members,
                                         'addressFormats': addressFormats,
                                         'emailAddrs': emailAddrs,'idomains': idomChoices} )
+
+
+        elif 'addmember' in request.POST:
+
+            print 'got to addmember'
+
+            gw = gwInit()
+            addressFormats = gw.addrFormats()
+            polist = gw.getPolist()
+            usercount = gw.getUserCount()
+            if request.method == "POST":
+                if 'next' in request.POST:
+                    nextId = request.POST['nextid']
+                    userlist = gw.pageUsers(nextId)
+                    if int(userlist['nextId']) > 1:
+                        firstset = False
+                        return render(request, 'helpdesk/addgrpmember.html',
+                                      {'users': userlist['userList'], 'nextid': userlist['nextId'],
+                                       'firstset': firstset,
+                                       'usercount': usercount})
+                    else:
+                        firstset = True
+                        return render(request, 'helpdesk/addgrpmember.html',
+                                      {'users': userlist['userList'], 'firstset': firstset, 'usercount': usercount})
+                    print userlist
+                elif 'add' in request.POST:
+                    print "got to add"
+
+
+                    u
+                else:
+                    return render(request, 'helpdesk/addgrpmember.html',
+                                  {'users': userlist['userList'], 'firstset': firstset, 'usercount': usercount})
+
+            return render(request, 'helpdesk/addgrpmember.html')
+
+
+                          ##{'form': form, 'group': groupdata, 'members': members,
+                           #                                       'addressFormats': addressFormats,
+                            #                                      'emailAddrs': emailAddrs, 'idomains': idomChoices})
+
+
 
         elif 'deletemember' in request.POST:
             id = request.POST['id']
@@ -1436,7 +1507,9 @@ def extuserdata(request):
                 userstuff = form.cleaned_data
                 allowed = gw.userFormats(uid)
                 from pprint import pprint
-                #pprint(userstuff)
+
+
+                #print(userstuff)
                 userDict = updatedata(userstuff, uid, allowed)
                 log(request, 'Updated GroupWise settings for user: %s' % request.POST['name'])
                 newData = gw.updateUser(uid, userDict)
